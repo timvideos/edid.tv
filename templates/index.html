@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EDID Database</title>
+</head>
+<body>
+{% block content %}
+<div>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Upload your EDID file:</p>
+        <input type="file" name="edid_file">
+        <input type="submit" name="submit" value="Upload!">
+    </form>
+</div>
+<div>
+    <ul>
+        {% for edid in edids %}
+        <li>{{ edid.manufacturer_name_id }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+</body>
+</html>
