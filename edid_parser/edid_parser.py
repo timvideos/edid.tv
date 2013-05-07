@@ -10,19 +10,30 @@ import struct
 class EDID_Parser(object):
     edid = None
     data = {}
+    successed = False
+    error = ""
 
-    def __init__(self, bin_data):
+    def __init__(self, bin_data=None):
         """
         Preparing settings
 
         """
 
+        if bin_data:
+            self.parse(bin_data)
+
+
+    def parse(self, bin_data):
         self.edid = struct.unpack("b" * 128, bin_data)
 
-        if sum(bytearray([chr(x & 0xff) for x in self.edid])) % 256 == 0:
-            print "Checksum passed!"
-        else:
-            print "Currupt EDID file!"
+        #Check EDID header
+        if not [x & 0xff for x in self.edid[0:8]] == [0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00]:
+            self.error = "Input is not an EDID file."
+            successed = False
+
+        if not sum(bytearray([chr(x & 0xff) for x in self.edid])) % 256 == 0:
+            self.error = "Checksum is currupt."
+            successed = False
 
         self.parse_header()
         self.data['Basic_display_parameters'] = self.parse_basic_display()
@@ -31,14 +42,10 @@ class EDID_Parser(object):
         self.data['Standard_Timings'] = self.parse_standard_timings()
         self.data['Descriptors'] = self.parse_descriptors()
 
+        successed = True
+
 
     def parse_header(self):
-        #Check EDID header
-        if [x & 0xff for x in self.edid[0:8]] == [0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00]:
-            print "This is indeed EDID file!"
-        else:
-            print "Header is currupt!"
-
         #ID Manufacturer Name: edid[8:10]
         if (self.edid[8] >> 7 == 0):
             first = (self.edid[8] & 0b01111100) >> 2
@@ -47,7 +54,8 @@ class EDID_Parser(object):
 
             self.data['ID_Manufacturer_Name'] = chr(first + 64) + chr(second + 64) + chr(third + 64)
         else:
-            print "ID Manufacturer Name field is currupt!"
+            self.error = "ID Manufacturer Name field is currupt."
+            successed = False
 
 
         #ID Product Code: edid[10:12]
@@ -60,6 +68,10 @@ class EDID_Parser(object):
         self.data['Year_of_manufacture'] = self.edid[17] + 1990
         self.data['EDID_version'] = self.edid[18]
         self.data['EDID_revision'] = self.edid[19]
+
+        if (self.data['EDID_version'], self.data['EDID_revision']) not in [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (2, 0)]:
+            print "EDID version %d.%d is invalid." % (self.data['EDID_version'], self.data['EDID_revision'])
+
         self.data['Extension_Flag'] = self.edid[126]
 
 
