@@ -5,7 +5,6 @@ http://en.wikipedia.org/wiki/Extended_display_identification_data
 http://read.pudn.com/downloads110/ebook/456020/E-EDID%20Standard.pdf
 """
 
-#import sys
 import struct
 
 class EDID_Parser(object):
@@ -289,8 +288,11 @@ class EDID_Parser(object):
 
 
 if __name__ == "__main__":
-    with open('toshiba.edid', 'rb') as file:
+    import sys
+    import pprint
+
+    with open(sys.argv[1], 'rb') as file:
         bin_data = file.read()
 
     my_edid = EDID_Parser(bin_data)
-    print my_edid.data
+    print pprint.pprint(my_edid.data)
