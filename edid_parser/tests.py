@@ -37,6 +37,48 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(self.parser.data['EDID_version'], 1)
         self.assertEqual(self.parser.data['EDID_revision'], 3)
 
+    def test_standard_timings(self):
+        self.parser.data['EDID_version'] = 1
+        self.parser.data['EDID_reversion'] = 3
+        test_edid = [0x81, 0x3C, 0x45, 0x7C, 0x81, 0x80, 0x8B, 0xC0, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
+        data = self.parser.parse_standard_timings(test_edid)
+
+        self.assertEqual(len(data), 4)
+
+        self.assertEqual(data['Identification_1']['Horizontal_active_pixels'], 1280)
+        self.assertEqual(data['Identification_1']['Vertical_active_pixels'], 800)
+        self.assertEqual(data['Identification_1']['Image_aspect_ratio'], (16, 10))
+        self.assertEqual(data['Identification_1']['Refresh_Rate'], 120)
+
+        self.assertEqual(data['Identification_2']['Horizontal_active_pixels'], 800)
+        self.assertEqual(data['Identification_2']['Vertical_active_pixels'], 600)
+        self.assertEqual(data['Identification_2']['Image_aspect_ratio'], (4, 3))
+        self.assertEqual(data['Identification_2']['Refresh_Rate'], 120)
+
+        self.assertEqual(data['Identification_3']['Horizontal_active_pixels'], 1280)
+        self.assertEqual(data['Identification_3']['Vertical_active_pixels'], 1024)
+        self.assertEqual(data['Identification_3']['Image_aspect_ratio'], (5, 4))
+        self.assertEqual(data['Identification_3']['Refresh_Rate'], 60)
+
+        self.assertEqual(data['Identification_4']['Horizontal_active_pixels'], 1360)
+        self.assertEqual(data['Identification_4']['Vertical_active_pixels'], 765)
+        self.assertEqual(data['Identification_4']['Image_aspect_ratio'], (16, 9))
+        self.assertEqual(data['Identification_4']['Refresh_Rate'], 60)
+
+        #Note: EDID structures prior to Version 1 Revision 3 defined the bit combination of 0 0
+        # to indicate a 1:1 aspect ratio
+        self.parser.data['EDID_version'] = 1
+        self.parser.data['EDID_reversion'] = 2
+        test_edid = [0x81, 0x3C, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
+        data = self.parser.parse_standard_timings(test_edid)
+
+        self.assertEqual(len(data), 1)
+
+        self.assertEqual(data['Identification_1']['Horizontal_active_pixels'], 1280)
+        self.assertEqual(data['Identification_1']['Vertical_active_pixels'], 1280)
+        self.assertEqual(data['Identification_1']['Image_aspect_ratio'], (1, 1))
+        self.assertEqual(data['Identification_1']['Refresh_Rate'], 120)
+
 class EDIDInvalidTest(EDIDTest):
     """EDID Parser tests with invalid input."""
 

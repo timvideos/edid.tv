@@ -213,29 +213,27 @@ class EDID_Parser(object):
 
         new_data = {}
 
-        #Note: EDID structures prior to Version 1 Revision 3 defined the bit combination of 0 0
-        # to indicate a 1:1 aspect ratio
-
         for i in range(0, 15, 2):
-            #Check if the field is not unused (value 01)
-            if (edid[i] & 0xff) is not 0b01:
+            #Check if the field is not unused (both bytes are 0b01)
+            if (edid[i] & 0xff) is not 0b01 and (edid[i + 1] & 0xff) is not 0b01:
                 id = {}
-                id['X_Resolution'] = (((edid[i] & 0xff) + 31) * 8)
-
-                #Y Resolution should be calculated using the aspect ratio below
-                #Shouldn't we do that here?
-
-                id['Image_Aspect_ratio'] = ((edid[i + 1] & 0xff) & 0b11000000) >> 6
-#                if (id['Image_Aspect_ratio'] == 0b00):
-#                    id['Image_Aspect_ratio'] = "16:10"
-#                elif (id['Image_Aspect_ratio'] == 0b01):
-#                    id['Image_Aspect_ratio'] = "4:3"
-#                elif (id['Image_Aspect_ratio'] == 0b10):
-#                    id['Image_Aspect_ratio'] = "5:4"
-#                elif (id['Image_Aspect_ratio'] == 0b11):
-#                    id['Image_Aspect_ratio'] = "16:9"
-
+                id['Horizontal_active_pixels'] = (((edid[i] & 0xff) + 31) * 8)
                 id['Refresh_Rate'] = ((edid[i + 1] & 0xff) & 0b00111111) + 60
+
+                id['Image_aspect_ratio'] = ((edid[i + 1] & 0xff) & 0b11000000) >> 6
+                if id['Image_aspect_ratio'] == 0b00:
+                    if (self.data['EDID_version'] <= 1) and (self.data['EDID_reversion'] < 3):
+                        id['Image_aspect_ratio'] = (1, 1)
+                    else:
+                        id['Image_aspect_ratio'] = (16, 10)
+                elif id['Image_aspect_ratio'] == 0b01:
+                    id['Image_aspect_ratio'] = (4, 3)
+                elif id['Image_aspect_ratio'] == 0b10:
+                    id['Image_aspect_ratio'] = (5, 4)
+                elif id['Image_aspect_ratio'] == 0b11:
+                    id['Image_aspect_ratio'] = (16, 9)
+
+                id['Vertical_active_pixels'] = ((id['Horizontal_active_pixels'] * id['Image_aspect_ratio'][1]) / id['Image_aspect_ratio'][0])
 
                 new_data['Identification_%d' % ((i / 2) + 1)] = id
 
