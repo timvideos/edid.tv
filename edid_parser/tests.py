@@ -37,6 +37,28 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(self.parser.data['EDID_version'], 1)
         self.assertEqual(self.parser.data['EDID_revision'], 3)
 
+    def test_established_timings(self):
+        test_edid = [0b10101010, 0b10101010]
+        data = self.parser.parse_established_timings(test_edid)
+
+        self.assertTrue(data['720x400@70Hz'])
+        self.assertFalse(data['720x400@88Hz'])
+        self.assertTrue(data['640x480@60Hz'])
+        self.assertFalse(data['640x480@67Hz'])
+        self.assertTrue(data['640x480@72Hz'])
+        self.assertFalse(data['640x480@75Hz'])
+        self.assertTrue(data['800x600@56Hz'])
+        self.assertFalse(data['800x600@60Hz'])
+
+        self.assertTrue(data['800x600@72Hz'])
+        self.assertFalse(data['800x600@75Hz'])
+        self.assertTrue(data['832x624@75Hz'])
+        self.assertFalse(data['1024x768@87Hz'])
+        self.assertTrue(data['1024x768@60Hz'])
+        self.assertFalse(data['1024x768@70Hz'])
+        self.assertTrue(data['1024x768@75Hz'])
+        self.assertFalse(data['1280x1024@75Hz'])
+
     def test_standard_timings(self):
         self.parser.data['EDID_version'] = 1
         self.parser.data['EDID_reversion'] = 3

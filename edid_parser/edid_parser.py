@@ -183,25 +183,23 @@ class EDID_Parser(object):
 
         new_data = {}
 
-        new_data['720x400@70Hz'] = ((edid[0] & 0xff) & 0b10000000) >> 7
-        new_data['720x400@88Hz'] = ((edid[0] & 0xff) & 0b01000000) >> 6
-        new_data['640x480@60Hz'] = ((edid[0] & 0xff) & 0b00100000) >> 5
-        new_data['640x480@67Hz'] = ((edid[0] & 0xff) & 0b00010000) >> 4
-        new_data['640x480@72Hz'] = ((edid[0] & 0xff) & 0b00001000) >> 3
-        new_data['640x480@75Hz'] = ((edid[0] & 0xff) & 0b00000100) >> 2
-        new_data['800x600@56Hz'] = ((edid[0] & 0xff) & 0b00000010) >> 1
-        new_data['800x600@60Hz'] = (edid[0] & 0xff) & 0b00000001
+        new_data['720x400@70Hz'] = (edid[0] & 0b10000000) >> 7
+        new_data['720x400@88Hz'] = (edid[0] & 0b01000000) >> 6
+        new_data['640x480@60Hz'] = (edid[0] & 0b00100000) >> 5
+        new_data['640x480@67Hz'] = (edid[0] & 0b00010000) >> 4
+        new_data['640x480@72Hz'] = (edid[0] & 0b00001000) >> 3
+        new_data['640x480@75Hz'] = (edid[0] & 0b00000100) >> 2
+        new_data['800x600@56Hz'] = (edid[0] & 0b00000010) >> 1
+        new_data['800x600@60Hz'] = edid[0] & 0b00000001
 
-        new_data['800x600@72Hz'] = ((edid[1] & 0xff) & 0b10000000) >> 7
-        new_data['800x600@75Hz'] = ((edid[1] & 0xff) & 0b01000000) >> 6
-        new_data['832x624@75Hz'] = ((edid[1] & 0xff) & 0b00100000) >> 5
-        new_data['1024x768@87Hz'] = ((edid[1] & 0xff) & 0b00010000) >> 4
-        new_data['1024x768@60Hz'] = ((edid[1] & 0xff) & 0b00001000) >> 3
-        new_data['1024x768@70Hz'] = ((edid[1] & 0xff) & 0b00000100) >> 2
-        new_data['1024x768@75Hz'] = ((edid[1] & 0xff) & 0b00000010) >> 1
-        new_data['1280x1024@75Hz'] = (edid[1] & 0xff) & 0b00000001
-
-        new_data['1152x870@75Hz'] = ((edid[2] & 0xff) & 0b10000000) >> 7
+        new_data['800x600@72Hz'] = (edid[1] & 0b10000000) >> 7
+        new_data['800x600@75Hz'] = (edid[1] & 0b01000000) >> 6
+        new_data['832x624@75Hz'] = (edid[1] & 0b00100000) >> 5
+        new_data['1024x768@87Hz'] = (edid[1] & 0b00010000) >> 4
+        new_data['1024x768@60Hz'] = (edid[1] & 0b00001000) >> 3
+        new_data['1024x768@70Hz'] = (edid[1] & 0b00000100) >> 2
+        new_data['1024x768@75Hz'] = (edid[1] & 0b00000010) >> 1
+        new_data['1280x1024@75Hz'] = edid[1] & 0b00000001
 
         return new_data
 
