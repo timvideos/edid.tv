@@ -137,21 +137,19 @@ class EDID_Parser(object):
 
 
     def parse_chromaticity(self, edid):
-        """Parses "Color Characteristics"
+        """Parses "Chromaticity"
 
         edid is list of bytes 25 (19h) to 34 (22h)"""
 
-        new_data = {}
-
         #Extract low bits
-        Red_low_x = ((edid[0] & 0xff) & 0b11000000) >> 6
-        Red_low_y = ((edid[0] & 0xff) & 0b00110000) >> 4
-        Green_low_x = ((edid[0] & 0xff) & 0b00001100) >> 2
-        Green_low_y = (edid[0] & 0xff) & 0b00000011
-        Blue_low_x = ((edid[1] & 0xff) & 0b11000000) >> 6
-        Blue_low_y = ((edid[1] & 0xff) & 0b00110000) >> 4
-        White_low_x = ((edid[1] & 0xff) & 0b00001100) >> 2
-        White_low_y = (edid[1] & 0xff) & 0b00000011
+        Red_low_x = (edid[0] & 0b11000000) >> 6
+        Red_low_y = (edid[0] & 0b00110000) >> 4
+        Green_low_x = (edid[0] & 0b00001100) >> 2
+        Green_low_y = edid[0] & 0b00000011
+        Blue_low_x = (edid[1] & 0b11000000) >> 6
+        Blue_low_y = (edid[1] & 0b00110000) >> 4
+        White_low_x = (edid[1] & 0b00001100) >> 2
+        White_low_y = edid[1] & 0b00000011
 
         #Get the rest of the bits
         Red_high_x = edid[2] & 0xff
@@ -164,6 +162,7 @@ class EDID_Parser(object):
         White_high_y = edid[9] & 0xff
 
         #Combine all bits and convert them to decimal fractions
+        new_data = {}
         new_data['Red_x'] = ((Red_high_x << 2) + Red_low_x) / 2.0**10
         new_data['Red_y'] = ((Red_high_y << 2) + Red_low_y) / 2.0**10
         new_data['Green_x'] = ((Green_high_x << 2) + Green_low_x) / 2.0**10

@@ -37,6 +37,19 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(self.parser.data['EDID_version'], 1)
         self.assertEqual(self.parser.data['EDID_revision'], 3)
 
+    def test_chromaticity(self):
+        test_edid = [0xF0, 0x9D, 0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47, 0x4A]
+        data = self.parser.parse_chromaticity(test_edid)
+
+        self.assertEqual(data['Red_x'], 0.6396484375)
+        self.assertEqual(data['Red_y'], 0.3349609375)
+        self.assertEqual(data['Green_x'], 0.28515625)
+        self.assertEqual(data['Green_y'], 0.60546875)
+        self.assertEqual(data['Blue_x'], 0.150390625)
+        self.assertEqual(data['Blue_y'], 0.0595703125)
+        self.assertEqual(data['White_x'], 0.2802734375)
+        self.assertEqual(data['White_y'], 0.2900390625)
+
     def test_established_timings(self):
         test_edid = [0b10101010, 0b10101010]
         data = self.parser.parse_established_timings(test_edid)
