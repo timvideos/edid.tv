@@ -1,11 +1,14 @@
 import unittest
-from edid_parser import EDID_Parser, EDIDParsingError
+from edid_parser import EDID_Parser, EDIDParsingError, Display_Type
 
 class EDIDTest(unittest.TestCase):
     """Base class for EDID Parser tests."""
 
     def setUp(self):
         self.parser = EDID_Parser()
+        #Assuming version 1.3 by default
+        self.parser.data['EDID_version'] = 1
+        self.parser.data['EDID_reversion'] = 3
 
 class EDIDValidTest(EDIDTest):
     """EDID Parser tests with valid input."""
@@ -36,6 +39,52 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(self.parser.data['ID_Serial_Number'], 16843009)
         self.assertEqual(self.parser.data['EDID_version'], 1)
         self.assertEqual(self.parser.data['EDID_revision'], 3)
+
+    def test_basic_display(self):
+        test_edid = [0b10000000, 0x59, 0x32, 0x78, 0b00001010]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertTrue(data['Video_Input'])
+        self.assertFalse(data['Video_Input_DFP_1'])
+
+        self.assertEqual(data['Max_Horizontal_Image_Size'], 89)
+        self.assertEqual(data['Max_Vertical_Image_Size'], 50)
+
+        self.assertEqual(data['Display_Gamma'], 2.2)
+
+        self.assertFalse(data['Feature_Support']['Standby'])
+        self.assertFalse(data['Feature_Support']['Suspend'])
+        self.assertFalse(data['Feature_Support']['Active-off'])
+        self.assertFalse(data['Feature_Support']['Standard-sRGB'])
+        self.assertTrue(data['Feature_Support']['Preferred_Timing_Mode'])
+        self.assertFalse(data['Feature_Support']['Default_GTF'])
+
+        self.assertEqual(data['Feature_Support']['Display_Type'], Display_Type.RGB_color)
+
+        test_edid = [0b01011111, 0x78, 0x44, 0x99, 0b11110111]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertFalse(data['Video_Input'])
+        self.assertEqual(data['Signal_Level_Standard'], (1.000, 0.400))
+        self.assertTrue(data['Blank-to-black_setup'])
+        self.assertTrue(data['Separate_syncs'])
+        self.assertTrue(data['Composite_sync'])
+        self.assertTrue(data['Sync_on_green_video'])
+        self.assertTrue(data['Vsync_serration'])
+
+        self.assertEqual(data['Max_Horizontal_Image_Size'], 120)
+        self.assertEqual(data['Max_Vertical_Image_Size'], 68)
+
+        self.assertEqual(data['Display_Gamma'], 2.53)
+
+        self.assertTrue(data['Feature_Support']['Standby'])
+        self.assertTrue(data['Feature_Support']['Suspend'])
+        self.assertTrue(data['Feature_Support']['Active-off'])
+        self.assertTrue(data['Feature_Support']['Standard-sRGB'])
+        self.assertTrue(data['Feature_Support']['Preferred_Timing_Mode'])
+        self.assertTrue(data['Feature_Support']['Default_GTF'])
+
+        self.assertEqual(data['Feature_Support']['Display_Type'], Display_Type.Non_RGB_color)
 
     def test_chromaticity(self):
         test_edid = [0xF0, 0x9D, 0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47, 0x4A]
@@ -73,8 +122,6 @@ class EDIDValidTest(EDIDTest):
         self.assertFalse(data['1280x1024@75Hz'])
 
     def test_standard_timings(self):
-        self.parser.data['EDID_version'] = 1
-        self.parser.data['EDID_reversion'] = 3
         test_edid = [0x81, 0x3C, 0x45, 0x7C, 0x81, 0x80, 0x8B, 0xC0, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
         data = self.parser.parse_standard_timings(test_edid)
 

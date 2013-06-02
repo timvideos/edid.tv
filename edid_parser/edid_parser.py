@@ -7,6 +7,12 @@ http://read.pudn.com/downloads110/ebook/456020/E-EDID%20Standard.pdf
 
 import struct
 
+class Display_Type:
+    Monochrome = 0b00
+    RGB_color = 0b01
+    Non_RGB_color = 0b10
+    Undefined = 0b11
+
 class EDID_Parser(object):
     def __init__(self, bin_data=None):
         """
@@ -100,38 +106,52 @@ class EDID_Parser(object):
 
         new_data = {}
 
-        new_data['Video_Input'] = (edid[0] & 0xff) >> 7
+        new_data['Video_Input'] = edid[0] >> 7
+        #Analog Input
         if new_data['Video_Input'] == 0:
-            new_data['Signal_Level_Standard'] = ((edid[0] & 0xff) & 0b01100000) >> 5
-            if (new_data['Signal_Level_Standard'] == 0b00):
+            signal_level_standard = (edid[0] & 0b01100000) >> 5
+            if signal_level_standard == 0b00:
                 new_data['Signal_Level_Standard'] = (0.700, 0.300)
-            elif (new_data['Signal_Level_Standard'] == 0b01):
+            elif signal_level_standard == 0b01:
                 new_data['Signal_Level_Standard'] = (0.714, 0.286)
-            elif (new_data['Signal_Level_Standard'] == 0b10):
+            elif signal_level_standard == 0b10:
                 new_data['Signal_Level_Standard'] = (1.000, 0.400)
-            elif (new_data['Signal_Level_Standard'] == 0b11):
+            elif signal_level_standard == 0b11:
                 new_data['Signal_Level_Standard'] = (0.700, 0.000)
 
-            new_data['Blank-to-black_setup'] = ((edid[0] & 0xff) & 0b00010000) >> 4
-            new_data['Separate_syncs'] = ((edid[0] & 0xff) & 0b00001000) >> 3
-            new_data['Composite_sync'] = ((edid[0] & 0xff) & 0b00000100) >> 2
-            new_data['Sync_on_green'] = ((edid[0] & 0xff) & 0b00000010) >> 1
-            new_data['Vsync_serration'] = (edid[0] & 0xff) & 0b00000001
+            new_data['Blank-to-black_setup'] = (edid[0] & 0b00010000) >> 4
+            new_data['Separate_syncs'] = (edid[0] & 0b00001000) >> 3
+            new_data['Composite_sync'] = (edid[0] & 0b00000100) >> 2
+            new_data['Sync_on_green_video'] = (edid[0] & 0b00000010) >> 1
+            new_data['Vsync_serration'] = edid[0] & 0b00000001
+        #Digital Input
         else:
-            new_data['Video_Input_DFP_1'] = (edid[0] & 0xff) & 0b00000001
+            #If True: Interface is signal compatible with VESA DFP 1.x TMDS CRGB,
+            # 1 pixel / clock, up to 8 bits / color MSB aligned, DE active high
+            new_data['Video_Input_DFP_1'] = edid[0] & 0b00000001
 
+        #If either or both bytes are set to zero, then the system shall make no assumptions regarding the display size.
+        # e.g. A projection display may be of indeterminate size.
         new_data['Max_Horizontal_Image_Size'] = edid[1]
         new_data['Max_Vertical_Image_Size'] = edid[2]
-        new_data['Display_Gamma'] = float(edid[3] + 100) / 100
 
-        new_data['Feature_Support'] = {'Standby': ((edid[4] & 0xff) & 0b10000000) >> 7,
-                                    'Suspend': ((edid[4] & 0xff) & 0b01000000) >> 6,
-                                    'Active-off': ((edid[4] & 0xff) & 0b00100000) >> 5,
-                                    'Display_Type': ((edid[4] & 0xff) & 0b00011000) >> 3,
-                                    'Standard-sRGB': ((edid[4] & 0xff) & 0b00000100) >> 2,
-                                    'Preferred_Timing_Mode': ((edid[4] & 0xff) & 0b00000010) >> 1,
-                                    'Default_GTF': (edid[4] & 0xff) & 0b00000001}
-        #Note that "Display Type" have multiple choices, should be handled by the website
+        if edid[3] == 0xFF:
+            new_data['Display_Gamma'] = None
+        else:
+            new_data['Display_Gamma'] = float(edid[3] + 100) / 100
+
+        new_data['Feature_Support'] = {'Standby': (edid[4] & 0b10000000) >> 7,
+                            'Suspend': (edid[4] & 0b01000000) >> 6,
+                            'Active-off': (edid[4] & 0b00100000) >> 5,
+                            'Display_Type': (edid[4] & 0b00011000) >> 3,
+                            'Standard-sRGB': (edid[4] & 0b00000100) >> 2,
+                            'Preferred_Timing_Mode': (edid[4] & 0b00000010) >> 1,
+                            'Default_GTF': edid[4] & 0b00000001}
+
+#        if not new_data['Feature_Support']['Preferred_Timing_Mode']:
+#            if (self.data['EDID_version'] == 1 and self.data['EDID_reversion'] >= 3) or self.data['EDID_version'] > 1:
+#                #Warning
+#                print "Use of preferred timing mode is required by EDID Structure Version 1 Revision 3 and higher."
 
         return new_data
 
