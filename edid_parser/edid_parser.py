@@ -25,7 +25,6 @@ class EDID_Parser(object):
         if bin_data:
             self.parse_all(bin_data)
 
-
     def parse_all(self, bin_data):
         edid = self.parse_binary(bin_data)
 
@@ -37,7 +36,6 @@ class EDID_Parser(object):
         self.data['Standard_Timings'] = self.parse_standard_timings(edid[38:54])
         self.data['Descriptors'] = self.parse_descriptors(edid[54:125])
 
-
     def parse_binary(self, bin_data):
         """Converts string to list of bytes, supports first 128 bytes only
 
@@ -47,7 +45,6 @@ class EDID_Parser(object):
             raise EDIDParsingError("Binary file is smaller than 128 bytes.")
 
         return struct.unpack("b" * 128, bin_data[:128])
-
 
     def checksum(self, edid):
         """Checks EDID header and checksum
@@ -63,7 +60,6 @@ class EDID_Parser(object):
             raise EDIDParsingError("Checksum is currupt.")
 
         self.data['Extension_Flag'] = edid[126]
-
 
     def parse_header(self, edid):
         """Parses "Vendor / Product Identification" and "EDID Structure Version / Revision"
@@ -88,7 +84,7 @@ class EDID_Parser(object):
         self.data['ID_Serial_Number'] = edid[4] + (edid[5] << 8) + (edid[6] << 16) + (edid[7] << 24)
 
         #Week of manufacture and Year of manufacture: edid[16:17]
-        self.data['Week_of_manufacture'] = edid[8] & 0xff
+        self.data['Week_of_manufacture'] = edid[8]
         self.data['Year_of_manufacture'] = edid[9] + 1990
 
         #EDID version and revision: edid[18:19]
@@ -97,7 +93,6 @@ class EDID_Parser(object):
             self.data['EDID_revision'] = edid[11]
         else:
             raise EDIDParsingError("EDID version and revision %d.%d are invalid." % (edid[10], edid[11]))
-
 
     def parse_basic_display(self, edid):
         """Parses "Basic Display Parameters / Features"
@@ -141,12 +136,12 @@ class EDID_Parser(object):
             new_data['Display_Gamma'] = float(edid[3] + 100) / 100
 
         new_data['Feature_Support'] = {'Standby': (edid[4] & 0b10000000) >> 7,
-                            'Suspend': (edid[4] & 0b01000000) >> 6,
-                            'Active-off': (edid[4] & 0b00100000) >> 5,
-                            'Display_Type': (edid[4] & 0b00011000) >> 3,
-                            'Standard-sRGB': (edid[4] & 0b00000100) >> 2,
-                            'Preferred_Timing_Mode': (edid[4] & 0b00000010) >> 1,
-                            'Default_GTF': edid[4] & 0b00000001}
+                                        'Suspend': (edid[4] & 0b01000000) >> 6,
+                                        'Active-off': (edid[4] & 0b00100000) >> 5,
+                                        'Display_Type': (edid[4] & 0b00011000) >> 3,
+                                        'Standard-sRGB': (edid[4] & 0b00000100) >> 2,
+                                        'Preferred_Timing_Mode': (edid[4] & 0b00000010) >> 1,
+                                        'Default_GTF': edid[4] & 0b00000001}
 
 #        if not new_data['Feature_Support']['Preferred_Timing_Mode']:
 #            if (self.data['EDID_version'] == 1 and self.data['EDID_reversion'] >= 3) or self.data['EDID_version'] > 1:
@@ -154,7 +149,6 @@ class EDID_Parser(object):
 #                print "Use of preferred timing mode is required by EDID Structure Version 1 Revision 3 and higher."
 
         return new_data
-
 
     def parse_chromaticity(self, edid):
         """Parses "Chromaticity"
@@ -172,14 +166,14 @@ class EDID_Parser(object):
         White_low_y = edid[1] & 0b00000011
 
         #Get the rest of the bits
-        Red_high_x = edid[2] & 0xff
-        Red_high_y = edid[3] & 0xff
-        Green_high_x = edid[4] & 0xff
-        Green_high_y = edid[5] & 0xff
-        Blue_high_x = edid[6] & 0xff
-        Blue_high_y = edid[7] & 0xff
-        White_high_x = edid[8] & 0xff
-        White_high_y = edid[9] & 0xff
+        Red_high_x = edid[2]
+        Red_high_y = edid[3]
+        Green_high_x = edid[4]
+        Green_high_y = edid[5]
+        Blue_high_x = edid[6]
+        Blue_high_y = edid[7]
+        White_high_x = edid[8]
+        White_high_y = edid[9]
 
         #Combine all bits and convert them to decimal fractions
         new_data = {}
@@ -193,7 +187,6 @@ class EDID_Parser(object):
         new_data['White_y'] = ((White_high_y << 2) + White_low_y) / 2.0**10
 
         return new_data
-
 
     def parse_established_timings(self, edid):
         """Parses "Established Timings"
@@ -222,7 +215,6 @@ class EDID_Parser(object):
 
         return new_data
 
-
     def parse_standard_timings(self, edid):
         """Parses "Standard Timing Identification"
 
@@ -232,12 +224,12 @@ class EDID_Parser(object):
 
         for i in range(0, 15, 2):
             #Check if the field is not unused (both bytes are 0b01)
-            if (edid[i] & 0xff) is not 0b01 and (edid[i + 1] & 0xff) is not 0b01:
+            if edid[i] is not 0b01 and edid[i + 1] is not 0b01:
                 id = {}
-                id['Horizontal_active_pixels'] = (((edid[i] & 0xff) + 31) * 8)
-                id['Refresh_Rate'] = ((edid[i + 1] & 0xff) & 0b00111111) + 60
+                id['Horizontal_active_pixels'] = ((edid[i] + 31) * 8)
+                id['Refresh_Rate'] = (edid[i + 1] & 0b00111111) + 60
 
-                id['Image_aspect_ratio'] = ((edid[i + 1] & 0xff) & 0b11000000) >> 6
+                id['Image_aspect_ratio'] = (edid[i + 1] & 0b11000000) >> 6
                 if id['Image_aspect_ratio'] == 0b00:
                     if (self.data['EDID_version'] <= 1) and (self.data['EDID_reversion'] < 3):
                         id['Image_aspect_ratio'] = (1, 1)
@@ -255,7 +247,6 @@ class EDID_Parser(object):
                 new_data['Identification_%d' % ((i / 2) + 1)] = id
 
         return new_data
-
 
     def parse_descriptors(self, edid):
         """Parses "Standard Timing Identification"
@@ -283,7 +274,6 @@ class EDID_Parser(object):
                     print "Descriptor contains additional Standard Timing Identifications, NOT supported yet."
 
         return new_data
-
 
     def parse_timing_descriptor(self, edid):
         """Parses "Detailed Timing Descriptor"
@@ -323,7 +313,6 @@ class EDID_Parser(object):
                         'Stereo_Mode_x': (edid[17] & 0xff) & 0b00000001}
 
         return new_data
-
 
     def parse_monitor_descriptor_text(self, name, edid):
         """Parses texts descriptor
@@ -368,14 +357,12 @@ class EDID_Parser(object):
 
         return new_data
 
-
 class EDIDParsingError(Exception):
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return repr(self.value)
-
 
 if __name__ == "__main__":
     import sys
