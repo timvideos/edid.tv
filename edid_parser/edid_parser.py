@@ -59,7 +59,7 @@ class EDID_Parser(object):
         if len(bin_data) < 128:
             raise EDIDParsingError("Binary file is smaller than 128 bytes.")
 
-        return struct.unpack("b" * 128, bin_data[:128])
+        return struct.unpack("B" * 128, bin_data[:128])
 
     def checksum(self, edid):
         """Checks EDID header and checksum
@@ -67,11 +67,11 @@ class EDID_Parser(object):
         edid is a list of bytes"""
 
         #Check EDID header
-        if not [x & 0xff for x in edid[0:8]] == [0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00]:
+        if not [x for x in edid[0:8]] == [0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00]:
             raise EDIDParsingError("Input is not an EDID file.")
 
         #Check EDID checksum
-        if not sum(bytearray([chr(x & 0xff) for x in edid])) % 256 == 0:
+        if not sum(bytearray([chr(x) for x in edid])) % 256 == 0:
             raise EDIDParsingError("Checksum is currupt.")
 
         self.data['Extension_Flag'] = edid[126]
@@ -275,17 +275,17 @@ class EDID_Parser(object):
                 new_data['Timing_Descriptor_%d' % ((i / 18) + 1)] = self.parse_timing_descriptor(edid[i:i + 18])
             else:
                 tmp_edid = edid[i + 5:i + 18]
-                if ((edid[i + 3] & 0xff) == 0xff):
+                if edid[i + 3] == 0xff:
                     self.parse_monitor_descriptor_text("Monitor_Serial_Number", tmp_edid)
-                elif ((edid[i + 3] & 0xff) == 0xfe):
+                elif edid[i + 3] == 0xfe:
                     self.parse_monitor_descriptor_text("Data_String", tmp_edid)
-                elif ((edid[i + 3] & 0xff) == 0xfd):
+                elif edid[i + 3] == 0xfd:
                     new_data["Monitor_Range_Limits_Descriptor"] = self.parse_monitor_descriptor_range_limits(tmp_edid)
-                elif ((edid[i + 3] & 0xff) == 0xfc):
+                elif edid[i + 3] == 0xfc:
                     self.parse_monitor_descriptor_text("Monitor_Name", tmp_edid)
-                elif ((edid[i + 3] & 0xff) == 0xfb):
+                elif edid[i + 3] == 0xfb:
                     print "Descriptor contains additional color point data, NOT supported yet."
-                elif ((edid[i + 3] & 0xff) == 0xfa):
+                elif edid[i + 3] == 0xfa:
                     print "Descriptor contains additional Standard Timing Identifications, NOT supported yet."
 
         return new_data
