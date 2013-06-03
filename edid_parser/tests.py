@@ -1,5 +1,5 @@
 import unittest
-from edid_parser import EDID_Parser, EDIDParsingError, Display_Type
+from edid_parser import EDID_Parser, EDIDParsingError, Display_Type, Display_Stereo_Mode, Timing_Sync_Scheme
 
 class EDIDTest(unittest.TestCase):
     """Base class for EDID Parser tests."""
@@ -160,6 +160,120 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(data['Identification_1']['Vertical_active_pixels'], 1280)
         self.assertEqual(data['Identification_1']['Image_aspect_ratio'], (1, 1))
         self.assertEqual(data['Identification_1']['Refresh_Rate'], 120)
+
+    def test_descriptors(self):
+        test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58, 0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+                     0x66, 0x21, 0x50, 0xB0, 0x51, 0x00, 0x1B, 0x30, 0x40, 0x70, 0x36, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+                     0x00, 0x00, 0x00, 0xFC, 0x00, 0x54, 0x4F, 0x53, 0x48, 0x49, 0x42, 0x41, 0x2D, 0x54, 0x56, 0x0A, 0x20, 0x20,
+                     0x00, 0x00, 0x00, 0xFD, 0x00, 0x17, 0x3D, 0x0F, 0x44, 0x0F, 0x00, 0x0A, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20]
+        data = self.parser.parse_descriptors(test_edid)
+
+        self.assertIn('Timing_Descriptor_1', data)
+        self.assertIn('Timing_Descriptor_2', data)
+        self.assertIn('Monitor_Name', self.parser.data)
+        self.assertIn('Monitor_Range_Limits_Descriptor', data)
+
+    def test_timing_descriptor(self):
+        pass
+        test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58, 0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E]
+        data = self.parser.parse_timing_descriptor(test_edid)
+
+        self.assertEqual(data['Pixel_clock'], 14850)
+
+        self.assertEqual(data['Horizontal_Active'], 1920)
+        self.assertEqual(data['Horizontal_Blanking'], 280)
+        self.assertEqual(data['Horizontal_Sync_Offset'], 88)
+        self.assertEqual(data['Horizontal_Sync_Pulse_Width'], 44)
+        self.assertEqual(data['Horizontal_Image_Size'], 886)
+        self.assertEqual(data['Horizontal_Border'], 0)
+
+        self.assertEqual(data['Vertical_Active'], 1080)
+        self.assertEqual(data['Vertical_Blanking'], 45)
+        self.assertEqual(data['Vertical_Sync_Offset'], 4)
+        self.assertEqual(data['Vertical_Sync_Pulse_Width'], 5)
+        self.assertEqual(data['Vertical_Image_Size'], 498)
+        self.assertEqual(data['Vertical_Border'], 0)
+
+        self.assertFalse(data['Flags']['Interlaced'])
+        self.assertEqual(data['Flags']['Stereo_Mode'], Display_Stereo_Mode.Normal_display)
+        self.assertEqual(data['Flags']['Sync_Scheme'], Timing_Sync_Scheme.Digital_Separate)
+        self.assertTrue(data['Flags']['Vertical_Polarity'])
+        self.assertTrue(data['Flags']['Horizontal_Polarity'])
+
+        test_edid = [0x66, 0x21, 0x50, 0xB0, 0x51, 0x00, 0x1B, 0x30, 0x40, 0x70, 0x36, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E]
+        data = self.parser.parse_timing_descriptor(test_edid)
+
+        self.assertEqual(data['Pixel_clock'], 8550)
+
+        self.assertEqual(data['Horizontal_Active'], 1360)
+        self.assertEqual(data['Horizontal_Blanking'], 432)
+        self.assertEqual(data['Horizontal_Sync_Offset'], 64)
+        self.assertEqual(data['Horizontal_Sync_Pulse_Width'], 112)
+        self.assertEqual(data['Horizontal_Image_Size'], 886)
+        self.assertEqual(data['Horizontal_Border'], 0)
+
+        self.assertEqual(data['Vertical_Active'], 768)
+        self.assertEqual(data['Vertical_Blanking'], 27)
+        self.assertEqual(data['Vertical_Sync_Offset'], 3)
+        self.assertEqual(data['Vertical_Sync_Pulse_Width'], 6)
+        self.assertEqual(data['Vertical_Image_Size'], 498)
+        self.assertEqual(data['Vertical_Border'], 0)
+
+        self.assertFalse(data['Flags']['Interlaced'])
+        self.assertEqual(data['Flags']['Stereo_Mode'], Display_Stereo_Mode.Normal_display)
+        self.assertEqual(data['Flags']['Sync_Scheme'], Timing_Sync_Scheme.Digital_Separate)
+        self.assertTrue(data['Flags']['Vertical_Polarity'])
+        self.assertTrue(data['Flags']['Horizontal_Polarity'])
+
+    def test_stereo_mode(self):
+        self.assertEqual(self.parser.decode_stereo_mode(0, 0, 0), Display_Stereo_Mode.Normal_display)
+        self.assertEqual(self.parser.decode_stereo_mode(0, 0, 1), Display_Stereo_Mode.Normal_display)
+        self.assertEqual(self.parser.decode_stereo_mode(0, 1, 0), Display_Stereo_Mode.Field_sequential_right)
+        self.assertEqual(self.parser.decode_stereo_mode(1, 0, 0), Display_Stereo_Mode.Field_sequential_left)
+        self.assertEqual(self.parser.decode_stereo_mode(0, 1, 1), Display_Stereo_Mode.Interleaved_2_way_right)
+        self.assertEqual(self.parser.decode_stereo_mode(1, 0, 1), Display_Stereo_Mode.Interleaved_2_way_left)
+        self.assertEqual(self.parser.decode_stereo_mode(1, 1, 0), Display_Stereo_Mode.Interleaved_4_way)
+        self.assertEqual(self.parser.decode_stereo_mode(1, 1, 1), Display_Stereo_Mode.Interleaved_side_by_side)
+
+    def test_monitor_descriptor_text(self):
+        test_edid = [0x54, 0x4F, 0x53, 0x48, 0x49, 0x42, 0x41, 0x2D, 0x54, 0x56, 0x0A, 0x20, 0x20]
+        self.parser.parse_monitor_descriptor_text('test_TOSHIBA-TV', test_edid)
+
+        self.assertEqual(self.parser.data['test_TOSHIBA-TV'], 'TOSHIBA-TV')
+
+    def test_monitor_descriptor_range_limits(self):
+        test_edid = [0x17, 0x3D, 0x0F, 0x44, 0x0F, 0x00, 0x0A, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20]
+        data = self.parser.parse_monitor_descriptor_range_limits(test_edid)
+
+        self.assertEqual(data['Min_Vertical_rate'], 23)
+        self.assertEqual(data['Max_Vertical_rate'], 61)
+
+        self.assertEqual(data['Min_Horizontal_rate'], 15)
+        self.assertEqual(data['Max_Horizontal_rate'], 68)
+
+        self.assertEqual(data['Max_Supported_Pixel_Clock'], 150)
+
+        self.assertFalse(data['Secondary_GTF_curve_supported'], data)
+
+        test_edid = [0x3D, 0x17, 0x44, 0x0F, 0x44, 0x02, 0x0A, 0x55, 0x08, 0x80, 0xCB, 0xBC, 0xAD]
+        data = self.parser.parse_monitor_descriptor_range_limits(test_edid)
+
+        self.assertEqual(data['Min_Vertical_rate'], 61)
+        self.assertEqual(data['Max_Vertical_rate'], 23)
+
+        self.assertEqual(data['Min_Horizontal_rate'], 68)
+        self.assertEqual(data['Max_Horizontal_rate'], 15)
+
+        self.assertEqual(data['Max_Supported_Pixel_Clock'], 680)
+
+        self.assertTrue(data['Secondary_GTF_curve_supported'], data)
+
+        self.assertEqual(data['Secondary_GTF']['Start_frequency'], 170)
+        self.assertEqual(data['Secondary_GTF']['C'], 4)
+        self.assertEqual(data['Secondary_GTF']['M'], 32971)
+        self.assertEqual(data['Secondary_GTF']['K'], 188)
+        self.assertEqual(data['Secondary_GTF']['J'], 86.5)
+
 
 class EDIDInvalidTest(EDIDTest):
     """EDID Parser tests with invalid input."""

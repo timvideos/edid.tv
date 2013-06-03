@@ -13,6 +13,21 @@ class Display_Type:
     Non_RGB_color = 0b10
     Undefined = 0b11
 
+class Display_Stereo_Mode:
+    Normal_display = 0b000
+    Field_sequential_right = 0b010
+    Field_sequential_left = 0b100
+    Interleaved_2_way_right = 0b011
+    Interleaved_2_way_left = 0b101
+    Interleaved_4_way = 0b110
+    Interleaved_side_by_side = 0b111
+
+class Timing_Sync_Scheme:
+    Analog_Composite = 0b00
+    Bipolar_Analog_Composite = 0b01
+    Digital_Composite = 0b10
+    Digital_Separate = 0b11
+
 class EDID_Parser(object):
     def __init__(self, bin_data=None):
         """
@@ -256,7 +271,7 @@ class EDID_Parser(object):
         new_data = {}
 
         for i in range(0, 71, 18):
-            if not (((edid[i] & 0xff) << 8) + (edid[i + 1] & 0xff)) == 0x0000:
+            if not ((edid[i] << 8) + edid[i + 1]) == 0x0000 and not edid[i + 2] == 0x00 and not edid[i + 4] == 0x00:
                 new_data['Timing_Descriptor_%d' % ((i / 18) + 1)] = self.parse_timing_descriptor(edid[i:i + 18])
             else:
                 tmp_edid = edid[i + 5:i + 18]
@@ -282,37 +297,77 @@ class EDID_Parser(object):
 
         new_data = {}
 
-        new_data['Pixel_clock'] = ((edid[1] & 0xff) << 8) + (edid[0] & 0xff)
+        new_data['Pixel_clock'] = (edid[1] << 8) + edid[0]
 
-        new_data['Horizontal_Active'] = ((edid[4] & 0b11110000) << 4) + (edid[2] & 0xff)
-        new_data['Horizontal_Blanking'] = ((edid[4] & 0b00001111) << 8) + (edid[3] & 0xff)
+        new_data['Horizontal_Active'] = ((edid[4] & 0b11110000) << 4) + edid[2]
+        new_data['Horizontal_Blanking'] = ((edid[4] & 0b00001111) << 8) + edid[3]
 
-        new_data['Vertical_Active'] = ((edid[7] & 0b11110000) << 4) + (edid[5] & 0xff)
-        new_data['Vertical_Blanking'] = ((edid[7] & 0b00001111) << 8) + (edid[6] & 0xff)
+        new_data['Vertical_Active'] = ((edid[7] & 0b11110000) << 4) + edid[5]
+        new_data['Vertical_Blanking'] = ((edid[7] & 0b00001111) << 8) + edid[6]
 
-        new_data['Horizontal_Sync_Offset'] = ((edid[11] & 0b11000000) << 4) + (edid[8] & 0xff)
-        new_data['Horizontal_Sync_Pulse_Width'] = ((edid[11] & 0b00110000) << 8) + (edid[9] & 0xff)
+        new_data['Horizontal_Sync_Offset'] = ((edid[11] & 0b11000000) << 4) + edid[8]
+        new_data['Horizontal_Sync_Pulse_Width'] = ((edid[11] & 0b00110000) << 8) + edid[9]
 
         new_data['Vertical_Sync_Offset'] = ((edid[11] & 0b00001100) << 4)\
                                            + (edid[10] & 0b11110000) >> 4
         new_data['Vertical_Sync_Pulse_Width'] = ((edid[11] & 0b00000011) << 8)\
                                                 + (edid[10] & 0b00001111)
 
-        new_data['Horizontal_Image_Size'] = ((edid[14] & 0b11110000) << 4) + (edid[12] & 0xff)
-        new_data['Vertical_Image_Size'] = ((edid[14] & 0b00001111) << 8) + (edid[13] & 0xff)
+        new_data['Horizontal_Image_Size'] = ((edid[14] & 0b11110000) << 4) + edid[12]
+        new_data['Vertical_Image_Size'] = ((edid[14] & 0b00001111) << 8) + edid[13]
 
-        new_data['Horizontal_Border'] = (edid[15] & 0xff)
-        new_data['Vertical_Border'] = (edid[16] & 0xff)
+        new_data['Horizontal_Border'] = edid[15]
+        new_data['Vertical_Border'] = edid[16]
 
-        #TODO: Need rewrite to parse these deeply
-        new_data['Flags'] = {'Interlaced': ((edid[17] & 0xff) & 0b10000000) >> 7,
-                        'Stereo_Mode': ((edid[17] & 0xff) & 0b01100000) >> 5,
-                        'Sync': ((edid[17] & 0xff) & 0b00011000) >> 3,
-                        'Bit_2': ((edid[17] & 0xff) & 0b00000100) >> 2,
-                        'Bit_1': ((edid[17] & 0xff) & 0b00000010) >> 1,
-                        'Stereo_Mode_x': (edid[17] & 0xff) & 0b00000001}
+        flags = {}
+
+        flags['Interlaced'] = (edid[17] & 0b10000000) >> 7
+        flags['Stereo_Mode'] = self.decode_stereo_mode((edid[17] & 0b01000000) >> 6,
+                                                       (edid[17] & 0b00100000) >> 5,
+                                                       edid[17] & 0b00000001)
+        flags['Sync_Scheme'] = (edid[17] & 0b00011000) >> 3
+
+        bit_2 = (edid[17] & 0b00000100) >> 2
+        bit_1 = (edid[17] & 0b00000010) >> 1
+
+        if flags['Sync_Scheme'] == Timing_Sync_Scheme.Digital_Separate:
+            flags['Vertical_Polarity'] = bit_2
+            flags['Horizontal_Polarity'] = bit_1
+        else:
+            flags['Serrate'] = bit_2
+
+            if flags['Sync_Scheme'] == Timing_Sync_Scheme.Digital_Composite:
+                flags['Composite_Polarity'] = bit_1
+            else:
+                flags['Sync_On_RGB'] = bit_1
+
+        new_data['Flags'] = flags
 
         return new_data
+
+    def decode_stereo_mode(self, x, y, z):
+        """Decodes stereo mode bits
+
+        x is bit 6
+        y is bit 5
+        z is bit 0"""
+
+        if x == 0 and y == 0:
+            stereo_mode = Display_Stereo_Mode.Normal_display
+        elif x == 0 and y == 1 and z == 0:
+            stereo_mode = Display_Stereo_Mode.Field_sequential_right
+        elif x == 1 and y == 0 and z == 0:
+            stereo_mode = Display_Stereo_Mode.Field_sequential_left
+        elif x == 0 and y == 1 and z == 1:
+            stereo_mode = Display_Stereo_Mode.Interleaved_2_way_right
+        elif x == 1 and y == 0 and z == 1:
+            stereo_mode = Display_Stereo_Mode.Interleaved_2_way_left
+        elif x == 1 and y == 1 and z == 0:
+            stereo_mode = Display_Stereo_Mode.Interleaved_4_way
+        elif x == 1 and y == 1 and z == 1:
+            stereo_mode = Display_Stereo_Mode.Interleaved_side_by_side
+
+        return stereo_mode
 
     def parse_monitor_descriptor_text(self, name, edid):
         """Parses texts descriptor
@@ -336,24 +391,27 @@ class EDID_Parser(object):
 
         new_data = {}
 
-        new_data['Min_Vertical_rate'] = (edid[0] & 0xff)
-        new_data['Max_Vertical_rate'] = (edid[1] & 0xff)
+        new_data['Min_Vertical_rate'] = edid[0]
+        new_data['Max_Vertical_rate'] = edid[1]
 
-        new_data['Min_Horizontal_rate'] = (edid[2] & 0xff)
-        new_data['Max_Horizontal_rate'] = (edid[3] & 0xff)
+        new_data['Min_Horizontal_rate'] = edid[2]
+        new_data['Max_Horizontal_rate'] = edid[3]
 
-        new_data['Max_Supported_Pixel_Clock'] = (edid[4] & 0xff) * 10
+        new_data['Max_Supported_Pixel_Clock'] = edid[4] * 10
 
-        if ((edid[5] & 0xff) == 0x02):
+        if edid[5] == 0x02:
+            new_data['Secondary_GTF_curve_supported'] = True
             gtf = {}
 
-            gtf['Start_frequency'] = (edid[7] & 0xff) * 2
-            gtf['C'] = (edid[8] & 0xff) / 2
-            gtf['M'] = (((edid[9] & 0xff) << 8) + (edid[10] & 0xff))
-            gtf['K'] = (edid[11] & 0xff)
-            gtf['J'] = (edid[12] & 0xff) / 2
+            gtf['Start_frequency'] = edid[7] * 2
+            gtf['C'] = float(edid[8]) / 2
+            gtf['M'] = (edid[9] << 8) + edid[10]
+            gtf['K'] = edid[11]
+            gtf['J'] = float(edid[12]) / 2
 
-            new_data['Generalized_Timing_Formula'] = gtf
+            new_data['Secondary_GTF'] = gtf
+        else:
+            new_data['Secondary_GTF_curve_supported'] = False
 
         return new_data
 
