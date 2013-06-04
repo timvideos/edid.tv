@@ -59,7 +59,7 @@ class EDIDValidTest(EDIDTest):
         self.assertTrue(data['Feature_Support']['Preferred_Timing_Mode'])
         self.assertFalse(data['Feature_Support']['Default_GTF'])
 
-        self.assertEqual(data['Feature_Support']['Display_Type'], Display_Type.RGB_color)
+        self.assertEqual(data['Feature_Support']['Display_Type'], Display_Type.RGB)
 
         test_edid = [0b01011111, 0x78, 0x44, 0x99, 0b11110111]
         data = self.parser.parse_basic_display(test_edid)
@@ -84,20 +84,25 @@ class EDIDValidTest(EDIDTest):
         self.assertTrue(data['Feature_Support']['Preferred_Timing_Mode'])
         self.assertTrue(data['Feature_Support']['Default_GTF'])
 
-        self.assertEqual(data['Feature_Support']['Display_Type'], Display_Type.Non_RGB_color)
+        self.assertEqual(data['Feature_Support']['Display_Type'], Display_Type.Non_RGB)
 
     def test_chromaticity(self):
         test_edid = [0xF0, 0x9D, 0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47, 0x4A]
         data = self.parser.parse_chromaticity(test_edid)
 
-        self.assertEqual(data['Red_x'], 0.6396484375)
-        self.assertEqual(data['Red_y'], 0.3349609375)
-        self.assertEqual(data['Green_x'], 0.28515625)
-        self.assertEqual(data['Green_y'], 0.60546875)
-        self.assertEqual(data['Blue_x'], 0.150390625)
-        self.assertEqual(data['Blue_y'], 0.0595703125)
-        self.assertEqual(data['White_x'], 0.2802734375)
-        self.assertEqual(data['White_y'], 0.2900390625)
+        self.assertEqual(data['Red_x'], 0.640)
+        self.assertEqual(data['Red_y'], 0.335)
+        self.assertEqual(data['Green_x'], 0.285)
+        self.assertEqual(data['Green_y'], 0.605)
+        self.assertEqual(data['Blue_x'], 0.150)
+        self.assertEqual(data['Blue_y'], 0.060)
+        self.assertEqual(data['White_x'], 0.280)
+        self.assertEqual(data['White_y'], 0.290)
+
+    def test_chromaticity_calculater(self):
+        self.assertEqual(self.parser.calculate_chromaticity(0b10011100, 0b01), 0.610)
+        self.assertEqual(self.parser.calculate_chromaticity(0b01001110, 0b10), 0.307)
+        self.assertEqual(self.parser.calculate_chromaticity(0b00100110, 0b10), 0.150)
 
     def test_established_timings(self):
         test_edid = [0b10101010, 0b10101010]

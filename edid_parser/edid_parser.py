@@ -9,8 +9,8 @@ import struct
 
 class Display_Type:
     Monochrome = 0b00
-    RGB_color = 0b01
-    Non_RGB_color = 0b10
+    RGB = 0b01
+    Non_RGB = 0b10
     Undefined = 0b11
 
 class Display_Stereo_Mode:
@@ -82,7 +82,7 @@ class EDID_Parser(object):
         edid is list of bytes 8 (08h) to 19 (13h)"""
 
         #ID Manufacturer Name: edid[8:10]
-        if (edid[0] >> 7 == 0):
+        if edid[0] >> 7 == 0:
             first = (edid[0] & 0b01111100) >> 2
             second = ((edid[0] & 0b00000011) << 3) + ((edid[1] & 0b11100000) >> 5)
             third = edid[1] & 0b00011111
@@ -192,16 +192,19 @@ class EDID_Parser(object):
 
         #Combine all bits and convert them to decimal fractions
         new_data = {}
-        new_data['Red_x'] = ((Red_high_x << 2) + Red_low_x) / 2.0**10
-        new_data['Red_y'] = ((Red_high_y << 2) + Red_low_y) / 2.0**10
-        new_data['Green_x'] = ((Green_high_x << 2) + Green_low_x) / 2.0**10
-        new_data['Green_y'] = ((Green_high_y << 2) + Green_low_y) / 2.0**10
-        new_data['Blue_x'] = ((Blue_high_x << 2) + Blue_low_x) / 2.0**10
-        new_data['Blue_y'] = ((Blue_high_y << 2) + Blue_low_y) / 2.0**10
-        new_data['White_x'] = ((White_high_x << 2) + White_low_x) / 2.0**10
-        new_data['White_y'] = ((White_high_y << 2) + White_low_y) / 2.0**10
+        new_data['Red_x'] = self.calculate_chromaticity(Red_high_x, Red_low_x)
+        new_data['Red_y'] = self.calculate_chromaticity(Red_high_y, Red_low_y)
+        new_data['Green_x'] = self.calculate_chromaticity(Green_high_x, Green_low_x)
+        new_data['Green_y'] = self.calculate_chromaticity(Green_high_y, Green_low_y)
+        new_data['Blue_x'] = self.calculate_chromaticity(Blue_high_x, Blue_low_x)
+        new_data['Blue_y'] = self.calculate_chromaticity(Blue_high_y, Blue_low_y)
+        new_data['White_x'] = self.calculate_chromaticity(White_high_x, White_low_x)
+        new_data['White_y'] = self.calculate_chromaticity(White_high_y, White_low_y)
 
         return new_data
+
+    def calculate_chromaticity(self, high, low):
+        return round(((high << 2) + low) / 2.0**10, 3)
 
     def parse_established_timings(self, edid):
         """Parses "Established Timings"
@@ -278,7 +281,7 @@ class EDID_Parser(object):
                 if edid[i + 3] == 0xff:
                     self.parse_monitor_descriptor_text("Monitor_Serial_Number", tmp_edid)
                 elif edid[i + 3] == 0xfe:
-                    self.parse_monitor_descriptor_text("Data_String", tmp_edid)
+                    self.parse_monitor_descriptor_text("Monitor_Data_String", tmp_edid)
                 elif edid[i + 3] == 0xfd:
                     new_data["Monitor_Range_Limits_Descriptor"] = self.parse_monitor_descriptor_range_limits(tmp_edid)
                 elif edid[i + 3] == 0xfc:
