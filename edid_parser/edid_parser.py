@@ -46,7 +46,7 @@ class EDID_Parser(object):
         self.checksum(edid)
         self.parse_header(edid[8:20])
         self.data['Basic_display_parameters'] = self.parse_basic_display(edid[20:25])
-        self.data['Filter_Chromaticity'] = self.parse_chromaticity(edid[25:35])
+        self.data['Chromaticity'] = self.parse_chromaticity(edid[25:35])
         self.data['Established_Timings'] = self.parse_established_timings(edid[35:38])
         self.data['Standard_Timings'] = self.parse_standard_timings(edid[38:54])
         self.data['Descriptors'] = self.parse_descriptors(edid[54:125])

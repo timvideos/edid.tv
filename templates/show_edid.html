@@ -8,4 +8,61 @@
     <p>{{ edid.manufacturer_name_id }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</p>
   </div>
 </div>
+<div class="row">
+  <div class="span4">
+    <h3>Basic Display Parameters</h3>
+    <dl>
+      <dt>Display gamma</dt>
+      <dd>{{ edid.bsp_display_gamma }}</dd>
+      <dt>Maximum horizontal image size</dt>
+      <dd>{{ edid.bsp_max_horizontal_image_size }} cm</dd>
+      <dt>Maximum vertical image size</dt>
+      <dd>{{ edid.bsp_max_vertical_image_size }} cm</dd>
+      <dt>Signal level input</dt>
+      <dd>{{ edid.bsp_video_input|yesno:"Digital,Analog" }}</dd>
+{% if not edid.bsp_video_input %}
+      <dd><i class="icon-{{ edid.bsp_blank_to_black_setup|yesno:"ok,remove" }}"></i> Blank-to-black setup</dd>
+      <dd><i class="icon-{{ edid.bsp_separate_syncs|yesno:"ok,remove" }}"></i> Separate syncs</dd>
+      <dd><i class="icon-{{ edid.bsp_composite_sync|yesno:"ok,remove" }}"></i> Composite syncs</dd>
+      <dd><i class="icon-{{ edid.bsp_sync_on_green_video|yesno:"ok,remove" }}"></i> Sync_on_green_video</dd>
+      <dd><i class="icon-{{ edid.bsp_vsync_serration|yesno:"ok,remove" }}"></i> Vsync_serration</dd>
+      <dt>Signal Level Standard</dt>
+      <dd>{{ edid.get_bsp_signal_level_standard_display }}</dd>
+{% else %}
+      <dt>VESA DFP 1.x</dt>
+      <dd><i class="icon-{{ edid.bsp_video_input_DFP_1|yesno:"ok,remove" }}"></i></dd>
+{% endif %}
+      <dt>Feature Support</dt>
+      <dd><i class="icon-{{ edid.bsp_feature_active_off|yesno:"ok,remove" }}"></i> Active-off</dd>
+      <dd><i class="icon-{{ edid.bsp_feature_default_GTF|yesno:"ok,remove" }}"></i> Default GTF</dd>
+      <dd><i class="icon-{{ edid.bsp_feature_preferred_timing_mode|yesno:"ok,remove" }}"></i> Preferred Timing Mode</dd>
+      <dd><i class="icon-{{ edid.bsp_feature_standard_sRGB|yesno:"ok,remove" }}"></i> Standard sRGB</dd>
+      <dd><i class="icon-{{ edid.bsp_feature_standby|yesno:"ok,remove" }}"></i> Standby</dd>
+      <dd><i class="icon-{{ edid.bsp_feature_suspend|yesno:"ok,remove" }}"></i> Suspend</dd>
+      <dt>Display Type</dt>
+      <dd>{{ edid.get_bsp_feature_display_type_display }}</dd>
+    </dl>
+  </div>
+  <div class="span4">
+    <h3>Chromaticity</h3>
+    <dl class="dl-horizontal">
+      <dt>Red X</dt>
+      <dd>{{ edid.chr_red_x|floatformat:3 }}</dd>
+      <dt>Red Y</dt>
+      <dd>{{ edid.chr_red_y|floatformat:3 }}</dd>
+      <dt>Green X</dt>
+      <dd>{{ edid.chr_green_x|floatformat:3 }}</dd>
+      <dt>Green Y</dt>
+      <dd>{{ edid.chr_green_y|floatformat:3 }}</dd>
+      <dt>Blue X</dt>
+      <dd>{{ edid.chr_blue_x|floatformat:3 }}</dd>
+      <dt>Blue Y</dt>
+      <dd>{{ edid.chr_blue_y|floatformat:3 }}</dd>
+      <dt>White X</dt>
+      <dd>{{ edid.chr_white_x|floatformat:3 }}</dd>
+      <dt>White Y</dt>
+      <dd>{{ edid.chr_white_y|floatformat:3 }}</dd>
+    </dl>
+  </div>
+</div>
 {% endblock %}
