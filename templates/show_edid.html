@@ -64,5 +64,18 @@
       <dd>{{ edid.chr_white_y|floatformat:3 }}</dd>
     </dl>
   </div>
+  <div class="span4">
+    <h3>Established Timings</h3>
+    <dl class="dl-horizontal">
+{% with est_timings=edid.get_est_timings %}
+  {% for timing, supported in est_timings %}
+    {% if supported %}
+    <dt>{{ timing }}</dt>
+    <dd><i class="icon-ok"></i></dd>
+    {% endif %}
+  {% endfor %}
+{% endwith %}
+    </dl>
+  </div>
 </div>
 {% endblock %}

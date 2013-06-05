@@ -74,6 +74,24 @@ class EDID(models.Model):
     chr_white_x = models.DecimalField(max_digits=4, decimal_places=3)
     chr_white_y = models.DecimalField(max_digits=4, decimal_places=3)
 
+    ###est_timings=Established Timings
+    est_timings_720_400_70 = models.BooleanField()
+    est_timings_720_400_88 = models.BooleanField()
+    est_timings_640_480_60 = models.BooleanField()
+    est_timings_640_480_67 = models.BooleanField()
+    est_timings_640_480_72 = models.BooleanField()
+    est_timings_640_480_75 = models.BooleanField()
+    est_timings_800_600_56 = models.BooleanField()
+    est_timings_800_600_60 = models.BooleanField()
+    est_timings_800_600_72 = models.BooleanField()
+    est_timings_800_600_75 = models.BooleanField()
+    est_timings_832_624_75 = models.BooleanField()
+    est_timings_1024_768_87 = models.BooleanField()
+    est_timings_1024_768_60 = models.BooleanField()
+    est_timings_1024_768_70 = models.BooleanField()
+    est_timings_1024_768_75 = models.BooleanField()
+    est_timings_1280_1024_75 = models.BooleanField()
+
     def populate_from_edid_parser(self, edid):
         ### Header
         #TODO: Parse from PNP IDs list
@@ -134,6 +152,42 @@ class EDID(models.Model):
         self.chr_blue_y = edid['Chromaticity']['Blue_y']
         self.chr_white_x = edid['Chromaticity']['White_x']
         self.chr_white_y = edid['Chromaticity']['White_y']
+
+        ###Established Timings
+        self.est_timings_720_400_70 = edid['Established_Timings']['720x400@70Hz']
+        self.est_timings_720_400_88 = edid['Established_Timings']['720x400@88Hz']
+        self.est_timings_640_480_60 = edid['Established_Timings']['640x480@60Hz']
+        self.est_timings_640_480_67 = edid['Established_Timings']['640x480@67Hz']
+        self.est_timings_640_480_72 = edid['Established_Timings']['640x480@72Hz']
+        self.est_timings_640_480_75 = edid['Established_Timings']['640x480@75Hz']
+        self.est_timings_800_600_56 = edid['Established_Timings']['800x600@56Hz']
+        self.est_timings_800_600_60 = edid['Established_Timings']['800x600@60Hz']
+        self.est_timings_800_600_72 = edid['Established_Timings']['800x600@72Hz']
+        self.est_timings_800_600_75 = edid['Established_Timings']['800x600@75Hz']
+        self.est_timings_832_624_75 = edid['Established_Timings']['832x624@75Hz']
+        self.est_timings_1024_768_87 = edid['Established_Timings']['1024x768@87Hz']
+        self.est_timings_1024_768_60 = edid['Established_Timings']['1024x768@60Hz']
+        self.est_timings_1024_768_70 = edid['Established_Timings']['1024x768@70Hz']
+        self.est_timings_1024_768_75 = edid['Established_Timings']['1024x768@75Hz']
+        self.est_timings_1280_1024_75 = edid['Established_Timings']['1280x1024@75Hz']
+
+    def get_est_timings(self):
+        return [('720x400@70Hz', self.est_timings_720_400_70),
+                ('720x400@88Hz', self.est_timings_720_400_88),
+                ('640x480@60Hz', self.est_timings_640_480_60),
+                ('640x480@67Hz', self.est_timings_640_480_67),
+                ('640x480@72Hz', self.est_timings_640_480_72),
+                ('640x480@75Hz', self.est_timings_640_480_75),
+                ('800x600@56Hz', self.est_timings_800_600_56),
+                ('800x600@60Hz', self.est_timings_800_600_60),
+                ('800x600@72Hz', self.est_timings_800_600_72),
+                ('800x600@75Hz', self.est_timings_800_600_75),
+                ('832x624@75Hz', self.est_timings_832_624_75),
+                ('1024x768@87Hz', self.est_timings_1024_768_87),
+                ('1024x768@60Hz', self.est_timings_1024_768_60),
+                ('1024x768@70Hz', self.est_timings_1024_768_70),
+                ('1024x768@75Hz', self.est_timings_1024_768_75),
+                ('1280x1024@75Hz', self.est_timings_1280_1024_75)]
 
     def __unicode__(self):
         #should be manufacturer_name NOT _id
