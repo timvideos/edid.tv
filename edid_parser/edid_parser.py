@@ -300,7 +300,8 @@ class EDID_Parser(object):
 
         new_data = {}
 
-        new_data['Pixel_clock'] = (edid[1] << 8) + edid[0]
+        #Pixel clock in kHz
+        new_data['Pixel_clock'] = ((edid[1] << 8) + edid[0]) * 10
 
         new_data['Horizontal_Active'] = ((edid[4] & 0b11110000) << 4) + edid[2]
         new_data['Horizontal_Blanking'] = ((edid[4] & 0b00001111) << 8) + edid[3]
