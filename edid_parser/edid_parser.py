@@ -49,7 +49,7 @@ class EDID_Parser(object):
         self.data['Chromaticity'] = self.parse_chromaticity(edid[25:35])
         self.data['Established_Timings'] = self.parse_established_timings(edid[35:38])
         self.data['Standard_Timings'] = self.parse_standard_timings(edid[38:54])
-        self.data['Descriptors'] = self.parse_descriptors(edid[54:125])
+        self.data['Descriptors'] = self.parse_descriptors(edid[54:126])
 
     def parse_binary(self, bin_data):
         """Converts string to list of bytes, supports first 128 bytes only
