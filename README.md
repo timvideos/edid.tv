@@ -1,8 +1,4 @@
 EDID Database Website
 ===============
 
-This website will serve as database for EDID files data.
-
-You can upload binary EDID files and they will be parsed automatically, all users can edit the EDID data.
-
-An API will available for [HDMI2USB](https://github.com/timvideos/HDMI2USB) to upload EDID files anonymously.
+Catalog for [EDID](http://en.wikipedia.org/wiki/Extended_display_identification_data) data. This is part of [TimVideos.us](https://code.timvideos.us) project.
