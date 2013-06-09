@@ -11,7 +11,7 @@
     {% if edids %}
     <ul>
       {% for edid in edids %}
-      <li>{{ edid.manufacturer_name_id }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</li>
+      <li>{{ edid.manufacturer.name }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</li>
       {% endfor %}
     </ul>
     {% else %}

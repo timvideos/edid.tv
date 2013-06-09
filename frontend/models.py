@@ -4,7 +4,18 @@ from django.db import models
 
 from edid_parser.edid_parser import Display_Type, Display_Stereo_Mode, Timing_Sync_Scheme
 
+class Manufacturer(models.Model):
+    #Full name
+    name = models.CharField(max_length=255, blank=True)
+    #ID, 3 characters
+    name_id = models.CharField(max_length=3, primary_key=True)
+
+    def __unicode__(self):
+        return "%s: %s" % (self.name_id, self.name)
+
 class EDID(models.Model):
+    manufacturer = models.ForeignKey(Manufacturer)
+
     #Initialized and basic data auto-added
     STATUS_INITIALIZED = 0
     #Standard and detailed timings auto-added
@@ -20,10 +31,6 @@ class EDID(models.Model):
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=STATUS_INITIALIZED)
 
     ### Header
-    #ID Manufacturer Name, full name assigned from PNP IDs list
-    manufacturer_name = models.CharField(max_length=255, blank=True)
-    #ID Manufacturer Name, 3 characters
-    manufacturer_name_id = models.CharField(max_length=3)
     #ID Product Code
     manufacturer_product_code = models.CharField(max_length=4, blank=True)
     #ID Serial Number, 32-bit
@@ -33,17 +40,17 @@ class EDID(models.Model):
     #Year of manufacture, 1990-2245
     year_of_manufacture = models.PositiveSmallIntegerField()
     #EDID version
-    EDID_version = models.IntegerField()
+    EDID_version = models.PositiveSmallIntegerField()
     #EDID revision
-    EDID_revision = models.IntegerField()
+    EDID_revision = models.PositiveSmallIntegerField()
 
     ###ASCII Text Descriptors
     #Monitor Name, from Monitor Descriptor Description (type 0xFC)
-    monitor_name = models.CharField(max_length=13, blank=True)
+    monitor_name = models.CharField(max_length=13, blank=True, null=True)
     #Monitor Serial Number, from Monitor Descriptor Description (type 0xFF)
-    monitor_serial_number = models.CharField(max_length=13, blank=True)
+    monitor_serial_number = models.CharField(max_length=13, blank=True, null=True)
     #Monitor Data String, from Monitor Descriptor Description (type 0xFE)
-    monitor_data_string = models.CharField(max_length=13, blank=True)
+    monitor_data_string = models.CharField(max_length=13, blank=True, null=True)
 
     ###bsp=Basic display parameters
     bsp_video_input = models.BooleanField()
@@ -62,8 +69,8 @@ class EDID(models.Model):
     #Digital Input
     bsp_video_input_DFP_1 = models.NullBooleanField()
 
-    bsp_max_horizontal_image_size = models.IntegerField()
-    bsp_max_vertical_image_size = models.IntegerField()
+    bsp_max_horizontal_image_size = models.PositiveSmallIntegerField()
+    bsp_max_vertical_image_size = models.PositiveSmallIntegerField()
     bsp_display_gamma = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
 
     bsp_feature_display_type_choices = ((Display_Type.Monochrome, 'Monochrome / grayscale display'),
@@ -109,9 +116,11 @@ class EDID(models.Model):
 
     def populate_from_edid_parser(self, edid):
         ### Header
-        #TODO: Parse from PNP IDs list
-        self.manufacturer_name = edid['ID_Manufacturer_Name']
-        self.manufacturer_name_id = edid['ID_Manufacturer_Name']
+        try:
+            self.manufacturer = Manufacturer.objects.get(name_id=edid['ID_Manufacturer_Name'])
+        except ObjectDoesNotExist:
+            #UNK is reserved for unknown manufacturer
+            self.manufacturer = Manufacturer.objects.get(name_id='UNK')
 
         self.manufacturer_product_code = edid['ID_Product_Code']
         self.manufacturer_serial_number = edid['ID_Serial_Number']
@@ -271,8 +280,7 @@ class EDID(models.Model):
         self.status = self.STATUS_TIMINGS_ADDED
 
     def __unicode__(self):
-        #should be manufacturer_name NOT _id
-        return "%s %s" % (self.manufacturer_name_id, self.monitor_name)
+        return "%s %s" % (self.manufacturer.name, self.monitor_name)
 
 class StandardTiming(models.Model):
     EDID = models.ForeignKey(EDID)
@@ -297,6 +305,9 @@ class StandardTiming(models.Model):
                             (ASPECT_RATIO_5_4, '5:4'),
                             (ASPECT_RATIO_16_9, '16:9'))
     aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
+
+    class Meta:
+        unique_together = (("EDID", "identification"),)
 
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active_pixels, self.vertical_active_pixels, self.refresh_rate)
@@ -355,6 +366,9 @@ class DetailedTiming(models.Model):
 
     #If not flags_sync_scheme == Digital_Composite and not flags_sync_scheme == Digital_Separate
     flags_sync_on_RGB = models.NullBooleanField()
+
+    class Meta:
+        unique_together = (("EDID", "identification"),)
 
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active, self.pixel_clock / 1000)
