@@ -22,15 +22,24 @@ def upload_edid(request):
     if request.method == 'POST':
         form = UploadEDIDForm(request.POST, request.FILES)
         if form.is_valid():
+            #Read EDID file
             edid_file = request.FILES['edid_file'].read()
+            #Parse EDID file
             edid_data = EDID_Parser(edid_file)
+
+            #Create EDID entry
             edid_object = EDID()
+            #Add basic data
             edid_object.populate_from_edid_parser(edid_data.data)
 
             #We can check for duplicate EDID file here, based on manufacturer_name_id, manufacturer_product_code
             #                                                   and manufacturer_serial_number
 
-            #Saving the entry in DB
+            #Save the entry
+            edid_object.save()
+            #Add timings
+            edid_object.populate_timings_from_edid_parser(edid_data.data)
+            #Save the updated entry
             edid_object.save()
 
             return HttpResponseRedirect(reverse('show_edid', args=(edid_object.id,)))

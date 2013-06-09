@@ -1,9 +1,24 @@
+import re
 
 from django.db import models
 
 from edid_parser.edid_parser import Display_Type, Display_Stereo_Mode, Timing_Sync_Scheme
 
 class EDID(models.Model):
+    #Initialized and basic data auto-added
+    STATUS_INITIALIZED = 0
+    #Standard and detailed timings auto-added
+    STATUS_TIMINGS_ADDED = 1
+    #Manually edited by users
+    STATUS_EDITED = 2
+    #Private, hidden from public
+    STATUS_PRIVATE = 3
+    STATUS_CHOICES = ((STATUS_INITIALIZED, 'Initialized'),
+                      (STATUS_TIMINGS_ADDED, 'Timings Added'),
+                      (STATUS_EDITED, 'Edited'),
+                      (STATUS_PRIVATE, 'Private'))
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=STATUS_INITIALIZED)
+
     ### Header
     #ID Manufacturer Name, full name assigned from PNP IDs list
     manufacturer_name = models.CharField(max_length=255, blank=True)
@@ -189,6 +204,157 @@ class EDID(models.Model):
                 ('1024x768@75Hz', self.est_timings_1024_768_75),
                 ('1280x1024@75Hz', self.est_timings_1280_1024_75)]
 
+    def populate_timings_from_edid_parser(self, edid):
+        for item in edid['Standard_Timings']:
+            data = edid['Standard_Timings'][item]
+            id = re.search("^Identification_(\d+)$", item, re.IGNORECASE)
+
+            if data['Image_aspect_ratio'] == (1, 1):
+                aspect_ratio = StandardTiming.ASPECT_RATIO_1_1
+            elif data['Image_aspect_ratio'] == (16, 10):
+                aspect_ratio = StandardTiming.ASPECT_RATIO_16_10
+            elif data['Image_aspect_ratio'] == (4, 3):
+                aspect_ratio = StandardTiming.ASPECT_RATIO_4_3
+            elif data['Image_aspect_ratio'] == (5, 4):
+                aspect_ratio = StandardTiming.ASPECT_RATIO_5_4
+            elif data['Image_aspect_ratio'] == (16, 9):
+                aspect_ratio = StandardTiming.ASPECT_RATIO_16_9
+            else:
+                raise Exception('Invalid aspect ratio can not be parsed.')
+
+            timing = StandardTiming(identification=id.group(1),
+                                    horizontal_active_pixels=data['Horizontal_active_pixels'],
+                                    vertical_active_pixels=data['Vertical_active_pixels'],
+                                    refresh_rate=data['Refresh_Rate'],
+                                    aspect_ratio=aspect_ratio)
+
+            self.standardtiming_set.add(timing)
+
+        for item in edid['Descriptors']:
+            data = edid['Descriptors'][item]
+            id = re.search("^Timing_Descriptor_(\d+)$", item, re.IGNORECASE)
+            if not id:
+                #Not timing descriptor
+                break
+
+            timing = DetailedTiming(identification=id.group(1),
+                                    pixel_clock=data['Pixel_clock'],
+                                    horizontal_active=data['Horizontal_Active'],
+                                    horizontal_blanking=data['Horizontal_Blanking'],
+                                    horizontal_sync_offset=data['Horizontal_Sync_Offset'],
+                                    horizontal_sync_pulse_width=data['Horizontal_Sync_Pulse_Width'],
+                                    horizontal_image_size=data['Horizontal_Image_Size'],
+                                    horizontal_border=data['Horizontal_Border'],
+                                    vertical_active=data['Vertical_Active'],
+                                    vertical_blanking=data['Vertical_Blanking'],
+                                    vertical_sync_offset=data['Vertical_Sync_Offset'],
+                                    vertical_sync_pulse_width=data['Vertical_Sync_Pulse_Width'],
+                                    vertical_image_size=data['Vertical_Image_Size'],
+                                    vertical_border=data['Vertical_Border'],
+                                    flags_interlaced=data['Flags']['Interlaced'],
+                                    flags_stereo_mode=data['Flags']['Stereo_Mode'],
+                                    flags_sync_scheme=data['Flags']['Sync_Scheme'])
+
+            if timing.flags_sync_scheme == DetailedTiming.Sync_Scheme.Digital_Separate:
+                timing.flags_horizontal_polarity = data['Flags']['Horizontal_Polarity']
+                timing.flags_vertical_polarity = data['Flags']['Vertical_Polarity']
+            else:
+                timing.flags_serrate = data['Flags']['Serrate']
+
+                if timing.flags_sync_scheme == DetailedTiming.Sync_Scheme.Digital_Composite:
+                    timing.flags_composite_polarity = data['Flags']['Composite_Polarity']
+                else:
+                    timing.flags_sync_on_RGB = data['Flags']['Sync_On_RGB']
+
+            self.detailedtiming_set.add(timing)
+
+        self.status = self.STATUS_TIMINGS_ADDED
+
     def __unicode__(self):
         #should be manufacturer_name NOT _id
         return "%s %s" % (self.manufacturer_name_id, self.monitor_name)
+
+class StandardTiming(models.Model):
+    EDID = models.ForeignKey(EDID)
+
+    #Identification
+    identification = models.IntegerField()
+    #Horizontal active pixels, 256-2288
+    horizontal_active_pixels = models.IntegerField()
+    #Vertical active pixels
+    vertical_active_pixels = models.IntegerField()
+    #Refresh rate, 60-123 Hz
+    refresh_rate = models.IntegerField()
+
+    ASPECT_RATIO_1_1 = 0
+    ASPECT_RATIO_16_10 = 1
+    ASPECT_RATIO_4_3 = 2
+    ASPECT_RATIO_5_4 = 3
+    ASPECT_RATIO_16_9 = 4
+    ASPECT_RATIO_CHOICES = ((ASPECT_RATIO_1_1, '1:1'),
+                            (ASPECT_RATIO_16_10, '16:10'),
+                            (ASPECT_RATIO_4_3, '4:3'),
+                            (ASPECT_RATIO_5_4, '5:4'),
+                            (ASPECT_RATIO_16_9, '16:9'))
+    aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
+
+    def __unicode__(self):
+        return "%dx%d@%dHz" % (self.horizontal_active_pixels, self.vertical_active_pixels, self.refresh_rate)
+
+class DetailedTiming(models.Model):
+    EDID = models.ForeignKey(EDID)
+
+    #Identification
+    identification = models.IntegerField()
+
+    #Pixel clock in kHz
+    pixel_clock = models.IntegerField()
+
+    horizontal_active = models.PositiveSmallIntegerField()
+    horizontal_blanking = models.PositiveSmallIntegerField()
+    horizontal_sync_offset = models.PositiveSmallIntegerField()
+    horizontal_sync_pulse_width = models.PositiveSmallIntegerField()
+    horizontal_image_size = models.PositiveSmallIntegerField()
+    horizontal_border = models.PositiveSmallIntegerField()
+
+    vertical_active = models.PositiveSmallIntegerField()
+    vertical_blanking = models.PositiveSmallIntegerField()
+    vertical_sync_offset = models.PositiveSmallIntegerField()
+    vertical_sync_pulse_width = models.PositiveSmallIntegerField()
+    vertical_image_size = models.PositiveSmallIntegerField()
+    vertical_border = models.PositiveSmallIntegerField()
+
+    flags_interlaced = models.BooleanField()
+
+    Stereo_Mode = Display_Stereo_Mode
+    STEREO_MODE_CHOICES = ((Stereo_Mode.Normal_display, ' Normal display, no stereo.'),
+                            (Stereo_Mode.Field_sequential_right, ' Field sequential stereo, right image when stereo sync.'),
+                            (Stereo_Mode.Field_sequential_left, ' Field sequential stereo, left image when stereo sync.'),
+                            (Stereo_Mode.Interleaved_2_way_right, '2-way interleaved stereo, right image on even lines.'),
+                            (Stereo_Mode.Interleaved_2_way_left, ' 2-way interleaved stereo, left image on even lines.'),
+                            (Stereo_Mode.Interleaved_4_way, '4-way interleaved stereo.'),
+                            (Stereo_Mode.Interleaved_side_by_side, ' Side-by-Side interleaved stereo.'))
+    flags_stereo_mode = models.PositiveSmallIntegerField(choices=STEREO_MODE_CHOICES)
+
+    Sync_Scheme = Timing_Sync_Scheme
+    SYNC_SCHEME_CHOICES = ((Sync_Scheme.Analog_Composite, 'Analog Composite'),
+                            (Sync_Scheme.Bipolar_Analog_Composite, 'Bipolar Analog Composite'),
+                            (Sync_Scheme.Digital_Composite, 'Digital Composite'),
+                            (Sync_Scheme.Digital_Separate, 'Digital Separate'))
+    flags_sync_scheme = models.PositiveSmallIntegerField(choices=SYNC_SCHEME_CHOICES)
+
+    #If flags_sync_scheme == Digital_Separate
+    flags_horizontal_polarity = models.NullBooleanField()
+    flags_vertical_polarity = models.NullBooleanField()
+
+    #If not flags_sync_scheme == Digital_Separate
+    flags_serrate = models.NullBooleanField()
+
+    #If flags_sync_scheme == Digital_Composite
+    flags_composite_polarity = models.NullBooleanField()
+
+    #If not flags_sync_scheme == Digital_Composite and not flags_sync_scheme == Digital_Separate
+    flags_sync_on_RGB = models.NullBooleanField()
+
+    def __unicode__(self):
+        return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active, self.pixel_clock / 1000)

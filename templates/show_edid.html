@@ -11,7 +11,7 @@
 <div class="row">
   <div class="span4">
     <h3>Basic Display Parameters</h3>
-    <dl>
+    <dl class="dl-horizontal">
       <dt>Display gamma</dt>
       <dd>{{ edid.bsp_display_gamma }}</dd>
       <dt>Maximum horizontal image size</dt>
@@ -77,5 +77,80 @@
 {% endwith %}
     </dl>
   </div>
+</div>
+<div class="row">
+{% for timing in edid.standardtiming_set.all %}
+  <div class="span4">
+    <h3>Standard Timings {{ timing.identification }}</h3>
+    <dl class="dl-horizontal">
+      <dt>X Resolution</dt>
+      <dd>{{ timing.horizontal_active_pixels }} pixels</dd>
+      <dt>Y Resolution</dt>
+      <dd>{{ timing.vertical_active_pixels }} pixels</dd>
+      <dt>Refresh Rate</dt>
+      <dd>{{ timing.refresh_rate }} Hz</dd>
+      <dt>Image Aspect Ratio</dt>
+      <dd>{{ timing.get_aspect_ratio_display }}</dd>
+   </dl>
+  </div>
+{% endfor %}
+</div>
+<div class="row">
+{% for timing in edid.detailedtiming_set.all %}
+  <div class="span4">
+    <h3>Detailed Timings {{ timing.identification }}</h3>
+    <dl class="dl-horizontal">
+      <dt>Pixel clock</dt>
+      <dd>{{ timing.pixel_clock }} kHz</dd>
+      <dt>Horizontal Active</dt>
+      <dd>{{ timing.horizontal_active }} pixels</dd>
+      <dt>Horizontal Blanking</dt>
+      <dd>{{ timing.horizontal_blanking }} pixels</dd>
+      <dt>Horizontal Sync Offset</dt>
+      <dd>{{ timing.horizontal_sync_offset }} lines</dd>
+      <dt>Horizontal Sync Pulse Width</dt>
+      <dd>{{ timing.horizontal_sync_pulse_width }} lines</dd>
+      <dt>Horizontal Image Size</dt>
+      <dd>{{ timing.horizontal_image_size }} mm</dd>
+      <dt>Horizontal Border</dt>
+      <dd>{{ timing.horizontal_border }} pixels</dd>
+      <dt>Vertical Active</dt>
+      <dd>{{ timing.vertical_active }} pixels</dd>
+      <dt>Vertical Blanking</dt>
+      <dd>{{ timing.vertical_blanking }} pixels</dd>
+      <dt>Vertical Sync Offset</dt>
+      <dd>{{ timing.vertical_sync_offset }} lines</dd>
+      <dt>Vertical Sync Pulse Width</dt>
+      <dd>{{ timing.vertical_sync_pulse_width }} lines</dd>
+      <dt>Vertical Image Size</dt>
+      <dd>{{ timing.vertical_image_size }} mm</dd>
+      <dt>Vertical Border</dt>
+      <dd>{{ timing.vertical_border }} pixels</dd>
+      <dt>Interlaced</dt>
+      <dd><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></dd>
+      <dt>Stereo Mode</dt>
+      <dd>{{ timing.get_flags_stereo_mode_display }}</dd>
+      <dt>Sync Scheme</dt>
+      <dd>{{ timing.get_flags_sync_scheme_display }}</dd>
+{% if timing.flags_sync_scheme == timing.Sync_Scheme.Digital_Separate %}
+      <dt>Horizontal Polarity</dt>
+      <dd>{{ edid.flags_horizontal_polarity }}</dd>
+      <dd><i class="icon-{{ timing.flags_horizontal_polarity|yesno:"ok,remove" }}"></i></dd>
+      <dt>Vertical Polarity</dt>
+      <dd><i class="icon-{{ timing.flags_vertical_polarity|yesno:"ok,remove" }}"></i></dd>
+{% else %}
+      <dt>Serrate</dt>
+      <dd><i class="icon-{{ timing.flags_serrate|yesno:"ok,remove" }}"></i></dd>
+  {% if timing.flags_sync_scheme == timing.Sync_Scheme.Digital_Composite %}
+      <dt>Composite Polarity</dt>
+      <dd><i class="icon-{{ timing.flags_composite_polarity|yesno:"ok,remove" }}"></i></dd>
+  {% else %}
+      <dt>Sync on RGB</dt>
+      <dd><i class="icon-{{ timing.flags_sync_on_RGB|yesno:"ok,remove" }}"></i></dd>
+  {% endif %}
+{% endif %}
+    </dl>
+  </div>
+{% endfor %}
 </div>
 {% endblock %}
