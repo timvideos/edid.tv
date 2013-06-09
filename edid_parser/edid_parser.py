@@ -94,6 +94,8 @@ class EDID_Parser(object):
 
         #ID Product Code: edid[12:10]
         self.data['ID_Product_Code'] = "%02x%02x" % (edid[3], edid[2])
+        #TODO: v1.1 works this way?
+        #self.data['ID_Product_Code'] = edid[2] + (edid[3] << 8)
 
         #ID Serial Number: edid[12:16]
         self.data['ID_Serial_Number'] = edid[4] + (edid[5] << 8) + (edid[6] << 16) + (edid[7] << 24)

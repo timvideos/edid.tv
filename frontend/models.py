@@ -1,6 +1,7 @@
 import re
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 from edid_parser.edid_parser import Display_Type, Display_Stereo_Mode, Timing_Sync_Scheme
 
@@ -55,10 +56,14 @@ class EDID(models.Model):
     ###bsp=Basic display parameters
     bsp_video_input = models.BooleanField()
     #Analog Input
-    bsp_signal_level_standard_choices = ((0, '(0.700, 0.300)'),
-                                        (1, '(0.714, 0.286)'),
-                                        (2, '(1.000, 0.400)'),
-                                        (3, '(0.700, 0.000)'))
+    bsp_signal_level_standard_0700_0300 = 0
+    bsp_signal_level_standard_0714_0286 = 1
+    bsp_signal_level_standard_1000_0400 = 2
+    bsp_signal_level_standard_0700_0000 = 3
+    bsp_signal_level_standard_choices = ((bsp_signal_level_standard_0700_0300, '(0.700, 0.300)'),
+                                        (bsp_signal_level_standard_0714_0286, '(0.714, 0.286)'),
+                                        (bsp_signal_level_standard_1000_0400, '(1.000, 0.400)'),
+                                        (bsp_signal_level_standard_0700_0000, '(0.700, 0.000)'))
     bsp_signal_level_standard = models.PositiveSmallIntegerField(choices=bsp_signal_level_standard_choices, blank=True, null=True)
 
     bsp_blank_to_black_setup = models.NullBooleanField()
@@ -145,7 +150,17 @@ class EDID(models.Model):
         self.bsp_video_input = edid['Basic_display_parameters']['Video_Input']
         #Analog Input
         if not self.bsp_video_input:
-            self.bsp_signal_level_standard = edid['Basic_display_parameters']['Signal_Level_Standard']
+            if edid['Basic_display_parameters']['Signal_Level_Standard'] == (0.700, 0.300):
+                self.bsp_signal_level_standard = self.bsp_signal_level_standard_0700_0300
+            elif edid['Basic_display_parameters']['Signal_Level_Standard'] == (0.714, 0.286):
+                self.bsp_signal_level_standard = self.bsp_signal_level_standard_0714_0286
+            elif edid['Basic_display_parameters']['Signal_Level_Standard'] == (1.000, 0.400):
+                self.bsp_signal_level_standard = self.bsp_signal_level_standard_1000_0400
+            elif edid['Basic_display_parameters']['Signal_Level_Standard'] == (0.700, 0.000):
+                self.bsp_signal_level_standard = self.bsp_signal_level_standard_0700_0000
+            else:
+                raise Exception('Invalid signal level standard can not be parsed.')
+
             self.bsp_blank_to_black_setup = edid['Basic_display_parameters']['Blank-to-black_setup']
             self.bsp_separate_syncs = edid['Basic_display_parameters']['Separate_syncs']
             self.bsp_composite_sync = edid['Basic_display_parameters']['Composite_sync']
