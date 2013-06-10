@@ -119,6 +119,30 @@ class EDID(models.Model):
     est_timings_1024_768_75 = models.BooleanField()
     est_timings_1280_1024_75 = models.BooleanField()
 
+    ###mrl=Monitor range limits
+    monitor_range_limits = models.BooleanField()
+
+    #in kHz
+    mrl_min_horizontal_rate = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_max_horizontal_rate = models.PositiveSmallIntegerField(blank=True, null=True)
+
+    #in Hz
+    mrl_min_vertical_rate = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_max_vertical_rate = models.PositiveSmallIntegerField(blank=True, null=True)
+
+    #in MHz
+    mrl_max_pixel_clock = models.PositiveSmallIntegerField(blank=True, null=True)
+
+    mrl_secondary_GTF_curve_supported = models.NullBooleanField()
+
+    #in kHz
+    mrl_secondary_GTF_start_frequency = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_secondary_GTF_C = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_secondary_GTF_M = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_secondary_GTF_K = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_secondary_GTF_J = models.PositiveSmallIntegerField(blank=True, null=True)
+
+
     def populate_from_edid_parser(self, edid):
         ### Header
         try:
@@ -291,6 +315,26 @@ class EDID(models.Model):
                     timing.flags_sync_on_RGB = data['Flags']['Sync_On_RGB']
 
             self.detailedtiming_set.add(timing)
+
+        if 'Monitor_Range_Limits_Descriptor' in edid['Descriptors']:
+            self.monitor_range_limits = True
+            data = edid['Descriptors']['Monitor_Range_Limits_Descriptor']
+
+            self.mrl_min_horizontal_rate = data['Min_Horizontal_rate']
+            self.mrl_max_horizontal_rate = data['Max_Horizontal_rate']
+            self.mrl_min_vertical_rate = data['Min_Vertical_rate']
+            self.mrl_max_vertical_rate = data['Max_Vertical_rate']
+            self.mrl_max_pixel_clock = data['Max_Supported_Pixel_Clock']
+            self.mrl_secondary_GTF_curve_supported = data['Secondary_GTF_curve_supported']
+
+            if self.mrl_secondary_GTF_curve_supported:
+                self.mrl_secondary_GTF_start_frequency = data['Secondary_GTF']['start_frequency']
+                self.mrl_secondary_GTF_C = data['Secondary_GTF']['C']
+                self.mrl_secondary_GTF_M = data['Secondary_GTF']['M']
+                self.mrl_secondary_GTF_K = data['Secondary_GTF']['K']
+                self.mrl_secondary_GTF_J = data['Secondary_GTF']['J']
+        else:
+            self.monitor_range_limits = False
 
         self.status = self.STATUS_TIMINGS_ADDED
 

@@ -78,6 +78,7 @@
     </dl>
   </div>
 </div>
+{% if edid.standardtiming_set.all %}
 <div class="row">
 {% for timing in edid.standardtiming_set.all %}
   <div class="span4">
@@ -95,6 +96,8 @@
   </div>
 {% endfor %}
 </div>
+{% endif %}
+{% if edid.detailedtiming_set.all %}
 <div class="row">
 {% for timing in edid.detailedtiming_set.all %}
   <div class="span4">
@@ -153,4 +156,38 @@
   </div>
 {% endfor %}
 </div>
+{% endif %}
+{% if edid.monitor_range_limits %}
+<div class="row">
+  <div class="span4">
+    <h3>Monitor Range Limits</h3>
+    <dl>
+      <dt>Minimum horizontal line rate</dt>
+      <dd>{{ edid.mrl_min_horizontal_rate }} kHz</dd>
+      <dt>Maximum horizontal line rate</dt>
+      <dd>{{ edid.mrl_max_horizontal_rate }} kHz</dd>
+      <dt>Minimum vertical line rate</dt>
+      <dd>{{ edid.mrl_min_vertical_rate }} Hz</dd>
+      <dt>Maximum vertical line rate</dt>
+      <dd>{{ edid.mrl_max_vertical_rate }} Hz</dd>
+      <dt>Maximum pixel clock rate</dt>
+      <dd>{{ edid.mrl_max_pixel_clock }} MHz</dd>
+      <dt>Secondary GTF curve supported</dt>
+      <dd><i class="icon-{{ edid.mrl_secondary_GTF_curve_supported|yesno:"ok,remove" }}"></i></dd>
+{% if edid.mrl_secondary_GTF_curve_supported %}
+      <dt>Start frequency</dt>
+      <dd>{{ edid.mrl_max_pixel_clock }} kHz</dd>
+      <dt>C</dt>
+      <dd>{{ edid.mrl_secondary_GTF_C }}</dd>
+      <dt>M</dt>
+      <dd>{{ edid.mrl_secondary_GTF_M }}</dd>
+      <dt>K</dt>
+      <dd>{{ edid.mrl_secondary_GTF_K }}</dd>
+      <dt>J</dt>
+      <dd>{{ edid.mrl_secondary_GTF_J }}</dd>
+{% endif %}
+    </dl>
+  </div>
+</div>
+{% endif %}
 {% endblock %}
