@@ -119,7 +119,7 @@ class EDID(models.Model):
     est_timings_1024_768_75 = models.BooleanField()
     est_timings_1280_1024_75 = models.BooleanField()
 
-    ###mrl=Monitor range limits
+    ###mrl=Monitor range limits, optional starting from v1.1
     monitor_range_limits = models.BooleanField()
 
     #in kHz

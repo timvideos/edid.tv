@@ -283,6 +283,9 @@ class EDID_Parser(object):
                 if edid[i + 3] == 0xff:
                     self.parse_monitor_descriptor_text("Monitor_Serial_Number", tmp_edid)
                 elif edid[i + 3] == 0xfe:
+                    #TODO: Fix for multiple strings
+                    #See "6.2  Example 2 - Legacy EDID example for reference" from\
+                    # "VESA Enhanced EDID Standard Release A, Rev.1"
                     self.parse_monitor_descriptor_text("Monitor_Data_String", tmp_edid)
                 elif edid[i + 3] == 0xfd:
                     new_data["Monitor_Range_Limits_Descriptor"] = self.parse_monitor_descriptor_range_limits(tmp_edid)
