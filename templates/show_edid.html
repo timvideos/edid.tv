@@ -3,191 +3,347 @@
 
 {% block content %}
 <div class="row">
-  <div class="span12">
-    <h2>EDID Details</h2>
-    <p>{{ edid.manufacturer.name }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</p>
+  <div class="span3 sidenav">
+    <ul class="nav nav-list sidenav" data-spy="affix">
+      <li><a href="#basic_display_parameters"><i class="icon-chevron-right"></i> Basic Display Parameters</a></li>
+      <li><a href="#chromaticity"><i class="icon-chevron-right"></i> Chromaticity</a></li>
+      <li><a href="#established_timings"><i class="icon-chevron-right"></i> Established Timings</a></li>
+      <li><a href="#standard_timings"><i class="icon-chevron-right"></i> Standard Timings</a></li>
+      <li><a href="#detailed_timings"><i class="icon-chevron-right"></i> Detailed Timings</a></li>
+      <li><a href="#monitor_range_limits"><i class="icon-chevron-right"></i> Monitor Range Limits</a></li>
+    </ul>
   </div>
-</div>
-<div class="row">
-  <div class="span4">
-    <h3>Basic Display Parameters</h3>
-    <dl class="dl-horizontal">
-      <dt>Display gamma</dt>
-      <dd>{{ edid.bsp_display_gamma }}</dd>
-      <dt>Maximum horizontal image size</dt>
-      <dd>{{ edid.bsp_max_horizontal_image_size }} cm</dd>
-      <dt>Maximum vertical image size</dt>
-      <dd>{{ edid.bsp_max_vertical_image_size }} cm</dd>
-      <dt>Signal level input</dt>
-      <dd>{{ edid.bsp_video_input|yesno:"Digital,Analog" }}</dd>
-{% if not edid.bsp_video_input %}
-      <dd><i class="icon-{{ edid.bsp_blank_to_black_setup|yesno:"ok,remove" }}"></i> Blank-to-black setup</dd>
-      <dd><i class="icon-{{ edid.bsp_separate_syncs|yesno:"ok,remove" }}"></i> Separate syncs</dd>
-      <dd><i class="icon-{{ edid.bsp_composite_sync|yesno:"ok,remove" }}"></i> Composite syncs</dd>
-      <dd><i class="icon-{{ edid.bsp_sync_on_green_video|yesno:"ok,remove" }}"></i> Sync_on_green_video</dd>
-      <dd><i class="icon-{{ edid.bsp_vsync_serration|yesno:"ok,remove" }}"></i> Vsync_serration</dd>
-      <dt>Signal Level Standard</dt>
-      <dd>{{ edid.get_bsp_signal_level_standard_display }}</dd>
-{% else %}
-      <dt>VESA DFP 1.x</dt>
-      <dd><i class="icon-{{ edid.bsp_video_input_DFP_1|yesno:"ok,remove" }}"></i></dd>
-{% endif %}
-      <dt>Feature Support</dt>
-      <dd><i class="icon-{{ edid.bsp_feature_active_off|yesno:"ok,remove" }}"></i> Active-off</dd>
-      <dd><i class="icon-{{ edid.bsp_feature_default_GTF|yesno:"ok,remove" }}"></i> Default GTF</dd>
-      <dd><i class="icon-{{ edid.bsp_feature_preferred_timing_mode|yesno:"ok,remove" }}"></i> Preferred Timing Mode</dd>
-      <dd><i class="icon-{{ edid.bsp_feature_standard_sRGB|yesno:"ok,remove" }}"></i> Standard sRGB</dd>
-      <dd><i class="icon-{{ edid.bsp_feature_standby|yesno:"ok,remove" }}"></i> Standby</dd>
-      <dd><i class="icon-{{ edid.bsp_feature_suspend|yesno:"ok,remove" }}"></i> Suspend</dd>
-      <dt>Display Type</dt>
-      <dd>{{ edid.get_bsp_feature_display_type_display }}</dd>
-    </dl>
-  </div>
-  <div class="span4">
-    <h3>Chromaticity</h3>
-    <dl class="dl-horizontal">
-      <dt>Red X</dt>
-      <dd>{{ edid.chr_red_x|floatformat:3 }}</dd>
-      <dt>Red Y</dt>
-      <dd>{{ edid.chr_red_y|floatformat:3 }}</dd>
-      <dt>Green X</dt>
-      <dd>{{ edid.chr_green_x|floatformat:3 }}</dd>
-      <dt>Green Y</dt>
-      <dd>{{ edid.chr_green_y|floatformat:3 }}</dd>
-      <dt>Blue X</dt>
-      <dd>{{ edid.chr_blue_x|floatformat:3 }}</dd>
-      <dt>Blue Y</dt>
-      <dd>{{ edid.chr_blue_y|floatformat:3 }}</dd>
-      <dt>White X</dt>
-      <dd>{{ edid.chr_white_x|floatformat:3 }}</dd>
-      <dt>White Y</dt>
-      <dd>{{ edid.chr_white_y|floatformat:3 }}</dd>
-    </dl>
-  </div>
-  <div class="span4">
-    <h3>Established Timings</h3>
-    <dl class="dl-horizontal">
+  <div class="span9">
+    <h2>{{ edid.manufacturer.name }} {{ edid.manufacturer_serial_number }}</h2>
+    <section id="basic_display_parameters">
+      <h3>Basic Display Parameters</h3>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Display gamma</td>
+            <td>{{ edid.bsp_display_gamma }}</td>
+          </tr>
+          <tr>
+            <td>Maximum horizontal image size</td>
+            <td>{{ edid.bsp_max_horizontal_image_size }} cm</td>
+          </tr>
+          <tr>
+            <td>Maximum vertical image size</td>
+            <td>{{ edid.bsp_max_vertical_image_size }} cm</td>
+          </tr>
+          <tr>
+            <td>Signal level input</td>
+            <td>{{ edid.bsp_video_input|yesno:"Digital,Analog" }}</td>
+          </tr>
+      {% if not edid.bsp_video_input %}
+          <tr>
+            <td><i class="icon-{{ edid.bsp_blank_to_black_setup|yesno:"ok,remove" }}"></i> Blank-to-black setup</td>
+            <td><i class="icon-{{ edid.bsp_separate_syncs|yesno:"ok,remove" }}"></i> Separate syncs</td>
+            <td><i class="icon-{{ edid.bsp_composite_sync|yesno:"ok,remove" }}"></i> Composite syncs</td>
+            <td><i class="icon-{{ edid.bsp_sync_on_green_video|yesno:"ok,remove" }}"></i> Sync_on_green_video</td>
+            <td><i class="icon-{{ edid.bsp_vsync_serration|yesno:"ok,remove" }}"></i> Vsync_serration</td>
+          </tr>
+          <tr>
+            <td>Signal Level Standard</td>
+            <td>{{ edid.get_bsp_signal_level_standard_display }}</td>
+          </tr>
+      {% else %}
+          <tr>
+            <td>VESA DFP 1.x</td>
+            <td><i class="icon-{{ edid.bsp_video_input_DFP_1|yesno:"ok,remove" }}"></i></td>
+          </tr>
+      {% endif %}
+          <tr>
+            <td>Display Type</td>
+            <td>{{ edid.get_bsp_feature_display_type_display }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h4>Feature Support</h4>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Active-off</td>
+            <td><i class="icon-{{ edid.bsp_feature_active_off|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Default GTF</td>
+            <td><i class="icon-{{ edid.bsp_feature_default_GTF|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Preferred Timing Mode</td>
+            <td><i class="icon-{{ edid.bsp_feature_preferred_timing_mode|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Standard sRGB</td>
+            <td><i class="icon-{{ edid.bsp_feature_standard_sRGB|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Standby</td>
+            <td><i class="icon-{{ edid.bsp_feature_standby|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Suspend</td>
+            <td><i class="icon-{{ edid.bsp_feature_suspend|yesno:"ok,remove" }}"></i></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="chromaticity">
+      <h3>Chromaticity</h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Color</th>
+            <th>X</th>
+            <th>Y</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Red</td>
+            <td>{{ edid.chr_red_x|floatformat:3 }}</td>
+            <td>{{ edid.chr_red_y|floatformat:3 }}</td>
+          </tr>
+          <tr>
+            <td>Green</td>
+            <td>{{ edid.chr_green_x|floatformat:3 }}</td>
+            <td>{{ edid.chr_green_y|floatformat:3 }}</td>
+          </tr>
+          <tr>
+            <td>Blue</td>
+            <td>{{ edid.chr_blue_x|floatformat:3 }}</td>
+            <td>{{ edid.chr_blue_y|floatformat:3 }}</td>
+          </tr>
+          <tr>
+            <td>White</td>
+            <td>{{ edid.chr_white_x|floatformat:3 }}</td>
+            <td>{{ edid.chr_white_y|floatformat:3 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="established_timings">
+      <h3>Established Timings</h3>
+      <table class="table table-striped">
+        <tbody>
 {% with est_timings=edid.get_est_timings %}
   {% for timing, supported in est_timings %}
     {% if supported %}
-    <dt>{{ timing }}</dt>
-    <dd><i class="icon-ok"></i></dd>
+          <tr>
+            <td>{{ timing }}</td>
+            <td><i class="icon-ok"></i></td>
+          </tr>
     {% endif %}
   {% endfor %}
 {% endwith %}
-    </dl>
-  </div>
-</div>
+        </tbody>
+      </table>
+    </section>
+
 {% if edid.standardtiming_set.all %}
-<div class="row">
-{% for timing in edid.standardtiming_set.all %}
-  <div class="span4">
-    <h3>Standard Timings {{ timing.identification }}</h3>
-    <dl class="dl-horizontal">
-      <dt>X Resolution</dt>
-      <dd>{{ timing.horizontal_active_pixels }} pixels</dd>
-      <dt>Y Resolution</dt>
-      <dd>{{ timing.vertical_active_pixels }} pixels</dd>
-      <dt>Refresh Rate</dt>
-      <dd>{{ timing.refresh_rate }} Hz</dd>
-      <dt>Image Aspect Ratio</dt>
-      <dd>{{ timing.get_aspect_ratio_display }}</dd>
-   </dl>
-  </div>
-{% endfor %}
-</div>
+    <section id="standard_timings">
+      <div class="row">
+  {% for timing in edid.standardtiming_set.all %}
+        <div class="span4">
+          <h3>Standard Timings {{ timing.identification }}</h3>
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>X Resolution</td>
+                <td>{{ timing.horizontal_active_pixels }} pixels</td>
+              </tr>
+              <tr>
+                <td>Y Resolution</td>
+                <td>{{ timing.vertical_active_pixels }} pixels</td>
+              </tr>
+              <tr>
+                <td>Refresh Rate</td>
+                <td>{{ timing.refresh_rate }} Hz</td>
+              </tr>
+              <tr>
+                <td>Image Aspect Ratio</td>
+                <td>{{ timing.get_aspect_ratio_display }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    {% if forloop.counter|divisibleby:2 and not forloop.last %}
+      </div>
+      <div class="row">
+    {% endif %}
+  {% endfor %}
+      </div>
+    </section>
 {% endif %}
+
 {% if edid.detailedtiming_set.all %}
-<div class="row">
-{% for timing in edid.detailedtiming_set.all %}
-  <div class="span4">
-    <h3>Detailed Timings {{ timing.identification }}</h3>
-    <dl class="dl-horizontal">
-      <dt>Pixel clock</dt>
-      <dd>{{ timing.pixel_clock }} kHz</dd>
-      <dt>Horizontal Active</dt>
-      <dd>{{ timing.horizontal_active }} pixels</dd>
-      <dt>Horizontal Blanking</dt>
-      <dd>{{ timing.horizontal_blanking }} pixels</dd>
-      <dt>Horizontal Sync Offset</dt>
-      <dd>{{ timing.horizontal_sync_offset }} lines</dd>
-      <dt>Horizontal Sync Pulse Width</dt>
-      <dd>{{ timing.horizontal_sync_pulse_width }} lines</dd>
-      <dt>Horizontal Image Size</dt>
-      <dd>{{ timing.horizontal_image_size }} mm</dd>
-      <dt>Horizontal Border</dt>
-      <dd>{{ timing.horizontal_border }} pixels</dd>
-      <dt>Vertical Active</dt>
-      <dd>{{ timing.vertical_active }} pixels</dd>
-      <dt>Vertical Blanking</dt>
-      <dd>{{ timing.vertical_blanking }} pixels</dd>
-      <dt>Vertical Sync Offset</dt>
-      <dd>{{ timing.vertical_sync_offset }} lines</dd>
-      <dt>Vertical Sync Pulse Width</dt>
-      <dd>{{ timing.vertical_sync_pulse_width }} lines</dd>
-      <dt>Vertical Image Size</dt>
-      <dd>{{ timing.vertical_image_size }} mm</dd>
-      <dt>Vertical Border</dt>
-      <dd>{{ timing.vertical_border }} pixels</dd>
-      <dt>Interlaced</dt>
-      <dd><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></dd>
-      <dt>Stereo Mode</dt>
-      <dd>{{ timing.get_flags_stereo_mode_display }}</dd>
-      <dt>Sync Scheme</dt>
-      <dd>{{ timing.get_flags_sync_scheme_display }}</dd>
-{% if timing.flags_sync_scheme == timing.Sync_Scheme.Digital_Separate %}
-      <dt>Horizontal Polarity</dt>
-      <dd>{{ edid.flags_horizontal_polarity }}</dd>
-      <dd><i class="icon-{{ timing.flags_horizontal_polarity|yesno:"ok,remove" }}"></i></dd>
-      <dt>Vertical Polarity</dt>
-      <dd><i class="icon-{{ timing.flags_vertical_polarity|yesno:"ok,remove" }}"></i></dd>
-{% else %}
-      <dt>Serrate</dt>
-      <dd><i class="icon-{{ timing.flags_serrate|yesno:"ok,remove" }}"></i></dd>
-  {% if timing.flags_sync_scheme == timing.Sync_Scheme.Digital_Composite %}
-      <dt>Composite Polarity</dt>
-      <dd><i class="icon-{{ timing.flags_composite_polarity|yesno:"ok,remove" }}"></i></dd>
-  {% else %}
-      <dt>Sync on RGB</dt>
-      <dd><i class="icon-{{ timing.flags_sync_on_RGB|yesno:"ok,remove" }}"></i></dd>
-  {% endif %}
+    <section id="detailed_timings">
+      <div class="row">
+    {% for timing in edid.detailedtiming_set.all %}
+        <div class="span4">
+          <h3>Detailed Timings {{ timing.identification }}</h3>
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>Pixel clock</td>
+                <td>{{ timing.pixel_clock }} kHz</td>
+              </tr>
+              <tr>
+                <td>Horizontal Active</td>
+                <td>{{ timing.horizontal_active }} pixels</td>
+              </tr>
+              <tr>
+                <td>Horizontal Blanking</td>
+                <td>{{ timing.horizontal_blanking }} pixels</td>
+              </tr>
+              <tr>
+                <td>Horizontal Sync Offset</td>
+                <td>{{ timing.horizontal_sync_offset }} lines</td>
+              </tr>
+              <tr>
+                <td>Horizontal Sync Pulse Width</td>
+                <td>{{ timing.horizontal_sync_pulse_width }} lines</td>
+              </tr>
+              <tr>
+                <td>Horizontal Image Size</td>
+                <td>{{ timing.horizontal_image_size }} mm</td>
+              </tr>
+              <tr>
+                <td>Horizontal Border</td>
+                <td>{{ timing.horizontal_border }} pixels</td>
+              </tr>
+              <tr>
+                <td>Vertical Active</td>
+                <td>{{ timing.vertical_active }} pixels</td>
+              </tr>
+              <tr>
+                <td>Vertical Blanking</td>
+                <td>{{ timing.vertical_blanking }} pixels</td>
+              </tr>
+              <tr>
+                <td>Vertical Sync Offset</td>
+                <td>{{ timing.vertical_sync_offset }} lines</td>
+              </tr>
+              <tr>
+                <td>Vertical Sync Pulse Width</td>
+                <td>{{ timing.vertical_sync_pulse_width }} lines</td>
+              </tr>
+              <tr>
+                <td>Vertical Image Size</td>
+                <td>{{ timing.vertical_image_size }} mm</td>
+              </tr>
+              <tr>
+                <td>Vertical Border</td>
+                <td>{{ timing.vertical_border }} pixels</td>
+              </tr>
+              <tr>
+                <td>Interlaced</td>
+                <td><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></td>
+              </tr>
+              <tr>
+                <td>Stereo Mode</td>
+                <td>{{ timing.get_flags_stereo_mode_display }}</td>
+              </tr>
+              <tr>
+                <td>Sync Scheme</td>
+                <td>{{ timing.get_flags_sync_scheme_display }}</td>
+              </tr>
+      {% if timing.flags_sync_scheme == timing.Sync_Scheme.Digital_Separate %}
+              <tr>
+                <td>Horizontal Polarity</td>
+                <td><i class="icon-{{ timing.flags_horizontal_polarity|yesno:"ok,remove" }}"></i></td>
+              </tr>
+              <tr>
+                <td>Vertical Polarity</td>
+                <td><i class="icon-{{ timing.flags_vertical_polarity|yesno:"ok,remove" }}"></i></td>
+              </tr>
+      {% else %}
+              <tr>
+                <td>Serrate</td>
+                <td><i class="icon-{{ timing.flags_serrate|yesno:"ok,remove" }}"></i></td>
+              </tr>
+          {% if timing.flags_sync_scheme == timing.Sync_Scheme.Digital_Composite %}
+              <tr>
+                <td>Composite Polarity</td>
+                <td><i class="icon-{{ timing.flags_composite_polarity|yesno:"ok,remove" }}"></i></td>
+              </tr>
+          {% else %}
+              <tr>
+                <td>Sync on RGB</td>
+                <td><i class="icon-{{ timing.flags_sync_on_RGB|yesno:"ok,remove" }}"></i></td>
+              </tr>
+          {% endif %}
+      {% endif %}
+            </tbody>
+          </table>
+        </div>
+      {% if forloop.counter|divisibleby:2 and not forloop.last %}
+      </div>
+      <div class="row">
+      {% endif %}
+    {% endfor %}
+      </div>
+    </section>
 {% endif %}
-    </dl>
-  </div>
-{% endfor %}
-</div>
-{% endif %}
+
 {% if edid.monitor_range_limits %}
-<div class="row">
-  <div class="span4">
-    <h3>Monitor Range Limits</h3>
-    <dl>
-      <dt>Minimum horizontal line rate</dt>
-      <dd>{{ edid.mrl_min_horizontal_rate }} kHz</dd>
-      <dt>Maximum horizontal line rate</dt>
-      <dd>{{ edid.mrl_max_horizontal_rate }} kHz</dd>
-      <dt>Minimum vertical line rate</dt>
-      <dd>{{ edid.mrl_min_vertical_rate }} Hz</dd>
-      <dt>Maximum vertical line rate</dt>
-      <dd>{{ edid.mrl_max_vertical_rate }} Hz</dd>
-      <dt>Maximum pixel clock rate</dt>
-      <dd>{{ edid.mrl_max_pixel_clock }} MHz</dd>
-      <dt>Secondary GTF curve supported</dt>
-      <dd><i class="icon-{{ edid.mrl_secondary_GTF_curve_supported|yesno:"ok,remove" }}"></i></dd>
-{% if edid.mrl_secondary_GTF_curve_supported %}
-      <dt>Start frequency</dt>
-      <dd>{{ edid.mrl_max_pixel_clock }} kHz</dd>
-      <dt>C</dt>
-      <dd>{{ edid.mrl_secondary_GTF_C }}</dd>
-      <dt>M</dt>
-      <dd>{{ edid.mrl_secondary_GTF_M }}</dd>
-      <dt>K</dt>
-      <dd>{{ edid.mrl_secondary_GTF_K }}</dd>
-      <dt>J</dt>
-      <dd>{{ edid.mrl_secondary_GTF_J }}</dd>
+    <section id="monitor_range_limits">
+      <h3>Monitor Range Limits</h3>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Minimum horizontal line rate</td>
+            <td>{{ edid.mrl_min_horizontal_rate }} kHz</td>
+          </tr>
+          <tr>
+            <td>Maximum horizontal line rate</td>
+            <td>{{ edid.mrl_max_horizontal_rate }} kHz</td>
+          </tr>
+          <tr>
+            <td>Minimum vertical line rate</td>
+            <td>{{ edid.mrl_min_vertical_rate }} Hz</td>
+          </tr>
+          <tr>
+            <td>Maximum vertical line rate</td>
+            <td>{{ edid.mrl_max_vertical_rate }} Hz</td>
+          </tr>
+          <tr>
+            <td>Maximum pixel clock rate</td>
+            <td>{{ edid.mrl_max_pixel_clock }} MHz</td>
+          </tr>
+          <tr>
+            <td>Secondary GTF curve supported</td>
+            <td><i class="icon-{{ edid.mrl_secondary_GTF_curve_supported|yesno:"ok,remove" }}"></i></td>
+          </tr>
+  {% if edid.mrl_secondary_GTF_curve_supported %}
+          <tr>
+            <td>Start frequency</td>
+            <td>{{ edid.mrl_max_pixel_clock }} kHz</td>
+          </tr>
+          <tr>
+            <td>C</td>
+            <td>{{ edid.mrl_secondary_GTF_C }}</td>
+          </tr>
+          <tr>
+            <td>M</td>
+            <td>{{ edid.mrl_secondary_GTF_M }}</td>
+          </tr>
+          <tr>
+            <td>K</td>
+            <td>{{ edid.mrl_secondary_GTF_K }}</td>
+          </tr>
+          <tr>
+            <td>J</td>
+            <td>{{ edid.mrl_secondary_GTF_J }}</td>
+          </tr>
+  {% endif %}
+        </tbody>
+      </table>
+    </section>
 {% endif %}
-    </dl>
   </div>
 </div>
-{% endif %}
 {% endblock %}
