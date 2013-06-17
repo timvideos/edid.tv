@@ -9,7 +9,7 @@ class Manufacturer(models.Model):
     #Full name
     name = models.CharField(max_length=255, blank=True)
     #ID, 3 characters
-    name_id = models.CharField(max_length=3, primary_key=True)
+    name_id = models.CharField(max_length=3)
 
     def __unicode__(self):
         return "%s: %s" % (self.name_id, self.name)
@@ -36,7 +36,7 @@ class EDID(models.Model):
     manufacturer_product_code = models.CharField(max_length=4, blank=True)
     #ID Serial Number, 32-bit
     manufacturer_serial_number = models.PositiveIntegerField(blank=True, null=True)
-    #Week of manufacture, 1-53, 255==the year model
+    #Week of manufacture, 1-54, 0==Unknown, 255==the year model
     week_of_manufacture = models.PositiveSmallIntegerField()
     #Year of manufacture, 1990-2245
     year_of_manufacture = models.PositiveSmallIntegerField()
@@ -54,7 +54,11 @@ class EDID(models.Model):
     monitor_data_string = models.CharField(max_length=13, blank=True, null=True)
 
     ###bsp=Basic display parameters
-    bsp_video_input = models.BooleanField()
+    bsp_video_input_analog = 0
+    bsp_video_input_digital = 1
+    bsp_video_input_choices = ((bsp_video_input_analog, 'Analog'),
+                              (bsp_video_input_digital, 'Digital'))
+    bsp_video_input = models.PositiveSmallIntegerField(choices=bsp_video_input_choices, default=bsp_video_input_analog)
     #Analog Input
     bsp_signal_level_standard_0700_0300 = 0
     bsp_signal_level_standard_0714_0286 = 1
@@ -367,6 +371,7 @@ class StandardTiming(models.Model):
 
     class Meta:
         unique_together = (("EDID", "identification"),)
+        ordering = ['identification']
 
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active_pixels, self.vertical_active_pixels, self.refresh_rate)
@@ -428,6 +433,7 @@ class DetailedTiming(models.Model):
 
     class Meta:
         unique_together = (("EDID", "identification"),)
+        ordering = ['identification']
 
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active, self.pixel_clock / 1000)
