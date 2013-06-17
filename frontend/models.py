@@ -69,7 +69,7 @@ class EDID(models.Model):
     bsp_video_input_digital = 1
     bsp_video_input_choices = ((bsp_video_input_analog, 'Analog'),
                               (bsp_video_input_digital, 'Digital'))
-    bsp_video_input = models.PositiveSmallIntegerField(choices=bsp_video_input_choices, default=bsp_video_input_analog)
+    bsp_video_input = models.PositiveSmallIntegerField('video input', choices=bsp_video_input_choices, default=bsp_video_input_analog)
     #Analog Input
     bsp_signal_level_standard_0700_0300 = 0
     bsp_signal_level_standard_0714_0286 = 1
@@ -79,83 +79,83 @@ class EDID(models.Model):
                                         (bsp_signal_level_standard_0714_0286, '(0.714, 0.286)'),
                                         (bsp_signal_level_standard_1000_0400, '(1.000, 0.400)'),
                                         (bsp_signal_level_standard_0700_0000, '(0.700, 0.000)'))
-    bsp_signal_level_standard = models.PositiveSmallIntegerField(choices=bsp_signal_level_standard_choices, blank=True, null=True)
+    bsp_signal_level_standard = models.PositiveSmallIntegerField('signal level standard', choices=bsp_signal_level_standard_choices, blank=True, null=True)
 
-    bsp_blank_to_black_setup = models.NullBooleanField()
-    bsp_separate_syncs = models.NullBooleanField()
-    bsp_composite_sync = models.NullBooleanField()
-    bsp_sync_on_green_video = models.NullBooleanField()
-    bsp_vsync_serration = models.NullBooleanField()
+    bsp_blank_to_black_setup = models.NullBooleanField('blank-to-black setup level')
+    bsp_separate_syncs = models.NullBooleanField('separate sync')
+    bsp_composite_sync = models.NullBooleanField('composite sync signal on horizontal')
+    bsp_sync_on_green_video = models.NullBooleanField('composite sync signal on green video')
+    bsp_vsync_serration = models.NullBooleanField('serration on the vertical sync')
     #Digital Input
-    bsp_video_input_DFP_1 = models.NullBooleanField()
+    bsp_video_input_DFP_1 = models.NullBooleanField('digital video interface standard')
 
-    bsp_max_horizontal_image_size = models.PositiveSmallIntegerField()
-    bsp_max_vertical_image_size = models.PositiveSmallIntegerField()
-    bsp_display_gamma = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
+    bsp_max_horizontal_image_size = models.PositiveSmallIntegerField('maximum horizontal image size')
+    bsp_max_vertical_image_size = models.PositiveSmallIntegerField('maximum vertical image size')
+    bsp_display_gamma = models.DecimalField('display gamma', max_digits=3, decimal_places=2, blank=True, null=True)
 
-    bsp_feature_display_type_choices = ((Display_Type.Monochrome, 'Monochrome / grayscale display'),
+    bsp_feature_display_type_choices = ((Display_Type.Monochrome, 'Monochrome or grayscale display'),
                                         (Display_Type.RGB, 'RGB color display'),
                                         (Display_Type.Non_RGB, 'Non-RGB multicolor display'),
                                         (Display_Type.Undefined, 'Undefined'))
 
-    bsp_feature_standby = models.BooleanField()
-    bsp_feature_suspend = models.BooleanField()
-    bsp_feature_active_off = models.BooleanField()
-    bsp_feature_display_type = models.PositiveSmallIntegerField(choices=bsp_feature_display_type_choices)
-    bsp_feature_standard_sRGB = models.BooleanField()
-    bsp_feature_preferred_timing_mode = models.BooleanField()
-    bsp_feature_default_GTF = models.BooleanField()
+    bsp_feature_standby = models.BooleanField('standby mode')
+    bsp_feature_suspend = models.BooleanField('suspend mode')
+    bsp_feature_active_off = models.BooleanField('active off/very low power mode')
+    bsp_feature_display_type = models.PositiveSmallIntegerField('display color type', choices=bsp_feature_display_type_choices)
+    bsp_feature_standard_sRGB = models.BooleanField('standard sRGB')
+    bsp_feature_preferred_timing_mode = models.BooleanField('preferred timing mode')
+    bsp_feature_default_GTF = models.BooleanField('default GTF')
 
     ###chr=Chromaticity
-    chr_red_x = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_red_y = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_green_x = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_green_y = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_blue_x = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_blue_y = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_white_x = models.DecimalField(max_digits=4, decimal_places=3)
-    chr_white_y = models.DecimalField(max_digits=4, decimal_places=3)
+    chr_red_x = models.DecimalField('red x', max_digits=4, decimal_places=3)
+    chr_red_y = models.DecimalField('red y', max_digits=4, decimal_places=3)
+    chr_green_x = models.DecimalField('green x', max_digits=4, decimal_places=3)
+    chr_green_y = models.DecimalField('green y', max_digits=4, decimal_places=3)
+    chr_blue_x = models.DecimalField('blue x', max_digits=4, decimal_places=3)
+    chr_blue_y = models.DecimalField('blue y', max_digits=4, decimal_places=3)
+    chr_white_x = models.DecimalField('white x', max_digits=4, decimal_places=3)
+    chr_white_y = models.DecimalField('white y', max_digits=4, decimal_places=3)
 
     ###est_timings=Established Timings
-    est_timings_720_400_70 = models.BooleanField()
-    est_timings_720_400_88 = models.BooleanField()
-    est_timings_640_480_60 = models.BooleanField()
-    est_timings_640_480_67 = models.BooleanField()
-    est_timings_640_480_72 = models.BooleanField()
-    est_timings_640_480_75 = models.BooleanField()
-    est_timings_800_600_56 = models.BooleanField()
-    est_timings_800_600_60 = models.BooleanField()
-    est_timings_800_600_72 = models.BooleanField()
-    est_timings_800_600_75 = models.BooleanField()
-    est_timings_832_624_75 = models.BooleanField()
-    est_timings_1024_768_87 = models.BooleanField()
-    est_timings_1024_768_60 = models.BooleanField()
-    est_timings_1024_768_70 = models.BooleanField()
-    est_timings_1024_768_75 = models.BooleanField()
-    est_timings_1280_1024_75 = models.BooleanField()
+    est_timings_720_400_70 = models.BooleanField('720x400@70Hz')
+    est_timings_720_400_88 = models.BooleanField('720x400@88Hz')
+    est_timings_640_480_60 = models.BooleanField('640x480@60Hz')
+    est_timings_640_480_67 = models.BooleanField('640x480@67Hz')
+    est_timings_640_480_72 = models.BooleanField('640x480@72Hz')
+    est_timings_640_480_75 = models.BooleanField('640x480@75Hz')
+    est_timings_800_600_56 = models.BooleanField('800x600@56Hz')
+    est_timings_800_600_60 = models.BooleanField('800x600@60Hz')
+    est_timings_800_600_72 = models.BooleanField('800x600@72Hz')
+    est_timings_800_600_75 = models.BooleanField('800x600@75Hz')
+    est_timings_832_624_75 = models.BooleanField('832x624@75Hz')
+    est_timings_1024_768_87 = models.BooleanField('1024x768@87Hz')
+    est_timings_1024_768_60 = models.BooleanField('1024x768@60Hz')
+    est_timings_1024_768_70 = models.BooleanField('1024x768@70Hz')
+    est_timings_1024_768_75 = models.BooleanField('1024x768@75Hz')
+    est_timings_1280_1024_75 = models.BooleanField('1280x1024@75Hz')
 
     ###mrl=Monitor range limits, optional starting from v1.1
-    monitor_range_limits = models.BooleanField()
+    monitor_range_limits = models.BooleanField('monitor range limits')
 
     #in kHz
-    mrl_min_horizontal_rate = models.PositiveSmallIntegerField(blank=True, null=True)
-    mrl_max_horizontal_rate = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_min_horizontal_rate = models.PositiveSmallIntegerField('minimum horizontal rate', blank=True, null=True)
+    mrl_max_horizontal_rate = models.PositiveSmallIntegerField('maximum horizontal rate', blank=True, null=True)
 
     #in Hz
-    mrl_min_vertical_rate = models.PositiveSmallIntegerField(blank=True, null=True)
-    mrl_max_vertical_rate = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_min_vertical_rate = models.PositiveSmallIntegerField('minimum vertical rate', blank=True, null=True)
+    mrl_max_vertical_rate = models.PositiveSmallIntegerField('maximum vertical rate', blank=True, null=True)
 
     #in MHz
-    mrl_max_pixel_clock = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_max_pixel_clock = models.PositiveSmallIntegerField('maximum supported pixel clock', blank=True, null=True)
 
-    mrl_secondary_GTF_curve_supported = models.NullBooleanField()
+    mrl_secondary_GTF_curve_supported = models.NullBooleanField('secondary GTF curve')
 
     #in kHz
-    mrl_secondary_GTF_start_frequency = models.PositiveSmallIntegerField(blank=True, null=True)
-    mrl_secondary_GTF_C = models.PositiveSmallIntegerField(blank=True, null=True)
-    mrl_secondary_GTF_M = models.PositiveSmallIntegerField(blank=True, null=True)
-    mrl_secondary_GTF_K = models.PositiveSmallIntegerField(blank=True, null=True)
-    mrl_secondary_GTF_J = models.PositiveSmallIntegerField(blank=True, null=True)
+    mrl_secondary_GTF_start_frequency = models.PositiveSmallIntegerField('start frequency', blank=True, null=True)
+    mrl_secondary_GTF_C = models.PositiveSmallIntegerField('C', blank=True, null=True)
+    mrl_secondary_GTF_M = models.PositiveSmallIntegerField('M', blank=True, null=True)
+    mrl_secondary_GTF_K = models.PositiveSmallIntegerField('K', blank=True, null=True)
+    mrl_secondary_GTF_J = models.PositiveSmallIntegerField('J', blank=True, null=True)
 
 
     def populate_from_edid_parser(self, edid):
@@ -425,7 +425,7 @@ class DetailedTiming(models.Model):
     vertical_image_size = models.PositiveSmallIntegerField()
     vertical_border = models.PositiveSmallIntegerField()
 
-    flags_interlaced = models.BooleanField()
+    flags_interlaced = models.BooleanField('interlaced')
 
     Stereo_Mode = Display_Stereo_Mode
     STEREO_MODE_CHOICES = ((Stereo_Mode.Normal_display, ' Normal display, no stereo.'),
@@ -435,27 +435,27 @@ class DetailedTiming(models.Model):
                             (Stereo_Mode.Interleaved_2_way_left, ' 2-way interleaved stereo, left image on even lines.'),
                             (Stereo_Mode.Interleaved_4_way, '4-way interleaved stereo.'),
                             (Stereo_Mode.Interleaved_side_by_side, ' Side-by-Side interleaved stereo.'))
-    flags_stereo_mode = models.PositiveSmallIntegerField(choices=STEREO_MODE_CHOICES)
+    flags_stereo_mode = models.PositiveSmallIntegerField('stereo mode', choices=STEREO_MODE_CHOICES)
 
     Sync_Scheme = Timing_Sync_Scheme
     SYNC_SCHEME_CHOICES = ((Sync_Scheme.Analog_Composite, 'Analog Composite'),
                             (Sync_Scheme.Bipolar_Analog_Composite, 'Bipolar Analog Composite'),
                             (Sync_Scheme.Digital_Composite, 'Digital Composite'),
                             (Sync_Scheme.Digital_Separate, 'Digital Separate'))
-    flags_sync_scheme = models.PositiveSmallIntegerField(choices=SYNC_SCHEME_CHOICES)
+    flags_sync_scheme = models.PositiveSmallIntegerField('sync scheme', choices=SYNC_SCHEME_CHOICES)
 
     #If flags_sync_scheme == Digital_Separate
-    flags_horizontal_polarity = models.NullBooleanField()
-    flags_vertical_polarity = models.NullBooleanField()
+    flags_horizontal_polarity = models.NullBooleanField('horizontal polarity')
+    flags_vertical_polarity = models.NullBooleanField('vertical polarity')
 
     #If not flags_sync_scheme == Digital_Separate
-    flags_serrate = models.NullBooleanField()
+    flags_serrate = models.NullBooleanField('serrate')
 
     #If flags_sync_scheme == Digital_Composite
-    flags_composite_polarity = models.NullBooleanField()
+    flags_composite_polarity = models.NullBooleanField('composite polarity')
 
     #If not flags_sync_scheme == Digital_Composite and not flags_sync_scheme == Digital_Separate
-    flags_sync_on_RGB = models.NullBooleanField()
+    flags_sync_on_RGB = models.NullBooleanField('sync on RGB')
 
     class Meta:
         unique_together = (("EDID", "identification"),)
