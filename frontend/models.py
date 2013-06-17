@@ -40,10 +40,21 @@ class EDID(models.Model):
     week_of_manufacture = models.PositiveSmallIntegerField()
     #Year of manufacture, 1990-2245
     year_of_manufacture = models.PositiveSmallIntegerField()
-    #EDID version
-    EDID_version = models.PositiveSmallIntegerField()
-    #EDID revision
-    EDID_revision = models.PositiveSmallIntegerField()
+
+    #EDID version and revision
+    EDID_version_1_0 = 0
+    EDID_version_1_1 = 1
+    EDID_version_1_2 = 2
+    EDID_version_1_3 = 3
+    EDID_version_1_4 = 4
+    EDID_version_2_0 = 5
+    EDID_version_choices = ((EDID_version_1_0, '1.0'),
+                            (EDID_version_1_1, '1.1'),
+                            (EDID_version_1_2, '1.2'),
+                            (EDID_version_1_3, '1.3'),
+                            (EDID_version_1_4, '1.4'),
+                            (EDID_version_2_0, '2.0'))
+    EDID_version = models.PositiveSmallIntegerField(choices=EDID_version_choices)
 
     ###ASCII Text Descriptors
     #Monitor Name, from Monitor Descriptor Description (type 0xFC)
@@ -161,8 +172,23 @@ class EDID(models.Model):
         self.week_of_manufacture = edid['Week_of_manufacture']
         self.year_of_manufacture = edid['Year_of_manufacture']
 
-        self.EDID_version = edid['EDID_version']
-        self.EDID_revision = edid['EDID_revision']
+        if edid['EDID_version'] == 1:
+            if edid['EDID_revision'] == 0:
+                self.EDID_version = self.EDID_version_1_0
+            elif edid['EDID_revision'] == 1:
+                self.EDID_version = self.EDID_version_1_1
+            elif edid['EDID_revision'] == 2:
+                self.EDID_version = self.EDID_version_1_2
+            elif edid['EDID_revision'] == 3:
+                self.EDID_version = self.EDID_version_1_3
+            elif edid['EDID_revision'] == 4:
+                self.EDID_version = self.EDID_version_1_4
+        elif edid['EDID_version'] == 2:
+            if edid['EDID_revision'] == 0:
+                self.EDID_version = self.EDID_version_2_0
+
+        if not self.EDID_version:
+            raise Exception('Invalid EDID version and revision.')
 
         ###ASCII Text Descriptors
         if 'Monitor_Name' in edid:
