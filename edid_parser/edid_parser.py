@@ -72,7 +72,7 @@ class EDID_Parser(object):
 
         #Check EDID checksum
         if not sum(bytearray([chr(x) for x in edid])) % 256 == 0:
-            raise EDIDParsingError("Checksum is currupt.")
+            raise EDIDParsingError("Checksum is corrupt.")
 
         self.data['Extension_Flag'] = edid[126]
 
@@ -89,7 +89,7 @@ class EDID_Parser(object):
 
             self.data['ID_Manufacturer_Name'] = chr(first + 64) + chr(second + 64) + chr(third + 64)
         else:
-            raise EDIDParsingError("ID Manufacturer Name field is currupt.")
+            raise EDIDParsingError("ID Manufacturer Name field is corrupt.")
 
 
         #ID Product Code: edid[12:10]
@@ -101,6 +101,12 @@ class EDID_Parser(object):
         self.data['ID_Serial_Number'] = edid[4] + (edid[5] << 8) + (edid[6] << 16) + (edid[7] << 24)
 
         #Week of manufacture and Year of manufacture: edid[16:17]
+        if edid[8] > 0x36 and edid[8] < 0xFF:
+            raise EDIDParsingError("Week of manufacture (%d) is invalid." % (edid[8]))
+
+        if edid[9] < 0x10:
+            raise EDIDParsingError("Year of manufacture (%d) is invalid." % (edid[9]))
+
         self.data['Week_of_manufacture'] = edid[8]
         self.data['Year_of_manufacture'] = edid[9] + 1990
 
