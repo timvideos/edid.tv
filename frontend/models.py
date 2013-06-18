@@ -87,7 +87,7 @@ class EDID(models.Model):
     bsp_sync_on_green_video = models.NullBooleanField('composite sync signal on green video')
     bsp_vsync_serration = models.NullBooleanField('serration on the vertical sync')
     #Digital Input
-    bsp_video_input_DFP_1 = models.NullBooleanField('digital video interface standard')
+    bsp_video_input_DFP_1 = models.NullBooleanField('digital flat panel 1.x')
 
     bsp_max_horizontal_image_size = models.PositiveSmallIntegerField('maximum horizontal image size')
     bsp_max_vertical_image_size = models.PositiveSmallIntegerField('maximum vertical image size')

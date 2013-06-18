@@ -179,7 +179,6 @@ class EDIDValidTest(EDIDTest):
         self.assertIn('Monitor_Range_Limits_Descriptor', data)
 
     def test_timing_descriptor(self):
-        pass
         test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58, 0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E]
         data = self.parser.parse_timing_descriptor(test_edid)
 
