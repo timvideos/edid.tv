@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 from frontend.models import EDID
-from frontend.forms import UploadEDIDForm
+from frontend.forms import UploadEDIDForm, EditEDIDForm
 
 from edid_parser.edid_parser import EDID_Parser
 
@@ -12,6 +12,20 @@ def index(request):
     edids = EDID.objects.filter()
 
     return render_to_response('index.html', {'edids': edids})
+
+def edit_edid(request, edid_id):
+    edid = get_object_or_404(EDID, id=edid_id)
+
+    if request.method == 'POST':
+        form = EditEDIDForm(request.POST, instance=edid)
+        if form.is_valid():
+            edid = form.save()
+
+            return HttpResponseRedirect(reverse('show_edid', args=(edid_id,)))
+    else:
+        form = EditEDIDForm(instance=edid)
+
+    return render_to_response('edit_edid.html', {'edid': edid, 'form': form}, context_instance=RequestContext(request))
 
 def show_edid(request, edid_id):
     edid = get_object_or_404(EDID, id=edid_id)

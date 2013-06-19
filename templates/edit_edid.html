@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Details - EDID Database{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <h1>Edit EDID</h1>
+    {% crispy form %}
+  </div>
+  <div class="span12">
+    <h3>Standard Timings</h3>
+{% if edid.standardtiming_set.exists %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+            <th>Identification</th>
+            <th>Horizontal Active</th>
+            <th>Vertical Active</th>
+            <th>Refresh Rate</th>
+            <th>Image Aspect Ratio</th>
+            <th class="pull-right"><button class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> Add</button></th>
+        </tr>
+      </thead>
+      <tbody>
+  {% for timing in edid.standardtiming_set.all %}
+        <tr>
+            <td>{{ timing.identification }}</td>
+            <td>{{ timing.horizontal_active_pixels }} pixels</td>
+            <td>{{ timing.vertical_active_pixels }} pixels</td>
+            <td>{{ timing.refresh_rate }} Hz</td>
+            <td>{{ timing.get_aspect_ratio_display }}</td>
+            <td><button class="btn" type="button"><i class="icon-edit"></i> Edit</button> <button class="btn btn-danger" type="button"><i class="icon-trash icon-white"></i> Delete</button></td>
+        </tr>
+  {% endfor %}
+      </tbody>
+    </table>
+{% else %}
+    <p>No standard timings available.</p>
+{% endif %}
+  </div>
+
+  <div class="span12">
+    <h3>Detailed Timings</h3>
+{% if edid.detailedtiming_set.exists %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+            <th>Identification</th>
+            <th>Pixel clock</th>
+            <th>Horizontal Active</th>
+            <th>Vertical Active</th>
+            <th>Interlaced</th>
+            <th class="pull-right"><button class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> Add</button></th>
+        </tr>
+      </thead>
+      <tbody>
+  {% for timing in edid.detailedtiming_set.all %}
+        <tr>
+            <td>{{ timing.identification }}</td>
+            <td>{{ timing.pixel_clock }} kHz</td>
+            <td>{{ timing.horizontal_active }} pixels</td>
+            <td>{{ timing.vertical_active }} pixels</td>
+            <td><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></td>
+            <td><button class="btn" type="button"><i class="icon-edit"></i> Edit</button> <button class="btn btn-danger" type="button"><i class="icon-trash icon-white"></i> Delete</button></td>
+        </tr>
+  {% endfor %}
+      </tbody>
+    </table>
+{% else %}
+    <p>No detailed timings available.</p>
+{% endif %}
+  </div>
+</div>
+{% endblock %}
