@@ -8,10 +8,10 @@
       <li><a href="#basic_display_parameters"><i class="icon-chevron-right"></i> Basic Display Parameters</a></li>
       <li><a href="#chromaticity"><i class="icon-chevron-right"></i> Chromaticity</a></li>
       <li><a href="#established_timings"><i class="icon-chevron-right"></i> Established Timings</a></li>
-  {% if edid.standardtiming_set.all %}
+  {% if edid.standardtiming_set.exists %}
       <li><a href="#standard_timings"><i class="icon-chevron-right"></i> Standard Timings</a></li>
   {% endif %}
-  {% if edid.detailedtiming_set.all %}
+  {% if edid.detailedtiming_set.exists %}
       <li><a href="#detailed_timings"><i class="icon-chevron-right"></i> Detailed Timings</a></li>
   {% endif %}
   {% if edid.monitor_range_limits %}
@@ -149,7 +149,7 @@
       </table>
     </section>
 
-{% if edid.standardtiming_set.all %}
+{% if edid.standardtiming_set.exists %}
     <section id="standard_timings">
       <div class="row">
   {% for timing in edid.standardtiming_set.all %}
@@ -185,7 +185,7 @@
     </section>
 {% endif %}
 
-{% if edid.detailedtiming_set.all %}
+{% if edid.detailedtiming_set.exists %}
     <section id="detailed_timings">
       <div class="row">
     {% for timing in edid.detailedtiming_set.all %}
