@@ -58,11 +58,11 @@ class EDID(models.Model):
 
     ###ASCII Text Descriptors
     #Monitor Name, from Monitor Descriptor Description (type 0xFC)
-    monitor_name = models.CharField(max_length=13, blank=True, null=True)
+    monitor_name = models.CharField(max_length=13, blank=True)
     #Monitor Serial Number, from Monitor Descriptor Description (type 0xFF)
-    monitor_serial_number = models.CharField(max_length=13, blank=True, null=True)
+    monitor_serial_number = models.CharField(max_length=13, blank=True)
     #Monitor Data String, from Monitor Descriptor Description (type 0xFE)
-    monitor_data_string = models.CharField(max_length=13, blank=True, null=True)
+    monitor_data_string = models.CharField(max_length=13, blank=True)
 
     ###bdp=Basic display parameters
     bdp_video_input_analog = 0
