@@ -27,41 +27,41 @@
         <tbody>
           <tr>
             <td>Display gamma</td>
-            <td>{{ edid.bsp_display_gamma }}</td>
+            <td>{{ edid.bdp_display_gamma }}</td>
           </tr>
           <tr>
             <td>Maximum horizontal image size</td>
-            <td>{{ edid.bsp_max_horizontal_image_size }} cm</td>
+            <td>{{ edid.bdp_max_horizontal_image_size }} cm</td>
           </tr>
           <tr>
             <td>Maximum vertical image size</td>
-            <td>{{ edid.bsp_max_vertical_image_size }} cm</td>
+            <td>{{ edid.bdp_max_vertical_image_size }} cm</td>
           </tr>
           <tr>
             <td>Signal level input</td>
-            <td>{{ edid.get_bsp_video_input_display }}</td>
+            <td>{{ edid.get_bdp_video_input_display }}</td>
           </tr>
-      {% if edid.bsp_video_input == edid.bsp_video_input_analog %}
+      {% if edid.bdp_video_input == edid.bdp_video_input_analog %}
           <tr>
-            <td><i class="icon-{{ edid.bsp_blank_to_black_setup|yesno:"ok,remove" }}"></i> Blank-to-black setup</td>
-            <td><i class="icon-{{ edid.bsp_separate_syncs|yesno:"ok,remove" }}"></i> Separate syncs</td>
-            <td><i class="icon-{{ edid.bsp_composite_sync|yesno:"ok,remove" }}"></i> Composite syncs</td>
-            <td><i class="icon-{{ edid.bsp_sync_on_green_video|yesno:"ok,remove" }}"></i> Sync_on_green_video</td>
-            <td><i class="icon-{{ edid.bsp_vsync_serration|yesno:"ok,remove" }}"></i> Vsync_serration</td>
+            <td><i class="icon-{{ edid.bdp_blank_to_black_setup|yesno:"ok,remove" }}"></i> Blank-to-black setup</td>
+            <td><i class="icon-{{ edid.bdp_separate_syncs|yesno:"ok,remove" }}"></i> Separate syncs</td>
+            <td><i class="icon-{{ edid.bdp_composite_sync|yesno:"ok,remove" }}"></i> Composite syncs</td>
+            <td><i class="icon-{{ edid.bdp_sync_on_green_video|yesno:"ok,remove" }}"></i> Sync_on_green_video</td>
+            <td><i class="icon-{{ edid.bdp_vsync_serration|yesno:"ok,remove" }}"></i> Vsync_serration</td>
           </tr>
           <tr>
             <td>Signal Level Standard</td>
-            <td>{{ edid.get_bsp_signal_level_standard_display }}</td>
+            <td>{{ edid.get_bdp_signal_level_standard_display }}</td>
           </tr>
       {% else %}
           <tr>
             <td>VESA DFP 1.x</td>
-            <td><i class="icon-{{ edid.bsp_video_input_DFP_1|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_video_input_DFP_1|yesno:"ok,remove" }}"></i></td>
           </tr>
       {% endif %}
           <tr>
             <td>Display Type</td>
-            <td>{{ edid.get_bsp_feature_display_type_display }}</td>
+            <td>{{ edid.get_bdp_feature_display_type_display }}</td>
           </tr>
         </tbody>
       </table>
@@ -70,27 +70,27 @@
         <tbody>
           <tr>
             <td>Active-off</td>
-            <td><i class="icon-{{ edid.bsp_feature_active_off|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_active_off|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Default GTF</td>
-            <td><i class="icon-{{ edid.bsp_feature_default_GTF|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_default_GTF|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Preferred Timing Mode</td>
-            <td><i class="icon-{{ edid.bsp_feature_preferred_timing_mode|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_preferred_timing_mode|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Standard sRGB</td>
-            <td><i class="icon-{{ edid.bsp_feature_standard_sRGB|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_standard_sRGB|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Standby</td>
-            <td><i class="icon-{{ edid.bsp_feature_standby|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_standby|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Suspend</td>
-            <td><i class="icon-{{ edid.bsp_feature_suspend|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_suspend|yesno:"ok,remove" }}"></i></td>
           </tr>
         </tbody>
       </table>

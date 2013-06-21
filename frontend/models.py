@@ -64,47 +64,47 @@ class EDID(models.Model):
     #Monitor Data String, from Monitor Descriptor Description (type 0xFE)
     monitor_data_string = models.CharField(max_length=13, blank=True, null=True)
 
-    ###bsp=Basic display parameters
-    bsp_video_input_analog = 0
-    bsp_video_input_digital = 1
-    bsp_video_input_choices = ((bsp_video_input_analog, 'Analog'),
-                              (bsp_video_input_digital, 'Digital'))
-    bsp_video_input = models.PositiveSmallIntegerField('video input', choices=bsp_video_input_choices, default=bsp_video_input_analog)
+    ###bdp=Basic display parameters
+    bdp_video_input_analog = 0
+    bdp_video_input_digital = 1
+    bdp_video_input_choices = ((bdp_video_input_analog, 'Analog'),
+                              (bdp_video_input_digital, 'Digital'))
+    bdp_video_input = models.PositiveSmallIntegerField('video input', choices=bdp_video_input_choices, default=bdp_video_input_analog)
     #Analog Input
-    bsp_signal_level_standard_0700_0300 = 0
-    bsp_signal_level_standard_0714_0286 = 1
-    bsp_signal_level_standard_1000_0400 = 2
-    bsp_signal_level_standard_0700_0000 = 3
-    bsp_signal_level_standard_choices = ((bsp_signal_level_standard_0700_0300, '(0.700, 0.300)'),
-                                        (bsp_signal_level_standard_0714_0286, '(0.714, 0.286)'),
-                                        (bsp_signal_level_standard_1000_0400, '(1.000, 0.400)'),
-                                        (bsp_signal_level_standard_0700_0000, '(0.700, 0.000)'))
-    bsp_signal_level_standard = models.PositiveSmallIntegerField('signal level standard', choices=bsp_signal_level_standard_choices, blank=True, null=True)
+    bdp_signal_level_standard_0700_0300 = 0
+    bdp_signal_level_standard_0714_0286 = 1
+    bdp_signal_level_standard_1000_0400 = 2
+    bdp_signal_level_standard_0700_0000 = 3
+    bdp_signal_level_standard_choices = ((bdp_signal_level_standard_0700_0300, '(0.700, 0.300)'),
+                                        (bdp_signal_level_standard_0714_0286, '(0.714, 0.286)'),
+                                        (bdp_signal_level_standard_1000_0400, '(1.000, 0.400)'),
+                                        (bdp_signal_level_standard_0700_0000, '(0.700, 0.000)'))
+    bdp_signal_level_standard = models.PositiveSmallIntegerField('signal level standard', choices=bdp_signal_level_standard_choices, blank=True, null=True)
 
-    bsp_blank_to_black_setup = models.NullBooleanField('blank-to-black setup level')
-    bsp_separate_syncs = models.NullBooleanField('separate sync')
-    bsp_composite_sync = models.NullBooleanField('composite sync signal on horizontal')
-    bsp_sync_on_green_video = models.NullBooleanField('composite sync signal on green video')
-    bsp_vsync_serration = models.NullBooleanField('serration on the vertical sync')
+    bdp_blank_to_black_setup = models.NullBooleanField('blank-to-black setup level')
+    bdp_separate_syncs = models.NullBooleanField('separate sync')
+    bdp_composite_sync = models.NullBooleanField('composite sync signal on horizontal')
+    bdp_sync_on_green_video = models.NullBooleanField('composite sync signal on green video')
+    bdp_vsync_serration = models.NullBooleanField('serration on the vertical sync')
     #Digital Input
-    bsp_video_input_DFP_1 = models.NullBooleanField('digital flat panel 1.x')
+    bdp_video_input_DFP_1 = models.NullBooleanField('digital flat panel 1.x')
 
-    bsp_max_horizontal_image_size = models.PositiveSmallIntegerField('maximum horizontal image size')
-    bsp_max_vertical_image_size = models.PositiveSmallIntegerField('maximum vertical image size')
-    bsp_display_gamma = models.DecimalField('display gamma', max_digits=3, decimal_places=2, blank=True, null=True)
+    bdp_max_horizontal_image_size = models.PositiveSmallIntegerField('maximum horizontal image size')
+    bdp_max_vertical_image_size = models.PositiveSmallIntegerField('maximum vertical image size')
+    bdp_display_gamma = models.DecimalField('display gamma', max_digits=3, decimal_places=2, blank=True, null=True)
 
-    bsp_feature_display_type_choices = ((Display_Type.Monochrome, 'Monochrome or grayscale display'),
+    bdp_feature_display_type_choices = ((Display_Type.Monochrome, 'Monochrome or grayscale display'),
                                         (Display_Type.RGB, 'RGB color display'),
                                         (Display_Type.Non_RGB, 'Non-RGB multicolor display'),
                                         (Display_Type.Undefined, 'Undefined'))
 
-    bsp_feature_standby = models.BooleanField('standby mode')
-    bsp_feature_suspend = models.BooleanField('suspend mode')
-    bsp_feature_active_off = models.BooleanField('active off/very low power mode')
-    bsp_feature_display_type = models.PositiveSmallIntegerField('display color type', choices=bsp_feature_display_type_choices)
-    bsp_feature_standard_sRGB = models.BooleanField('standard sRGB')
-    bsp_feature_preferred_timing_mode = models.BooleanField('preferred timing mode')
-    bsp_feature_default_GTF = models.BooleanField('default GTF')
+    bdp_feature_standby = models.BooleanField('standby mode')
+    bdp_feature_suspend = models.BooleanField('suspend mode')
+    bdp_feature_active_off = models.BooleanField('active off/very low power mode')
+    bdp_feature_display_type = models.PositiveSmallIntegerField('display color type', choices=bdp_feature_display_type_choices)
+    bdp_feature_standard_sRGB = models.BooleanField('standard sRGB')
+    bdp_feature_preferred_timing_mode = models.BooleanField('preferred timing mode')
+    bdp_feature_default_GTF = models.BooleanField('default GTF')
 
     ###chr=Chromaticity
     chr_red_x = models.DecimalField('red x', max_digits=4, decimal_places=3)
@@ -201,40 +201,40 @@ class EDID(models.Model):
             self.monitor_data_string = edid['Monitor_Data_String']
 
         ###Basic display parameters
-        self.bsp_video_input = edid['Basic_display_parameters']['Video_Input']
+        self.bdp_video_input = edid['Basic_display_parameters']['Video_Input']
         #Analog Input
-        if not self.bsp_video_input:
+        if not self.bdp_video_input:
             if edid['Basic_display_parameters']['Signal_Level_Standard'] == (0.700, 0.300):
-                self.bsp_signal_level_standard = self.bsp_signal_level_standard_0700_0300
+                self.bdp_signal_level_standard = self.bdp_signal_level_standard_0700_0300
             elif edid['Basic_display_parameters']['Signal_Level_Standard'] == (0.714, 0.286):
-                self.bsp_signal_level_standard = self.bsp_signal_level_standard_0714_0286
+                self.bdp_signal_level_standard = self.bdp_signal_level_standard_0714_0286
             elif edid['Basic_display_parameters']['Signal_Level_Standard'] == (1.000, 0.400):
-                self.bsp_signal_level_standard = self.bsp_signal_level_standard_1000_0400
+                self.bdp_signal_level_standard = self.bdp_signal_level_standard_1000_0400
             elif edid['Basic_display_parameters']['Signal_Level_Standard'] == (0.700, 0.000):
-                self.bsp_signal_level_standard = self.bsp_signal_level_standard_0700_0000
+                self.bdp_signal_level_standard = self.bdp_signal_level_standard_0700_0000
             else:
                 raise Exception('Invalid signal level standard can not be parsed.')
 
-            self.bsp_blank_to_black_setup = edid['Basic_display_parameters']['Blank-to-black_setup']
-            self.bsp_separate_syncs = edid['Basic_display_parameters']['Separate_syncs']
-            self.bsp_composite_sync = edid['Basic_display_parameters']['Composite_sync']
-            self.bsp_sync_on_green_video = edid['Basic_display_parameters']['Sync_on_green_video']
-            self.bsp_vsync_serration = edid['Basic_display_parameters']['Vsync_serration']
+            self.bdp_blank_to_black_setup = edid['Basic_display_parameters']['Blank-to-black_setup']
+            self.bdp_separate_syncs = edid['Basic_display_parameters']['Separate_syncs']
+            self.bdp_composite_sync = edid['Basic_display_parameters']['Composite_sync']
+            self.bdp_sync_on_green_video = edid['Basic_display_parameters']['Sync_on_green_video']
+            self.bdp_vsync_serration = edid['Basic_display_parameters']['Vsync_serration']
         #Digital Input
         else:
-            self.bsp_video_input_DFP_1 = edid['Basic_display_parameters']['Video_Input_DFP_1']
+            self.bdp_video_input_DFP_1 = edid['Basic_display_parameters']['Video_Input_DFP_1']
 
-        self.bsp_max_horizontal_image_size = edid['Basic_display_parameters']['Max_Horizontal_Image_Size']
-        self.bsp_max_vertical_image_size = edid['Basic_display_parameters']['Max_Vertical_Image_Size']
-        self.bsp_display_gamma = edid['Basic_display_parameters']['Display_Gamma']
+        self.bdp_max_horizontal_image_size = edid['Basic_display_parameters']['Max_Horizontal_Image_Size']
+        self.bdp_max_vertical_image_size = edid['Basic_display_parameters']['Max_Vertical_Image_Size']
+        self.bdp_display_gamma = edid['Basic_display_parameters']['Display_Gamma']
 
-        self.bsp_feature_standby = edid['Basic_display_parameters']['Feature_Support']['Standby']
-        self.bsp_feature_suspend = edid['Basic_display_parameters']['Feature_Support']['Suspend']
-        self.bsp_feature_active_off = edid['Basic_display_parameters']['Feature_Support']['Active-off']
-        self.bsp_feature_display_type = edid['Basic_display_parameters']['Feature_Support']['Display_Type']
-        self.bsp_feature_standard_sRGB = edid['Basic_display_parameters']['Feature_Support']['Standard-sRGB']
-        self.bsp_feature_preferred_timing_mode = edid['Basic_display_parameters']['Feature_Support']['Preferred_Timing_Mode']
-        self.bsp_feature_default_GTF = edid['Basic_display_parameters']['Feature_Support']['Default_GTF']
+        self.bdp_feature_standby = edid['Basic_display_parameters']['Feature_Support']['Standby']
+        self.bdp_feature_suspend = edid['Basic_display_parameters']['Feature_Support']['Suspend']
+        self.bdp_feature_active_off = edid['Basic_display_parameters']['Feature_Support']['Active-off']
+        self.bdp_feature_display_type = edid['Basic_display_parameters']['Feature_Support']['Display_Type']
+        self.bdp_feature_standard_sRGB = edid['Basic_display_parameters']['Feature_Support']['Standard-sRGB']
+        self.bdp_feature_preferred_timing_mode = edid['Basic_display_parameters']['Feature_Support']['Preferred_Timing_Mode']
+        self.bdp_feature_default_GTF = edid['Basic_display_parameters']['Feature_Support']['Default_GTF']
 
         ###Chromaticity
         self.chr_red_x = edid['Chromaticity']['Red_x']
