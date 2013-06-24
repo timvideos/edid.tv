@@ -22,7 +22,11 @@ def edit_edid(request, edid_id):
     if request.method == 'POST':
         form = EditEDIDForm(request.POST, instance=edid)
         if form.is_valid():
-            edid = form.save()
+            edid = form.save(commit=False)
+
+            #Set status to edited
+            edid.status = EDID.STATUS_EDITED
+            edid.save()
 
             return HttpResponseRedirect(reverse('show_edid', args=(edid_id,)))
     else:
