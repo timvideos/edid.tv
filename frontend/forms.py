@@ -2,7 +2,7 @@ from django import forms
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Layout, Submit
-from crispy_forms.bootstrap import FormActions, Tab, TabHolder
+from crispy_forms.bootstrap import FormActions, InlineRadios, Tab, TabHolder
 
 from frontend.models import EDID
 
@@ -38,6 +38,14 @@ class EditEDIDForm(forms.ModelForm):
                   'mrl_secondary_GTF_curve_supported', 'mrl_secondary_GTF_start_frequency', 'mrl_secondary_GTF_C',
                   'mrl_secondary_GTF_M', 'mrl_secondary_GTF_K', 'mrl_secondary_GTF_J']
 
+        widgets = {'bdp_blank_to_black_setup': forms.CheckboxInput,
+                   'bdp_separate_syncs': forms.CheckboxInput,
+                   'bdp_composite_sync': forms.CheckboxInput,
+                   'bdp_sync_on_green_video': forms.CheckboxInput,
+                   'bdp_vsync_serration': forms.CheckboxInput,
+                   'bdp_video_input_DFP_1': forms.CheckboxInput,
+                   'mrl_secondary_GTF_curve_supported': forms.CheckboxInput}
+
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_class = 'form-horizontal'
@@ -57,7 +65,7 @@ class EditEDIDForm(forms.ModelForm):
                 ),
                 Tab(
                     'Basic Display Parameters',
-                    'bdp_video_input',
+                    InlineRadios('bdp_video_input'),
                     'bdp_signal_level_standard',
                     'bdp_blank_to_black_setup',
                     'bdp_separate_syncs',
