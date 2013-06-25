@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Layout, Submit
-from crispy_forms.bootstrap import FormActions, InlineRadios, Tab, TabHolder
+from crispy_forms.bootstrap import AppendedText, FormActions, InlineRadios, Tab, TabHolder
 
 from frontend.models import EDID
 
@@ -101,8 +101,8 @@ class EditEDIDForm(BaseForm):
                     'bdp_sync_on_green_video',
                     'bdp_vsync_serration',
                     'bdp_video_input_DFP_1',
-                    'bdp_max_horizontal_image_size',
-                    'bdp_max_vertical_image_size',
+                    AppendedText('bdp_max_horizontal_image_size', 'cm'),
+                    AppendedText('bdp_max_vertical_image_size', 'cm'),
                     'bdp_display_gamma',
                     'bdp_feature_display_type',
                     'bdp_feature_standby',
@@ -145,13 +145,13 @@ class EditEDIDForm(BaseForm):
                 Tab(
                     'Monitor Range Limits',
                     'monitor_range_limits',
-                    'mrl_min_horizontal_rate',
-                    'mrl_max_horizontal_rate',
-                    'mrl_min_vertical_rate',
-                    'mrl_max_vertical_rate',
-                    'mrl_max_pixel_clock',
+                    AppendedText('mrl_min_horizontal_rate', 'kHz'),
+                    AppendedText('mrl_max_horizontal_rate', 'kHz'),
+                    AppendedText('mrl_min_vertical_rate', 'Hz'),
+                    AppendedText('mrl_max_vertical_rate', 'Hz'),
+                    AppendedText('mrl_max_pixel_clock', 'MHz'),
                     'mrl_secondary_GTF_curve_supported',
-                    'mrl_secondary_GTF_start_frequency',
+                    AppendedText('mrl_secondary_GTF_start_frequency', 'kHz'),
                     'mrl_secondary_GTF_C',
                     'mrl_secondary_GTF_M',
                     'mrl_secondary_GTF_K',
