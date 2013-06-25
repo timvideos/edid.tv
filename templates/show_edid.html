@@ -25,10 +25,12 @@
       <h3>Basic Display Parameters</h3>
       <table class="table table-striped">
         <tbody>
+      {% if edid.bdp_display_gamma %}
           <tr>
             <td>Display gamma</td>
             <td>{{ edid.bdp_display_gamma }}</td>
           </tr>
+      {% endif %}
           <tr>
             <td>Maximum horizontal image size</td>
             <td>{{ edid.bdp_max_horizontal_image_size }} cm</td>
