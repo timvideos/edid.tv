@@ -14,7 +14,15 @@ class Manufacturer(models.Model):
     def __unicode__(self):
         return "%s: %s" % (self.name_id, self.name)
 
+class EDIDPublicManager(models.Manager):
+    """Manager to filter private EDIDs from public interface."""
+
+    def get_query_set(self):
+        return super(EDIDPublicManager, self).get_query_set().exclude(status=EDID.STATUS_PRIVATE)
+
 class EDID(models.Model):
+    public = EDIDPublicManager()
+
     manufacturer = models.ForeignKey(Manufacturer)
 
     #Initialized and basic data auto-added

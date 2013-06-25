@@ -14,10 +14,7 @@ def index(request):
     return render_to_response('index.html', {'edids': edids})
 
 def edit_edid(request, edid_id):
-    edid = get_object_or_404(EDID, id=edid_id,
-                             status__in=[EDID.STATUS_INITIALIZED,
-                                         EDID.STATUS_TIMINGS_ADDED,
-                                         EDID.STATUS_EDITED])
+    edid = get_object_or_404(EDID.public, id=edid_id)
 
     if request.method == 'POST':
         form = EditEDIDForm(request.POST, instance=edid)
@@ -35,10 +32,7 @@ def edit_edid(request, edid_id):
     return render_to_response('edit_edid.html', {'edid': edid, 'form': form}, context_instance=RequestContext(request))
 
 def show_edid(request, edid_id):
-    edid = get_object_or_404(EDID, id=edid_id,
-                             status__in=[EDID.STATUS_INITIALIZED,
-                                         EDID.STATUS_TIMINGS_ADDED,
-                                         EDID.STATUS_EDITED])
+    edid = get_object_or_404(EDID.public, id=edid_id)
 
     return render_to_response('show_edid.html', {'edid': edid})
 
