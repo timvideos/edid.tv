@@ -241,8 +241,7 @@ class EditEDIDForm(BaseForm):
             self._nullify_field(cleaned_data, ['bdp_video_input_DFP_1'])
 
             if not cleaned_data.get('bdp_signal_level_standard'):
-                self._errors['bdp_signal_level_standard'] = self.error_class(['This field is required.'])
-                del cleaned_data['bdp_signal_level_standard']
+                cleaned_data = self._check_required_field(cleaned_data, ['bdp_signal_level_standard'])
         else:
             #Digital
             self._nullify_field(cleaned_data, ['bdp_signal_level_standard', 'bdp_blank_to_black_setup',
