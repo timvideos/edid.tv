@@ -19,10 +19,15 @@ class BaseForm(forms.ModelForm):
         To be used for fields that are required depending on other field value."""
 
         for field in fields:
-            if not cleaned_data.get(field):
-                self._errors[field] = self.error_class(['This field is required.'])
-                if field in cleaned_data:
-                    del cleaned_data[field]
+            # It passed other validators
+            if field not in self._errors:
+                # No value found for it
+                if cleaned_data.get(field) == None:
+                    self._errors[field] = self.error_class(['This field is required.'])
+
+                    # This field is no longer valid. Remove it from the cleaned data.
+                    if field in cleaned_data:
+                        del cleaned_data[field]
 
         return cleaned_data
 
@@ -240,8 +245,7 @@ class EditEDIDForm(BaseForm):
             #Analog
             self._nullify_field(cleaned_data, ['bdp_video_input_DFP_1'])
 
-            if not cleaned_data.get('bdp_signal_level_standard'):
-                cleaned_data = self._check_required_field(cleaned_data, ['bdp_signal_level_standard'])
+            cleaned_data = self._check_required_field(cleaned_data, ['bdp_signal_level_standard'])
         else:
             #Digital
             self._nullify_field(cleaned_data, ['bdp_signal_level_standard', 'bdp_blank_to_black_setup',
