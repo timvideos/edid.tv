@@ -2,6 +2,7 @@ import re
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 
 from edid_parser.edid_parser import Display_Type, Display_Stereo_Mode, Timing_Sync_Scheme
 
@@ -375,6 +376,9 @@ class EDID(models.Model):
             self.monitor_range_limits = False
 
         self.status = self.STATUS_TIMINGS_ADDED
+
+    def get_absolute_url(self):
+        return reverse('edid-detail', kwargs={'pk': self.pk})
 
     def __unicode__(self):
         return "%s %s" % (self.manufacturer.name, self.monitor_name)

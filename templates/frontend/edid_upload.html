@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
   <div class="span12">
-    <form action="{% url 'upload_edid' %}" method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <p>Upload your EDID file:</p>
       <input type="file" name="edid_file">

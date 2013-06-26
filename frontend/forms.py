@@ -5,10 +5,25 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Layout, Submit
 from crispy_forms.bootstrap import AppendedText, FormActions, InlineRadios, Tab, TabHolder
 
+from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
+
 from frontend.models import EDID
 
-class UploadEDIDForm(forms.Form):
+
+class EDIDUploadForm(forms.Form):
     edid_file = forms.FileField(label='EDID File')
+    edid_data = None
+
+    def clean_edid_file(self):
+        edid_file = self.cleaned_data['edid_file']
+
+        #Parse EDID file
+        try:
+            self.edid_data = EDID_Parser(edid_file.read()).data
+        except EDIDParsingError as msg:
+            raise forms.ValidationError(msg)
+
+        return edid_file
 
 class BaseForm(forms.ModelForm):
     """Base class for forms, provides common functions."""
@@ -42,7 +57,7 @@ class BaseForm(forms.ModelForm):
 
         return cleaned_data
 
-class EditEDIDForm(BaseForm):
+class EDIDUpdateForm(BaseForm):
     class Meta:
         model = EDID
         fields = [#Main Fields
@@ -165,11 +180,11 @@ class EditEDIDForm(BaseForm):
             ),
             FormActions(
                 Submit('submit', 'Submit'),
-                #TODO: Use show_edid link
+                #TODO: Use edid-detail link
                 Button('cancel', 'Cancel', onclick='history.go(-1);')
             )
         )
-        super(EditEDIDForm, self).__init__(*args, **kwargs)
+        super(EDIDUpdateForm, self).__init__(*args, **kwargs)
 
         # ID Serial Number, 32-bit
         # MinValueValidator is added by field type PositiveIntegerField
@@ -236,7 +251,7 @@ class EditEDIDForm(BaseForm):
         return mrl_max_pixel_clock
 
     def clean(self):
-        cleaned_data = super(EditEDIDForm, self).clean()
+        cleaned_data = super(EDIDUpdateForm, self).clean()
 
         ###Basic display video input
         #Set unused video input fields to null
@@ -278,3 +293,13 @@ class EditEDIDForm(BaseForm):
             self._nullify_field(cleaned_data, mrl_secondary_GTF_fields)
 
         return cleaned_data
+
+    def save(self, commit=True):
+        """Overrides save() method to set status to private."""
+        instance = super(EDIDUpdateForm, self).save(commit=False)
+        instance.status = EDID.STATUS_EDITED
+
+        if commit:
+            instance.save()
+
+        return instance

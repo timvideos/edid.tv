@@ -4,13 +4,13 @@
 {% block content %}
 <div class="row">
   <div class="span12">
-    <h2><a href="{% url 'upload_edid' %}">Upload your EDID file</a></h2>
+    <h2><a href="{% url 'edid-upload' %}">Upload your EDID file</a></h2>
   </div>
   <div class="span12">
     <h2>EDID List</h2>
-    {% if edids %}
+    {% if edid_list %}
     <ul>
-      {% for edid in edids %}
+      {% for edid in edid_list %}
       <li>{{ edid.manufacturer.name }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</li>
       {% endfor %}
     </ul>
