@@ -9,7 +9,7 @@ from frontend.forms import EDIDUpdateForm, EDIDUploadForm
 
 #EDID
 class EDIDList(ListView):
-    model = EDID
+    queryset = EDID.public.all()
     context_object_name = 'edid_list'
 
 class EDIDUpload(FormView):
@@ -39,5 +39,5 @@ class EDIDDetailView(DetailView):
     queryset = EDID.public.all()
 
 class EDIDUpdate(UpdateView):
-    model = EDID
+    queryset = EDID.public.all()
     form_class = EDIDUpdateForm
