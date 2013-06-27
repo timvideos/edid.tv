@@ -153,3 +153,10 @@ LOGGING = {
         },
     }
 }
+
+#Import local_settings (if any) to override above settings
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
