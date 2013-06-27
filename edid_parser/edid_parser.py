@@ -252,7 +252,7 @@ class EDID_Parser(object):
             #Check if the field is not unused (both bytes are 0b01)
             if edid[i] is not 0b01 and edid[i + 1] is not 0b01:
                 id = {}
-                id['Horizontal_active_pixels'] = ((edid[i] + 31) * 8)
+                id['Horizontal_active'] = ((edid[i] + 31) * 8)
                 id['Refresh_Rate'] = (edid[i + 1] & 0b00111111) + 60
 
                 id['Image_aspect_ratio'] = (edid[i + 1] & 0b11000000) >> 6
@@ -268,7 +268,7 @@ class EDID_Parser(object):
                 elif id['Image_aspect_ratio'] == 0b11:
                     id['Image_aspect_ratio'] = (16, 9)
 
-                id['Vertical_active_pixels'] = ((id['Horizontal_active_pixels'] * id['Image_aspect_ratio'][1]) / id['Image_aspect_ratio'][0])
+                id['Vertical_active'] = ((id['Horizontal_active'] * id['Image_aspect_ratio'][1]) / id['Image_aspect_ratio'][0])
 
                 new_data['Identification_%d' % ((i / 2) + 1)] = id
 

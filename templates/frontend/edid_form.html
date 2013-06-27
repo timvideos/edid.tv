@@ -26,8 +26,8 @@
   {% for timing in edid.standardtiming_set.all %}
         <tr>
             <td>{{ timing.identification }}</td>
-            <td>{{ timing.horizontal_active_pixels }} pixels</td>
-            <td>{{ timing.vertical_active_pixels }} pixels</td>
+            <td>{{ timing.horizontal_active }} pixels</td>
+            <td>{{ timing.vertical_active }} pixels</td>
             <td>{{ timing.refresh_rate }} Hz</td>
             <td>{{ timing.get_aspect_ratio_display }}</td>
             <td><button class="btn" type="button"><i class="icon-edit"></i> Edit</button> <button class="btn btn-danger" type="button"><i class="icon-trash icon-white"></i> Delete</button></td>

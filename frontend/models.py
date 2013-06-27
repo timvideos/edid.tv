@@ -310,8 +310,8 @@ class EDID(models.Model):
                 raise Exception('Invalid aspect ratio can not be parsed.')
 
             timing = StandardTiming(identification=id.group(1),
-                                    horizontal_active_pixels=data['Horizontal_active_pixels'],
-                                    vertical_active_pixels=data['Vertical_active_pixels'],
+                                    horizontal_active=data['Horizontal_active'],
+                                    vertical_active=data['Vertical_active'],
                                     refresh_rate=data['Refresh_Rate'],
                                     aspect_ratio=aspect_ratio)
 
@@ -395,10 +395,10 @@ class Timing(models.Model):
         ordering = ['identification']
 
 class StandardTiming(Timing):
-    #Horizontal active pixels, 256-2288
-    horizontal_active_pixels = models.IntegerField()
-    #Vertical active pixels
-    vertical_active_pixels = models.IntegerField()
+    #Horizontal active, 256-2288 pixels
+    horizontal_active = models.IntegerField()
+    #Vertical active, pixels
+    vertical_active = models.IntegerField()
     #Refresh rate, 60-123 Hz
     refresh_rate = models.IntegerField()
 
@@ -415,7 +415,7 @@ class StandardTiming(Timing):
     aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
 
     def __unicode__(self):
-        return "%dx%d@%dHz" % (self.horizontal_active_pixels, self.vertical_active_pixels, self.refresh_rate)
+        return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active, self.refresh_rate)
 
 class DetailedTiming(Timing):
     #Pixel clock in kHz
