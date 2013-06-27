@@ -383,11 +383,18 @@ class EDID(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.manufacturer.name, self.monitor_name)
 
-class StandardTiming(models.Model):
+class Timing(models.Model):
     EDID = models.ForeignKey(EDID)
 
     #Identification
     identification = models.IntegerField()
+
+    class Meta:
+        abstract = True
+        unique_together = (("EDID", "identification"),)
+        ordering = ['identification']
+
+class StandardTiming(Timing):
     #Horizontal active pixels, 256-2288
     horizontal_active_pixels = models.IntegerField()
     #Vertical active pixels
@@ -407,19 +414,10 @@ class StandardTiming(models.Model):
                             (ASPECT_RATIO_16_9, '16:9'))
     aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
 
-    class Meta:
-        unique_together = (("EDID", "identification"),)
-        ordering = ['identification']
-
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active_pixels, self.vertical_active_pixels, self.refresh_rate)
 
-class DetailedTiming(models.Model):
-    EDID = models.ForeignKey(EDID)
-
-    #Identification
-    identification = models.IntegerField()
-
+class DetailedTiming(Timing):
     #Pixel clock in kHz
     pixel_clock = models.IntegerField()
 
@@ -468,10 +466,6 @@ class DetailedTiming(models.Model):
 
     #If not flags_sync_scheme == Digital_Composite and not flags_sync_scheme == Digital_Separate
     flags_sync_on_RGB = models.NullBooleanField('sync on RGB')
-
-    class Meta:
-        unique_together = (("EDID", "identification"),)
-        ordering = ['identification']
 
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active, self.pixel_clock / 1000)
