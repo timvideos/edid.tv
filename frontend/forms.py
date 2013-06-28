@@ -46,7 +46,7 @@ class BaseForm(forms.ModelForm):
 
         return cleaned_data
 
-    def _nullify_field(self, cleaned_data, fields):
+    def _nullify_fields(self, cleaned_data, fields):
         """Sets field value to Null.
 
         To be used for unused fields.
@@ -86,6 +86,7 @@ class EDIDUpdateForm(BaseForm):
                   'mrl_secondary_GTF_curve_supported', 'mrl_secondary_GTF_start_frequency', 'mrl_secondary_GTF_C',
                   'mrl_secondary_GTF_M', 'mrl_secondary_GTF_K', 'mrl_secondary_GTF_J']
 
+        # Change widget for NullBooleanField fields to act like regular BooleanField
         widgets = {'bdp_blank_to_black_setup': forms.CheckboxInput,
                    'bdp_separate_syncs': forms.CheckboxInput,
                    'bdp_composite_sync': forms.CheckboxInput,
@@ -258,14 +259,14 @@ class EDIDUpdateForm(BaseForm):
         bdp_video_input = cleaned_data.get('bdp_video_input')
         if not bdp_video_input:
             #Analog
-            self._nullify_field(cleaned_data, ['bdp_video_input_DFP_1'])
+            cleaned_data = self._nullify_fields(cleaned_data, ['bdp_video_input_DFP_1'])
 
             cleaned_data = self._check_required_field(cleaned_data, ['bdp_signal_level_standard'])
         else:
             #Digital
-            self._nullify_field(cleaned_data, ['bdp_signal_level_standard', 'bdp_blank_to_black_setup',
-                                               'bdp_separate_syncs', 'bdp_composite_sync', 'bdp_sync_on_green_video',
-                                               'bdp_vsync_serration'])
+            cleaned_data = self._nullify_fields(cleaned_data, ['bdp_signal_level_standard', 'bdp_blank_to_black_setup',
+                                                              'bdp_separate_syncs', 'bdp_composite_sync',
+                                                              'bdp_sync_on_green_video', 'bdp_vsync_serration'])
 
         ###Monitor Range Limits
         mrl_fields = ['mrl_min_horizontal_rate', 'mrl_max_horizontal_rate',
@@ -285,12 +286,12 @@ class EDIDUpdateForm(BaseForm):
                 cleaned_data = self._check_required_field(cleaned_data, mrl_secondary_GTF_fields)
             #If Secondary GTF curve is disabled set all its fields to null
             else:
-                self._nullify_field(cleaned_data, mrl_secondary_GTF_fields)
+                cleaned_data = self._nullify_fields(cleaned_data, mrl_secondary_GTF_fields)
         #If Monitor Range Limits is disabled set all its fields to null
         else:
-            self._nullify_field(cleaned_data, mrl_fields)
-            self._nullify_field(cleaned_data, ['mrl_secondary_GTF_curve_supported'])
-            self._nullify_field(cleaned_data, mrl_secondary_GTF_fields)
+            cleaned_data = self._nullify_fields(cleaned_data, mrl_fields)
+            cleaned_data = self._nullify_fields(cleaned_data, ['mrl_secondary_GTF_curve_supported'])
+            cleaned_data = self._nullify_fields(cleaned_data, mrl_secondary_GTF_fields)
 
         return cleaned_data
 
