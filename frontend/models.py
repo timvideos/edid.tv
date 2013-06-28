@@ -419,7 +419,7 @@ class StandardTiming(Timing):
 
 class DetailedTiming(Timing):
     #Pixel clock in kHz
-    pixel_clock = models.IntegerField()
+    pixel_clock = models.PositiveIntegerField()
 
     horizontal_active = models.PositiveSmallIntegerField()
     horizontal_blanking = models.PositiveSmallIntegerField()

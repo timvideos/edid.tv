@@ -2,12 +2,12 @@ from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Button, Layout, Submit
+from crispy_forms.layout import Button, Fieldset, Layout, Submit
 from crispy_forms.bootstrap import AppendedText, FormActions, InlineRadios, Tab, TabHolder
 
 from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
 
-from frontend.models import EDID
+from frontend.models import EDID, StandardTiming, DetailedTiming
 
 
 class EDIDUploadForm(forms.Form):
@@ -304,3 +304,167 @@ class EDIDUpdateForm(BaseForm):
             instance.save()
 
         return instance
+
+class StandardTimingForm(BaseForm):
+    class Meta:
+        model = StandardTiming
+        fields = ['horizontal_active', 'vertical_active', 'refresh_rate', 'aspect_ratio']
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            AppendedText('horizontal_active', 'pixels'),
+            AppendedText('vertical_active', 'pixels'),
+            AppendedText('refresh_rate', 'Hz'),
+            'aspect_ratio',
+            FormActions(
+                Submit('submit', 'Submit'),
+                #TODO: Use edid-detail link
+                Button('cancel', 'Cancel', onclick='history.go(-1);')
+            )
+        )
+        super(StandardTimingForm, self).__init__(*args, **kwargs)
+
+        # Horizontal active, 256-2288 pixels
+        self.fields['horizontal_active'].validators.append(MinValueValidator(256))
+        self.fields['horizontal_active'].validators.append(MaxValueValidator(2288))
+
+        # Vertical active
+        # Horizontal active = 256 and aspect_ratio == 16/9
+        self.fields['horizontal_active'].validators.append(MinValueValidator(144))
+        # Horizontal active = 2288 and aspect_ratio == 5/4
+        self.fields['horizontal_active'].validators.append(MaxValueValidator(1831))
+
+        # Refresh rate, 60-123 Hz
+        self.fields['refresh_rate'].validators.append(MinValueValidator(60))
+        self.fields['refresh_rate'].validators.append(MaxValueValidator(123))
+
+    def clean_horizontal_active(self):
+        horizontal_active = self.cleaned_data['horizontal_active']
+
+        if horizontal_active:
+            if not horizontal_active % 8 == 0:
+                raise forms.ValidationError('This field should be a multiple of 8.')
+
+        return horizontal_active
+
+class DetailedTimingForm(BaseForm):
+    class Meta:
+        model = DetailedTiming
+        fields = [# Horizontal
+                  'horizontal_active', 'horizontal_blanking', 'horizontal_sync_offset', 'horizontal_sync_pulse_width',
+                  'horizontal_image_size', 'horizontal_border',
+                  # Vertical
+                  'vertical_active', 'vertical_blanking', 'vertical_sync_offset', 'vertical_sync_pulse_width',
+                  'vertical_image_size', 'vertical_border',
+                  # Flags
+                  'pixel_clock', 'flags_interlaced', 'flags_stereo_mode', 'flags_sync_scheme',
+                  'flags_horizontal_polarity', 'flags_vertical_polarity', 'flags_serrate',
+                  'flags_composite_polarity', 'flags_sync_on_RGB']
+
+        # Change widget for NullBooleanField fields to act like regular BooleanField
+        widgets = {'flags_horizontal_polarity': forms.CheckboxInput,
+                   'flags_vertical_polarity': forms.CheckboxInput,
+                   'flags_serrate': forms.CheckboxInput,
+                   'flags_composite_polarity': forms.CheckboxInput,
+                   'flags_sync_on_RGB': forms.CheckboxInput}
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Fieldset(
+                'Horizontal',
+                AppendedText('horizontal_active', 'pixels'),
+                AppendedText('horizontal_blanking', 'pixels'),
+                AppendedText('horizontal_sync_offset', 'pixels'),
+                AppendedText('horizontal_sync_pulse_width', 'pixels'),
+                AppendedText('horizontal_image_size', 'mm'),
+                AppendedText('horizontal_border', 'pixels')),
+            Fieldset(
+                'Vertical',
+                AppendedText('vertical_active', 'lines'),
+                AppendedText('vertical_blanking', 'lines'),
+                AppendedText('vertical_sync_offset', 'lines'),
+                AppendedText('vertical_sync_pulse_width', 'lines'),
+                AppendedText('vertical_image_size', 'mm'),
+                AppendedText('vertical_border', 'lines')),
+            Fieldset(
+                'Flags',
+                AppendedText('pixel_clock', 'kHz'),
+                'flags_interlaced',
+                'flags_stereo_mode',
+                'flags_sync_scheme',
+                'flags_horizontal_polarity',
+                'flags_vertical_polarity',
+                'flags_serrate',
+                'flags_composite_polarity',
+                'flags_sync_on_RGB'
+            ),
+            FormActions(
+                Submit('submit', 'Submit'),
+                #TODO: Use edid-detail link
+                Button('cancel', 'Cancel', onclick='history.go(-1);')
+            )
+        )
+        super(DetailedTimingForm, self).__init__(*args, **kwargs)
+
+        # Pixel clock in kHz
+        self.fields['pixel_clock'].validators.append(MinValueValidator(10))
+        self.fields['pixel_clock'].validators.append(MaxValueValidator(655350))
+
+        # 12 bits
+        self.fields['horizontal_active'].validators.append(MaxValueValidator(4095))
+        self.fields['horizontal_blanking'].validators.append(MaxValueValidator(4095))
+        self.fields['horizontal_image_size'].validators.append(MaxValueValidator(4095))
+        self.fields['vertical_active'].validators.append(MaxValueValidator(4095))
+        self.fields['vertical_blanking'].validators.append(MaxValueValidator(4095))
+        self.fields['vertical_image_size'].validators.append(MaxValueValidator(4095))
+
+        # 10 bits
+        self.fields['horizontal_sync_offset'].validators.append(MaxValueValidator(1023))
+        self.fields['horizontal_sync_pulse_width'].validators.append(MaxValueValidator(1023))
+
+        # 8 bits
+        self.fields['horizontal_border'].validators.append(MaxValueValidator(255))
+        self.fields['vertical_border'].validators.append(MaxValueValidator(255))
+
+        # 6 bits
+        self.fields['vertical_sync_offset'].validators.append(MaxValueValidator(63))
+        self.fields['vertical_sync_pulse_width'].validators.append(MaxValueValidator(63))
+
+    def clean_pixel_clock(self):
+        pixel_clock = self.cleaned_data['pixel_clock']
+
+        if pixel_clock:
+            if not pixel_clock % 10 == 0:
+                raise forms.ValidationError('This field should be a multiple of 10.')
+
+        return pixel_clock
+
+    def clean(self):
+        cleaned_data = super(DetailedTimingForm, self).clean()
+
+        flags_sync_scheme = cleaned_data.get('flags_sync_scheme')
+        fields_to_nullify = []
+
+#        analog_composite = flags_sync_scheme == DetailedTiming.Sync_Scheme.Analog_Composite
+#        bipolar_analog_composite = flags_sync_scheme == DetailedTiming.Sync_Scheme.Bipolar_Analog_Composite
+        digital_composite = flags_sync_scheme == DetailedTiming.Sync_Scheme.Digital_Composite
+        digital_separate = flags_sync_scheme == DetailedTiming.Sync_Scheme.Digital_Separate
+
+        if not digital_separate:
+            fields_to_nullify.extend(['flags_horizontal_polarity', 'flags_vertical_polarity'])
+        else:
+            fields_to_nullify.append('flags_serrate')
+
+        if not digital_composite:
+            fields_to_nullify.append('flags_composite_polarity')
+
+        if digital_composite or digital_separate:
+            fields_to_nullify.append('flags_sync_on_RGB')
+
+        cleaned_data = self._nullify_fields(cleaned_data, fields_to_nullify)
+
+        return cleaned_data

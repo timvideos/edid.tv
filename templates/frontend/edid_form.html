@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Details - EDID Database{% endblock %}
+{% block title %}Update EDID - EDID Database{% endblock %}
 {% load crispy_forms_tags %}
 
 {% block content %}
 <div class="row">
   <div class="span12">
-    <h1>Edit EDID</h1>
+    <h1>Update EDID</h1>
     {% crispy form %}
   </div>
   <div class="span12">
@@ -19,7 +19,7 @@
             <th>Vertical Active</th>
             <th>Refresh Rate</th>
             <th>Image Aspect Ratio</th>
-            <th class="pull-right"><button class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> Add</button></th>
+            <th><a class="btn btn-success" href="{% url 'standard-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></th>
         </tr>
       </thead>
       <tbody>
@@ -30,7 +30,7 @@
             <td>{{ timing.vertical_active }} pixels</td>
             <td>{{ timing.refresh_rate }} Hz</td>
             <td>{{ timing.get_aspect_ratio_display }}</td>
-            <td><button class="btn" type="button"><i class="icon-edit"></i> Edit</button> <button class="btn btn-danger" type="button"><i class="icon-trash icon-white"></i> Delete</button></td>
+            <td><a class="btn" href="{% url 'standard-timing-update' edid.pk timing.pk %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'standard-timing-delete' edid.pk timing.pk %}"><i class="icon-trash icon-white"></i> Delete</a></td>
         </tr>
   {% endfor %}
       </tbody>
@@ -51,7 +51,7 @@
             <th>Horizontal Active</th>
             <th>Vertical Active</th>
             <th>Interlaced</th>
-            <th class="pull-right"><button class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> Add</button></th>
+            <th><a class="btn btn-success" href="{% url 'detailed-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></th>
         </tr>
       </thead>
       <tbody>
@@ -62,7 +62,7 @@
             <td>{{ timing.horizontal_active }} pixels</td>
             <td>{{ timing.vertical_active }} pixels</td>
             <td><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></td>
-            <td><button class="btn" type="button"><i class="icon-edit"></i> Edit</button> <button class="btn btn-danger" type="button"><i class="icon-trash icon-white"></i> Delete</button></td>
+            <td><a class="btn" href="{% url 'detailed-timing-update' edid.pk timing.pk %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'detailed-timing-delete' edid.pk timing.pk %}"><i class="icon-trash icon-white"></i> Delete</a></td>
         </tr>
   {% endfor %}
       </tbody>

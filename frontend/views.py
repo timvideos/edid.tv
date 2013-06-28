@@ -3,11 +3,11 @@ from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 
-from frontend.models import EDID
-from frontend.forms import EDIDUpdateForm, EDIDUploadForm
+from frontend.models import EDID, StandardTiming, DetailedTiming
+from frontend.forms import EDIDUpdateForm, EDIDUploadForm, StandardTimingForm, DetailedTimingForm
 
 
-#EDID
+### EDID
 class EDIDList(ListView):
     queryset = EDID.public.all()
     context_object_name = 'edid_list'
@@ -41,3 +41,41 @@ class EDIDDetailView(DetailView):
 class EDIDUpdate(UpdateView):
     queryset = EDID.public.all()
     form_class = EDIDUpdateForm
+
+
+### Standard Timing
+class StandardTimingCreate(CreateView):
+    model = StandardTiming
+    form_class = StandardTimingForm
+
+class StandardTimingUpdate(UpdateView):
+    model = StandardTiming
+    form_class = StandardTimingForm
+
+    def get_success_url(self):
+        # Returns url of EDID updating page
+        return reverse('edid-update', kwargs={'pk': self.object.EDID.pk})
+
+class StandardTimingDelete(DeleteView):
+    model = StandardTiming
+    form_class = StandardTimingForm
+#    success_url = reverse_lazy('edid-update')
+
+
+### Detailed Timing
+class DetailedTimingCreate(CreateView):
+    model = DetailedTiming
+    form_class = DetailedTimingForm
+
+class DetailedTimingUpdate(UpdateView):
+    model = DetailedTiming
+    form_class = DetailedTimingForm
+
+    def get_success_url(self):
+        # Returns url of EDID updating page
+        return reverse('edid-update', kwargs={'pk': self.object.EDID.pk})
+
+class DetailedTimingDelete(DeleteView):
+    model = DetailedTiming
+    form_class = DetailedTimingForm
+#    success_url = reverse_lazy('edid-update')
