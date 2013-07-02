@@ -12,6 +12,9 @@ class Manufacturer(models.Model):
     #ID, 3 characters
     name_id = models.CharField(max_length=3)
 
+    class Meta:
+        ordering = ['name_id']
+
     def __unicode__(self):
         return "%s: %s" % (self.name_id, self.name)
 

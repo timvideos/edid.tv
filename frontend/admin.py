@@ -1,7 +1,26 @@
 from django.contrib import admin
-from frontend.models import EDID
+from frontend.models import Manufacturer, EDID, StandardTiming, DetailedTiming
+
+class ManufacturerAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Manufacturer, ManufacturerAdmin)
+
+class StandardTimingInline(admin.TabularInline):
+    model = StandardTiming
+    fields = ['identification']
+
+class DetailedTimingInline(admin.TabularInline):
+    model = DetailedTiming
+    fields = ['identification']
 
 class EDIDAdmin(admin.ModelAdmin):
+    fields = ['manufacturer', 'status']
+    inlines = [
+        StandardTimingInline,
+        DetailedTimingInline,
+    ]
+
     def queryset(self, request):
         """
         Override default manager to list all EDID objects.
