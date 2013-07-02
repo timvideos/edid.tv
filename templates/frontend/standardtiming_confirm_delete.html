@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Delete Standard Timing - EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <h1>Delete Standard Timing</h1>
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <td>Horizontal Active</td>
+          <td>{{ timing.horizontal_active }} pixels</td>
+        </tr>
+        <tr>
+          <td>Vertical Active</td>
+          <td>{{ timing.vertical_active }} pixels</td>
+        </tr>
+        <tr>
+          <td>Refresh Rate</td>
+          <td>{{ timing.refresh_rate }} Hz</td>
+        </tr>
+        <tr>
+          <td>Image Aspect Ratio</td>
+          <td>{{ timing.get_aspect_ratio_display }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="span12">
+    <form method="post">{% csrf_token %}
+      <div class="form-actions text-right">
+        <a class="btn" href="{% url 'edid-update' timing.EDID_id %}">Cancel</a>
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger" id="delete-id-delete" />
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

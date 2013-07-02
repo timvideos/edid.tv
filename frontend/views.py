@@ -108,6 +108,26 @@ class TimingMixin(object):
 
         return super(TimingMixin, self).form_valid(form)
 
+    def delete(self, request, *args, **kwargs):
+        """
+        Deletes the timing and reorder the subsequent timings and then
+        redirects to the success URL.
+
+        Used for DeleteView.
+        """
+
+        self.object = self.get_object()
+        self.object.delete()
+
+        timings = self.model.objects.filter(EDID=self.object.EDID,
+                                            identification__gt=self.object.identification).all()
+
+        for timing in timings:
+            timing.identification = timing.identification - 1
+            timing.save()
+
+        return HttpResponseRedirect(self.get_success_url())
+
 
 ### Standard Timing
 class StandardTimingCreate(TimingMixin, CreateView):
