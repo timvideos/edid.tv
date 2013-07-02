@@ -48,6 +48,22 @@ class EDIDUpdate(UpdateView):
 class TimingMixin(object):
     context_object_name = 'timing'
 
+    def get_initial(self):
+        """
+        Uses edid_pk argument from URLConf to grab EDID object and inject it in the view.
+
+        Used for CreateView and UpdateView.
+        """
+
+        initial = super(TimingMixin, self).get_initial()
+
+        edid_pk = self.kwargs.get('edid_pk', None)
+
+        edid = get_object_or_404(EDID.public.all(), pk=edid_pk)
+        initial.update({'edid': edid})
+
+        return initial
+
     def get_object(self, queryset=None):
         """
         Gets timing object based on edid_pk and identification.

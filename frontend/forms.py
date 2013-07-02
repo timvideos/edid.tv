@@ -311,6 +311,9 @@ class StandardTimingForm(BaseForm):
         fields = ['horizontal_active', 'vertical_active', 'refresh_rate', 'aspect_ratio']
 
     def __init__(self, *args, **kwargs):
+        # Store EDID object in the form
+        self.EDID = kwargs['initial'].get('edid')
+
         self.helper = FormHelper()
         self.helper.form_class = 'form-horizontal'
         self.helper.layout = Layout(
@@ -324,6 +327,7 @@ class StandardTimingForm(BaseForm):
                 Button('cancel', 'Cancel', onclick='history.go(-1);')
             )
         )
+
         super(StandardTimingForm, self).__init__(*args, **kwargs)
 
         # Horizontal active, 256-2288 pixels
@@ -349,6 +353,20 @@ class StandardTimingForm(BaseForm):
 
         return horizontal_active
 
+    def clean_aspect_ratio(self):
+        aspect_ratio = self.cleaned_data['aspect_ratio']
+
+        old_versions = [EDID.EDID_version_1_0, EDID.EDID_version_1_1, EDID.EDID_version_1_2]
+
+        if aspect_ratio == StandardTiming.ASPECT_RATIO_1_1:
+            if not self.EDID.EDID_version in old_versions:
+                raise forms.ValidationError('1:1 aspect ratio is not allowed with EDID 1.3 or newer.')
+        elif aspect_ratio == StandardTiming.ASPECT_RATIO_16_10:
+            if self.EDID.EDID_version in old_versions:
+                raise forms.ValidationError('16:10 aspect ratio is not allowed prior to EDID 1.3.')
+
+        return aspect_ratio
+
 class DetailedTimingForm(BaseForm):
     class Meta:
         model = DetailedTiming
@@ -371,6 +389,9 @@ class DetailedTimingForm(BaseForm):
                    'flags_sync_on_RGB': forms.CheckboxInput}
 
     def __init__(self, *args, **kwargs):
+        # Store EDID object in the form
+        self.EDID = kwargs['initial'].get('edid')
+
         self.helper = FormHelper()
         self.helper.form_class = 'form-horizontal'
         self.helper.layout = Layout(
