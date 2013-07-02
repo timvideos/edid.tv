@@ -391,7 +391,6 @@ class Timing(models.Model):
 
     class Meta:
         abstract = True
-        unique_together = (("EDID", "identification"),)
         ordering = ['identification']
 
 class StandardTiming(Timing):

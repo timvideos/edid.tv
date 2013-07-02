@@ -8,29 +8,39 @@
     <h1>Update EDID</h1>
     {% crispy form %}
   </div>
+
   <div class="span12">
     <h3>Standard Timings</h3>
 {% if edid.standardtiming_set.exists %}
     <table class="table table-striped">
       <thead>
         <tr>
-            <th>Identification</th>
-            <th>Horizontal Active</th>
-            <th>Vertical Active</th>
-            <th>Refresh Rate</th>
-            <th>Image Aspect Ratio</th>
-            <th><a class="btn btn-success" href="{% url 'standard-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></th>
+          <td></td>
+          <th>Identification</th>
+          <th>Horizontal Active</th>
+          <th>Vertical Active</th>
+          <th>Refresh Rate</th>
+          <th>Image Aspect Ratio</th>
+          <th><a class="btn btn-success" href="{% url 'standard-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></th>
         </tr>
       </thead>
       <tbody>
   {% for timing in edid.standardtiming_set.all %}
         <tr>
-            <td>{{ timing.identification }}</td>
-            <td>{{ timing.horizontal_active }} pixels</td>
-            <td>{{ timing.vertical_active }} pixels</td>
-            <td>{{ timing.refresh_rate }} Hz</td>
-            <td>{{ timing.get_aspect_ratio_display }}</td>
-            <td><a class="btn" href="{% url 'standard-timing-update' edid.pk timing.identification %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'standard-timing-delete' edid.pk timing.identification %}"><i class="icon-trash icon-white"></i> Delete</a></td>
+          <td>
+    {% if not forloop.first %}
+            <a href="{% url 'standard-timing-reorder' edid.pk timing.identification 'up' %}"><i class="icon-arrow-up"></i></a>
+    {% endif %}
+    {% if not forloop.last %}
+            <a href="{% url 'standard-timing-reorder' edid.pk timing.identification 'down' %}"><i class="icon-arrow-down"></i></a>
+    {% endif %}
+          </td>
+          <td>{{ timing.identification }}</td>
+          <td>{{ timing.horizontal_active }} pixels</td>
+          <td>{{ timing.vertical_active }} pixels</td>
+          <td>{{ timing.refresh_rate }} Hz</td>
+          <td>{{ timing.get_aspect_ratio_display }}</td>
+          <td><a class="btn" href="{% url 'standard-timing-update' edid.pk timing.identification %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'standard-timing-delete' edid.pk timing.identification %}"><i class="icon-trash icon-white"></i> Delete</a></td>
         </tr>
   {% endfor %}
       </tbody>
@@ -46,23 +56,32 @@
     <table class="table table-striped">
       <thead>
         <tr>
-            <th>Identification</th>
-            <th>Pixel clock</th>
-            <th>Horizontal Active</th>
-            <th>Vertical Active</th>
-            <th>Interlaced</th>
-            <th><a class="btn btn-success" href="{% url 'detailed-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></th>
+          <td></td>
+          <th>Identification</th>
+          <th>Pixel clock</th>
+          <th>Horizontal Active</th>
+          <th>Vertical Active</th>
+          <th>Interlaced</th>
+          <th><a class="btn btn-success" href="{% url 'detailed-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></th>
         </tr>
       </thead>
       <tbody>
   {% for timing in edid.detailedtiming_set.all %}
         <tr>
-            <td>{{ timing.identification }}</td>
-            <td>{{ timing.pixel_clock }} kHz</td>
-            <td>{{ timing.horizontal_active }} pixels</td>
-            <td>{{ timing.vertical_active }} pixels</td>
-            <td><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></td>
-            <td><a class="btn" href="{% url 'detailed-timing-update' edid.pk timing.identification %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'detailed-timing-delete' edid.pk timing.identification %}"><i class="icon-trash icon-white"></i> Delete</a></td>
+          <td>
+    {% if not forloop.first %}
+            <a href="{% url 'detailed-timing-reorder' edid.pk timing.identification 'up' %}"><i class="icon-arrow-up"></i></a>
+    {% endif %}
+    {% if not forloop.last %}
+            <a href="{% url 'detailed-timing-reorder' edid.pk timing.identification 'down' %}"><i class="icon-arrow-down"></i></a>
+    {% endif %}
+          </td>
+          <td>{{ timing.identification }}</td>
+          <td>{{ timing.pixel_clock }} kHz</td>
+          <td>{{ timing.horizontal_active }} pixels</td>
+          <td>{{ timing.vertical_active }} pixels</td>
+          <td><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></td>
+          <td><a class="btn" href="{% url 'detailed-timing-update' edid.pk timing.identification %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'detailed-timing-delete' edid.pk timing.identification %}"><i class="icon-trash icon-white"></i> Delete</a></td>
         </tr>
   {% endfor %}
       </tbody>

@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 
 from frontend.models import EDID, StandardTiming, DetailedTiming
@@ -152,4 +152,60 @@ class DetailedTimingUpdate(TimingMixin, UpdateView):
     form_class = DetailedTimingForm
 
 class DetailedTimingDelete(TimingMixin, DeleteView):
+    model = DetailedTiming
+
+
+class TimingReorderMixin(object):
+    http_method_names = [u'get']
+
+    def get(self, request, *args, **kwargs):
+        edid_pk = kwargs.get('edid_pk', None)
+        identification = int(kwargs.get('identification', None))
+        direction = kwargs.get('direction', None)
+
+        if direction == 'up':
+            if identification == 1:
+                return HttpResponseForbidden('You can not move up a timing if its identification is 1.')
+
+            prev_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification - 1)
+            current_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification)
+
+            prev_timing.identification += 1
+            prev_timing.save()
+
+            current_timing.identification -= 1
+            current_timing.save()
+
+            return HttpResponseRedirect(self.get_success_url())
+        elif direction == 'down':
+            count = self.model.objects.filter(EDID_id=edid_pk).count()
+
+            if identification == count:
+                return HttpResponseForbidden('You can not move down a timing if it is the last one.')
+
+            current_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification)
+            next_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification + 1)
+
+            next_timing.identification -= 1
+            next_timing.save()
+
+            current_timing.identification += 1
+            current_timing.save()
+
+            return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        """
+        Returns url of EDID updating page.
+        """
+
+        edid_pk = self.kwargs.get('edid_pk')
+
+        return reverse('edid-update', kwargs={'pk': edid_pk})
+
+
+class StandardTimingReorder(TimingReorderMixin, View):
+    model = StandardTiming
+
+class DetailedTimingReorder(TimingReorderMixin, View):
     model = DetailedTiming
