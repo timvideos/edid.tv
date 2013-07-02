@@ -30,13 +30,13 @@
             <td>{{ timing.vertical_active }} pixels</td>
             <td>{{ timing.refresh_rate }} Hz</td>
             <td>{{ timing.get_aspect_ratio_display }}</td>
-            <td><a class="btn" href="{% url 'standard-timing-update' edid.pk timing.pk %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'standard-timing-delete' edid.pk timing.pk %}"><i class="icon-trash icon-white"></i> Delete</a></td>
+            <td><a class="btn" href="{% url 'standard-timing-update' edid.pk timing.identification %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'standard-timing-delete' edid.pk timing.identification %}"><i class="icon-trash icon-white"></i> Delete</a></td>
         </tr>
   {% endfor %}
       </tbody>
     </table>
 {% else %}
-    <p>No standard timings available.</p>
+    <p>No standard timings available. <a class="btn btn-success" href="{% url 'standard-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></p>
 {% endif %}
   </div>
 
@@ -62,13 +62,13 @@
             <td>{{ timing.horizontal_active }} pixels</td>
             <td>{{ timing.vertical_active }} pixels</td>
             <td><i class="icon-{{ timing.flags_interlaced|yesno:"ok,remove" }}"></i></td>
-            <td><a class="btn" href="{% url 'detailed-timing-update' edid.pk timing.pk %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'detailed-timing-delete' edid.pk timing.pk %}"><i class="icon-trash icon-white"></i> Delete</a></td>
+            <td><a class="btn" href="{% url 'detailed-timing-update' edid.pk timing.identification %}"><i class="icon-edit"></i> Edit</a> <a class="btn btn-danger" href="{% url 'detailed-timing-delete' edid.pk timing.identification %}"><i class="icon-trash icon-white"></i> Delete</a></td>
         </tr>
   {% endfor %}
       </tbody>
     </table>
 {% else %}
-    <p>No detailed timings available.</p>
+    <p>No detailed timings available. <a class="btn btn-success" href="{% url 'detailed-timing-create' edid.pk %}"><i class="icon-plus icon-white"></i> Add</a></p>
 {% endif %}
   </div>
 </div>
