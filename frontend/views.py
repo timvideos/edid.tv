@@ -10,7 +10,7 @@ from frontend.forms import EDIDUpdateForm, EDIDUploadForm, StandardTimingForm, D
 
 ### EDID
 class EDIDList(ListView):
-    queryset = EDID.public.all()
+    model = EDID
     context_object_name = 'edid_list'
 
 class EDIDUpload(FormView):
@@ -37,10 +37,10 @@ class EDIDUpload(FormView):
         return HttpResponseRedirect(reverse('edid-detail', kwargs={'pk': edid_object.pk}))
 
 class EDIDDetailView(DetailView):
-    queryset = EDID.public.all()
+    model = EDID
 
 class EDIDUpdate(UpdateView):
-    queryset = EDID.public.all()
+    model = EDID
     form_class = EDIDUpdateForm
 
 
@@ -59,7 +59,7 @@ class TimingMixin(object):
 
         edid_pk = self.kwargs.get('edid_pk', None)
 
-        edid = get_object_or_404(EDID.public.all(), pk=edid_pk)
+        edid = get_object_or_404(EDID, pk=edid_pk)
         initial.update({'edid': edid})
 
         return initial

@@ -22,7 +22,8 @@ class EDIDPublicManager(models.Manager):
         return super(EDIDPublicManager, self).get_query_set().exclude(status=EDID.STATUS_PRIVATE)
 
 class EDID(models.Model):
-    public = EDIDPublicManager()
+    objects = EDIDPublicManager()
+    all_objects = models.Manager()
 
     manufacturer = models.ForeignKey(Manufacturer)
 
