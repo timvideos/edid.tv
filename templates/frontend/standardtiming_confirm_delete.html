@@ -5,26 +5,7 @@
 <div class="row">
   <div class="span12">
     <h1>Delete Standard Timing</h1>
-    <table class="table table-striped">
-      <tbody>
-        <tr>
-          <td>Horizontal Active</td>
-          <td>{{ timing.horizontal_active }} pixels</td>
-        </tr>
-        <tr>
-          <td>Vertical Active</td>
-          <td>{{ timing.vertical_active }} pixels</td>
-        </tr>
-        <tr>
-          <td>Refresh Rate</td>
-          <td>{{ timing.refresh_rate }} Hz</td>
-        </tr>
-        <tr>
-          <td>Image Aspect Ratio</td>
-          <td>{{ timing.get_aspect_ratio_display }}</td>
-        </tr>
-      </tbody>
-    </table>
+    {% include 'frontend/standardtiming_table.html' %}
   </div>
 </div>
 <div class="row">
