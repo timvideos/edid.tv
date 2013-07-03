@@ -44,6 +44,9 @@ class EDID(models.Model):
                       (STATUS_PRIVATE, 'Private'))
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=STATUS_INITIALIZED)
 
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
     ### Header
     #ID Product Code
     manufacturer_product_code = models.CharField(max_length=4, blank=True)
@@ -389,6 +392,9 @@ class EDID(models.Model):
 
 class Timing(models.Model):
     EDID = models.ForeignKey(EDID)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     #Identification
     identification = models.IntegerField()
