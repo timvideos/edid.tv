@@ -12,14 +12,17 @@ from frontend.models import EDID, StandardTiming, DetailedTiming
 
 class EDIDUploadForm(forms.Form):
     edid_file = forms.FileField(label='EDID File')
+    edid_binary = None
     edid_data = None
 
     def clean_edid_file(self):
         edid_file = self.cleaned_data['edid_file']
 
+        self.edid_binary = edid_file.read()
+
         #Parse EDID file
         try:
-            self.edid_data = EDID_Parser(edid_file.read()).data
+            self.edid_data = EDID_Parser(self.edid_binary).data
         except EDIDParsingError as msg:
             raise forms.ValidationError(msg)
 

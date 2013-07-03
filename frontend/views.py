@@ -1,3 +1,4 @@
+from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -18,20 +19,23 @@ class EDIDUpload(FormView):
     template_name = 'frontend/edid_upload.html'
 
     def form_valid(self, form):
-        #Create EDID entry
+        # Create EDID entry
         edid_object = EDID()
-        #Add basic data
+        # Add basic data
         edid_object.populate_from_edid_parser(form.edid_data)
+
+        # Save the binary file
+        edid_object.file.save('edid.bin', ContentFile(form.edid_binary))
 
         # We can check for duplicate EDID file here, based on manufacturer_name_id, manufacturer_product_code
         #                                                     and manufacturer_serial_number
         # or probably somewhere else!
 
-        #Save the entry
+        # Save the entry
         edid_object.save()
-        #Add timings
+        # Add timings
         edid_object.populate_timings_from_edid_parser(form.edid_data)
-        #Save the updated entry
+        # Save the updated entry
         edid_object.save()
 
         return HttpResponseRedirect(reverse('edid-detail', kwargs={'pk': edid_object.pk}))

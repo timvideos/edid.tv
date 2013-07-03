@@ -47,6 +47,8 @@ class EDID(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    file = models.FileField(upload_to='edid/%Y/%m/%d')
+
     ### Header
     #ID Product Code
     manufacturer_product_code = models.CharField(max_length=4, blank=True)
