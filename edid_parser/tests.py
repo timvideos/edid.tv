@@ -132,23 +132,23 @@ class EDIDValidTest(EDIDTest):
 
         self.assertEqual(len(data), 4)
 
-        self.assertEqual(data['Identification_1']['Horizontal_active_pixels'], 1280)
-        self.assertEqual(data['Identification_1']['Vertical_active_pixels'], 800)
+        self.assertEqual(data['Identification_1']['Horizontal_active'], 1280)
+        self.assertEqual(data['Identification_1']['Vertical_active'], 800)
         self.assertEqual(data['Identification_1']['Image_aspect_ratio'], (16, 10))
         self.assertEqual(data['Identification_1']['Refresh_Rate'], 120)
 
-        self.assertEqual(data['Identification_2']['Horizontal_active_pixels'], 800)
-        self.assertEqual(data['Identification_2']['Vertical_active_pixels'], 600)
+        self.assertEqual(data['Identification_2']['Horizontal_active'], 800)
+        self.assertEqual(data['Identification_2']['Vertical_active'], 600)
         self.assertEqual(data['Identification_2']['Image_aspect_ratio'], (4, 3))
         self.assertEqual(data['Identification_2']['Refresh_Rate'], 120)
 
-        self.assertEqual(data['Identification_3']['Horizontal_active_pixels'], 1280)
-        self.assertEqual(data['Identification_3']['Vertical_active_pixels'], 1024)
+        self.assertEqual(data['Identification_3']['Horizontal_active'], 1280)
+        self.assertEqual(data['Identification_3']['Vertical_active'], 1024)
         self.assertEqual(data['Identification_3']['Image_aspect_ratio'], (5, 4))
         self.assertEqual(data['Identification_3']['Refresh_Rate'], 60)
 
-        self.assertEqual(data['Identification_4']['Horizontal_active_pixels'], 1360)
-        self.assertEqual(data['Identification_4']['Vertical_active_pixels'], 765)
+        self.assertEqual(data['Identification_4']['Horizontal_active'], 1360)
+        self.assertEqual(data['Identification_4']['Vertical_active'], 765)
         self.assertEqual(data['Identification_4']['Image_aspect_ratio'], (16, 9))
         self.assertEqual(data['Identification_4']['Refresh_Rate'], 60)
 
@@ -161,8 +161,8 @@ class EDIDValidTest(EDIDTest):
 
         self.assertEqual(len(data), 1)
 
-        self.assertEqual(data['Identification_1']['Horizontal_active_pixels'], 1280)
-        self.assertEqual(data['Identification_1']['Vertical_active_pixels'], 1280)
+        self.assertEqual(data['Identification_1']['Horizontal_active'], 1280)
+        self.assertEqual(data['Identification_1']['Vertical_active'], 1280)
         self.assertEqual(data['Identification_1']['Image_aspect_ratio'], (1, 1))
         self.assertEqual(data['Identification_1']['Refresh_Rate'], 120)
 
