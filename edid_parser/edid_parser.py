@@ -167,7 +167,7 @@ class EDID_Parser(object):
                                         'Default_GTF': edid[4] & 0b00000001}
 
 #        if not new_data['Feature_Support']['Preferred_Timing_Mode']:
-#            if (self.data['EDID_version'] == 1 and self.data['EDID_reversion'] >= 3) or self.data['EDID_version'] > 1:
+#            if (self.data['EDID_version'] == 1 and self.data['EDID_revision'] >= 3) or self.data['EDID_version'] > 1:
 #                #Warning
 #                print "Use of preferred timing mode is required by EDID Structure Version 1 Revision 3 and higher."
 
@@ -257,7 +257,7 @@ class EDID_Parser(object):
 
                 id['Image_aspect_ratio'] = (edid[i + 1] & 0b11000000) >> 6
                 if id['Image_aspect_ratio'] == 0b00:
-                    if (self.data['EDID_version'] <= 1) and (self.data['EDID_reversion'] < 3):
+                    if (self.data['EDID_version'] <= 1) and (self.data['EDID_revision'] < 3):
                         id['Image_aspect_ratio'] = (1, 1)
                     else:
                         id['Image_aspect_ratio'] = (16, 10)
