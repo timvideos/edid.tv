@@ -1,7 +1,7 @@
 # Django settings for edid_db_website project.
+# pylint: disable-msg=C0103
 import os
 
-#Stolen shamelessly from http://deanproxy.com/blog/posts/2011/10/5-django-environmental-based-settings.html
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DEBUG = True
@@ -15,7 +15,8 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
             'read_default_file': os.path.join(SITE_ROOT, 'mysql.cnf'),
         },
@@ -159,4 +160,3 @@ try:
     from local_settings import *
 except ImportError:
     pass
-

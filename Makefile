@@ -68,6 +68,7 @@ lint: install
 	@# W0221 - Disable "Arguments differ from parent", as get and post will.
 	@# E1103 - Disable "Instance of 'x' has no 'y' member (but some types could not be inferred)"
 	@# I0011 - Disable "Locally disabling 'xxxx'"
+	@# C0111 - Disable "Missing docstring"
 	@$(ACTIVATE) && python \
 		-W "ignore:disable-msg is:DeprecationWarning:pylint.lint" \
 		-c "import sys; from pylint import lint; lint.Run(sys.argv[1:])" \
@@ -79,6 +80,7 @@ lint: install
 		--disable=R0904 \
 		--disable=E1103 \
 		--disable=I0011 \
+		--disable=C0111 \
 		--const-rgx='[a-z_][a-z0-9_]{2,30}$$' \
 		*.py frontend/*.py edid_parser/*.py 2>&1 | grep -v 'maximum recursion depth exceeded'
 

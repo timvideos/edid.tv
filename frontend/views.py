@@ -3,16 +3,19 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, View
-from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
+from django.views.generic.edit import FormView, CreateView, UpdateView, \
+                                      DeleteView
 
 from frontend.models import EDID, StandardTiming, DetailedTiming
-from frontend.forms import EDIDUpdateForm, EDIDUploadForm, StandardTimingForm, DetailedTimingForm
+from frontend.forms import EDIDUpdateForm, EDIDUploadForm, \
+                           StandardTimingForm, DetailedTimingForm
 
 
 ### EDID
 class EDIDList(ListView):
     model = EDID
     context_object_name = 'edid_list'
+
 
 class EDIDUpload(FormView):
     form_class = EDIDUploadForm
@@ -27,10 +30,6 @@ class EDIDUpload(FormView):
         # Save the binary file
         edid_object.file.save('edid.bin', ContentFile(form.edid_binary))
 
-        # We can check for duplicate EDID file here, based on manufacturer_name_id, manufacturer_product_code
-        #                                                     and manufacturer_serial_number
-        # or probably somewhere else!
-
         # Save the entry
         edid_object.save()
         # Add timings
@@ -38,10 +37,13 @@ class EDIDUpload(FormView):
         # Save the updated entry
         edid_object.save()
 
-        return HttpResponseRedirect(reverse('edid-detail', kwargs={'pk': edid_object.pk}))
+        return HttpResponseRedirect(reverse('edid-detail',
+                                            kwargs={'pk': edid_object.pk}))
+
 
 class EDIDDetailView(DetailView):
     model = EDID
+
 
 class EDIDUpdate(UpdateView):
     model = EDID
@@ -54,7 +56,8 @@ class TimingMixin(object):
 
     def get_initial(self):
         """
-        Uses edid_pk argument from URLConf to grab EDID object and inject it in the view.
+        Uses edid_pk argument from URLConf to grab EDID object and inject it
+        in the view.
 
         Used for CreateView and UpdateView.
         """
@@ -80,7 +83,8 @@ class TimingMixin(object):
         edid_pk = self.kwargs.get('edid_pk', None)
         identification = self.kwargs.get('identification', None)
 
-        obj = get_object_or_404(queryset, EDID=edid_pk, identification=identification)
+        obj = get_object_or_404(queryset, EDID=edid_pk,
+                                identification=identification)
 
         return obj
 
@@ -106,7 +110,8 @@ class TimingMixin(object):
             form.instance.EDID = form.EDID
             if not form.instance.identification:
                 # Get count of available timings
-                count = self.model.objects.filter(EDID=form.instance.EDID).count()
+                count = self.model.objects.filter(EDID=form.instance.EDID)\
+                                          .count()
                 # Set identification to count + 1
                 form.instance.identification = count + 1
 
@@ -124,7 +129,7 @@ class TimingMixin(object):
         self.object.delete()
 
         timings = self.model.objects.filter(EDID=self.object.EDID,
-                                            identification__gt=self.object.identification).all()
+                      identification__gt=self.object.identification).all()
 
         for timing in timings:
             timing.identification = timing.identification - 1
@@ -138,9 +143,11 @@ class StandardTimingCreate(TimingMixin, CreateView):
     model = StandardTiming
     form_class = StandardTimingForm
 
+
 class StandardTimingUpdate(TimingMixin, UpdateView):
     model = StandardTiming
     form_class = StandardTimingForm
+
 
 class StandardTimingDelete(TimingMixin, DeleteView):
     model = StandardTiming
@@ -151,9 +158,11 @@ class DetailedTimingCreate(TimingMixin, CreateView):
     model = DetailedTiming
     form_class = DetailedTimingForm
 
+
 class DetailedTimingUpdate(TimingMixin, UpdateView):
     model = DetailedTiming
     form_class = DetailedTimingForm
+
 
 class DetailedTimingDelete(TimingMixin, DeleteView):
     model = DetailedTiming
@@ -169,10 +178,13 @@ class TimingReorderMixin(object):
 
         if direction == 'up':
             if identification == 1:
-                return HttpResponseForbidden('You can not move up a timing if its identification is 1.')
+                return HttpResponseForbidden('You can not move up a timing if'
+                                             ' its identification is 1.')
 
-            prev_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification - 1)
-            current_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification)
+            prev_timing = self.model.objects.get(EDID_id=edid_pk,
+                              identification=identification - 1)
+            current_timing = self.model.objects.get(EDID_id=edid_pk,
+                                 identification=identification)
 
             prev_timing.identification += 1
             prev_timing.save()
@@ -185,10 +197,13 @@ class TimingReorderMixin(object):
             count = self.model.objects.filter(EDID_id=edid_pk).count()
 
             if identification == count:
-                return HttpResponseForbidden('You can not move down a timing if it is the last one.')
+                return HttpResponseForbidden('You can not move down a timing'
+                                             ' if it is the last one.')
 
-            current_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification)
-            next_timing = self.model.objects.get(EDID_id=edid_pk, identification=identification + 1)
+            current_timing = self.model.objects.get(EDID_id=edid_pk,
+                                 identification=identification)
+            next_timing = self.model.objects.get(EDID_id=edid_pk,
+                              identification=identification + 1)
 
             next_timing.identification -= 1
             next_timing.save()
@@ -210,6 +225,7 @@ class TimingReorderMixin(object):
 
 class StandardTimingReorder(TimingReorderMixin, View):
     model = StandardTiming
+
 
 class DetailedTimingReorder(TimingReorderMixin, View):
     model = DetailedTiming
