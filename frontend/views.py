@@ -6,6 +6,8 @@ from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import FormView, CreateView, UpdateView, \
                                       DeleteView
 
+from braces.views import LoginRequiredMixin
+
 from frontend.models import EDID, StandardTiming, DetailedTiming
 from frontend.forms import EDIDUpdateForm, EDIDUploadForm, \
                            StandardTimingForm, DetailedTimingForm
@@ -24,6 +26,11 @@ class EDIDUpload(FormView):
     def form_valid(self, form):
         # Create EDID entry
         edid_object = EDID()
+
+        # Set the user
+        if self.request.user.is_authenticated():
+            edid_object.user = self.request.user
+
         # Add basic data
         edid_object.populate_from_edid_parser(form.edid_data)
 
@@ -45,10 +52,18 @@ class EDIDDetailView(DetailView):
     model = EDID
 
 
-class EDIDUpdate(UpdateView):
+class EDIDUpdate(LoginRequiredMixin, UpdateView):
     model = EDID
     form_class = EDIDUpdateForm
 
+    def form_valid(self, form):
+        """
+        Set the user.
+        """
+
+        form.instance.user = self.request.user
+
+        return super(EDIDUpdate, self).form_valid(form)
 
 ### Timing Mixin
 class TimingMixin(object):
@@ -115,6 +130,9 @@ class TimingMixin(object):
                 # Set identification to count + 1
                 form.instance.identification = count + 1
 
+        # Set the user
+        form.instance.user = self.request.user
+
         return super(TimingMixin, self).form_valid(form)
 
     def delete(self, request, *args, **kwargs):
@@ -139,35 +157,36 @@ class TimingMixin(object):
 
 
 ### Standard Timing
-class StandardTimingCreate(TimingMixin, CreateView):
+class StandardTimingCreate(LoginRequiredMixin, TimingMixin, CreateView):
     model = StandardTiming
     form_class = StandardTimingForm
 
 
-class StandardTimingUpdate(TimingMixin, UpdateView):
+class StandardTimingUpdate(LoginRequiredMixin, TimingMixin, UpdateView):
     model = StandardTiming
     form_class = StandardTimingForm
 
 
-class StandardTimingDelete(TimingMixin, DeleteView):
+class StandardTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
     model = StandardTiming
 
 
 ### Detailed Timing
-class DetailedTimingCreate(TimingMixin, CreateView):
+class DetailedTimingCreate(LoginRequiredMixin, TimingMixin, CreateView):
     model = DetailedTiming
     form_class = DetailedTimingForm
 
 
-class DetailedTimingUpdate(TimingMixin, UpdateView):
+class DetailedTimingUpdate(LoginRequiredMixin, TimingMixin, UpdateView):
     model = DetailedTiming
     form_class = DetailedTimingForm
 
 
-class DetailedTimingDelete(TimingMixin, DeleteView):
+class DetailedTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
     model = DetailedTiming
 
 
+### Timing Reorder Mixin
 class TimingReorderMixin(object):
     http_method_names = [u'get']
 
@@ -187,9 +206,11 @@ class TimingReorderMixin(object):
                                  identification=identification)
 
             prev_timing.identification += 1
+            prev_timing.user = request.user
             prev_timing.save()
 
             current_timing.identification -= 1
+            current_timing.user = request.user
             current_timing.save()
 
             return HttpResponseRedirect(self.get_success_url())
@@ -206,9 +227,11 @@ class TimingReorderMixin(object):
                               identification=identification + 1)
 
             next_timing.identification -= 1
+            next_timing.user = request.user
             next_timing.save()
 
             current_timing.identification += 1
+            current_timing.user = request.user
             current_timing.save()
 
             return HttpResponseRedirect(self.get_success_url())
@@ -223,9 +246,11 @@ class TimingReorderMixin(object):
         return reverse('edid-update', kwargs={'pk': edid_pk})
 
 
-class StandardTimingReorder(TimingReorderMixin, View):
+### Standard Timing
+class StandardTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
     model = StandardTiming
 
 
-class DetailedTimingReorder(TimingReorderMixin, View):
+### Detailed Timing
+class DetailedTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
     model = DetailedTiming

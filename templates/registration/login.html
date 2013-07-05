@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Login - EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span4">
+    {% if form.errors %}
+      <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <form method="post" class="form-signin">{% csrf_token %}
+      <h2 class="form-signin-heading">Please sign in</h2>
+      <input type="text" name="username" class="input-block-level"
+             placeholder="Username">
+      <input type="password" name="password" class="input-block-level"
+             placeholder="Password">
+      <button class="btn btn-large btn-primary" type="submit" value="login">Sign in</button>
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+  </div>
+</div>
+{% endblock %}
