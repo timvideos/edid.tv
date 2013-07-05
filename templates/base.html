@@ -36,9 +36,11 @@
             </ul>
             <ul class="nav pull-right">
 {% if user.is_authenticated %}
-              <li class="pull-right"><a href="{% url 'logout' %}">Logout</a></li>
+              <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+              <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
 {% else %}
-              <li class="pull-right"><a href="{% url 'login' %}">Login</a></li>
+              <li><a href="{% url 'account_login' %}">Sign In</a></li>
+              <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
 {% endif %}
             </ul>
           </div><!--/.nav-collapse -->

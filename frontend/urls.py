@@ -36,9 +36,11 @@ urlpatterns = patterns('',
         r'move_(?P<direction>up|down)/$',
         views.DetailedTimingReorder.as_view(), name='detailed-timing-reorder'),
 
-    # Login/Logout
-    url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout'),
+    # django-allauth
+    (r'^accounts/', include('allauth.urls')),
+
+    # User Profile
+    url(r'^accounts/profile/$', views.ProfileView.as_view(), name='profile'),
 
     # Index
     url(r'^$', views.EDIDList.as_view(), name='index'),

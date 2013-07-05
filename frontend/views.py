@@ -2,7 +2,7 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, ListView, View
+from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import FormView, CreateView, UpdateView, \
                                       DeleteView
 
@@ -254,3 +254,8 @@ class StandardTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
 ### Detailed Timing
 class DetailedTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
     model = DetailedTiming
+
+
+### User Profile
+class ProfileView(TemplateView):
+    template_name = 'frontend/profile.html'

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}EDID Database{% endblock %}
+{% load account %}
+{% load socialaccount %}
+{% get_social_accounts user as accounts %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <h1>Welcome to your profile, {% user_display user %}!</h1>
+{% if accounts %}
+    <ul>
+  {% for account in accounts %}
+      <li>{{ account }}</li>
+  {% endfor %}
+    </ul>
+{% endif %}
+  </div>
+</div>
+{% endblock %}
