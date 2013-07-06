@@ -48,6 +48,7 @@ install: install-ez_setup install-distribute install-packages
 prepare-serve:
 	$(ACTIVATE) && python manage.py collectstatic --noinput
 	$(ACTIVATE) && python manage.py syncdb
+	$(ACTIVATE) && python manage.py createinitialrevisions
 
 
 #### Tests

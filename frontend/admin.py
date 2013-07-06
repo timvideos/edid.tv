@@ -1,4 +1,7 @@
 from django.contrib import admin
+
+import reversion
+
 from frontend.models import Manufacturer, EDID, StandardTiming, DetailedTiming
 
 
@@ -18,7 +21,7 @@ class DetailedTimingInline(admin.TabularInline):
     fields = ['identification']
 
 
-class EDIDAdmin(admin.ModelAdmin):
+class EDIDAdmin(reversion.VersionAdmin):
     fields = ['manufacturer', 'status']
     inlines = [
         StandardTimingInline,
