@@ -6,7 +6,7 @@ from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import FormView, CreateView, UpdateView, \
                                       DeleteView
 
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, PrefetchRelatedMixin
 
 from frontend.models import EDID, StandardTiming, DetailedTiming
 from frontend.forms import EDIDUpdateForm, EDIDUploadForm, \
@@ -48,13 +48,15 @@ class EDIDUpload(FormView):
                                             kwargs={'pk': edid_object.pk}))
 
 
-class EDIDDetailView(DetailView):
+class EDIDDetailView(PrefetchRelatedMixin, DetailView):
     model = EDID
+    prefetch_related = ['standardtiming_set', 'detailedtiming_set']
 
 
-class EDIDUpdate(LoginRequiredMixin, UpdateView):
+class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
     model = EDID
     form_class = EDIDUpdateForm
+    prefetch_related = ['standardtiming_set', 'detailedtiming_set']
 
     def form_valid(self, form):
         """
