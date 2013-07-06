@@ -35,13 +35,32 @@
               <li><a href="#contact">Contact</a></li>
             </ul>
             <ul class="nav pull-right">
+              <li class="dropdown">
 {% if user.is_authenticated %}
-              <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
-              <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+  {% load account %}
+                <a href="#" class="dropdown-toggle"
+                   data-toggle="dropdown">{% user_display user %}
+                    <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+                  <li><a href="{% url 'account_change_password' %}">Change Password</a></li>
+  {% url 'socialaccount_connections' as connections_url %}
+  {% if connections_url %}
+                  <li><a href="{{ connections_url }}">Connected Accounts</a></li>
+  {% endif %}
+                  <li class="divider"></li>
+                  <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+                </ul>
 {% else %}
-              <li><a href="{% url 'account_login' %}">Sign In</a></li>
-              <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+                <a href="#" class="dropdown-toggle"
+                   data-toggle="dropdown">Account
+                    <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url 'account_login' %}">Sign In</a></li>
+                  <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+                </ul>
 {% endif %}
+              </li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -49,6 +68,19 @@
     </div>
 
     <div class="container">
+{% if messages %}
+      <div class="row">
+        <div class="span12">
+          <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {% for message in messages %}
+            {{message}}{% if not forloop.last %}<br>{% endif %}
+  {% endfor %}
+          </div>
+        </div>
+      </div>
+{% endif %}
+
       {% block content %}{% endblock %}
     </div> <!-- /container -->
 

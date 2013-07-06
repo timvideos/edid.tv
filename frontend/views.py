@@ -260,4 +260,4 @@ class DetailedTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
 
 ### User Profile
 class ProfileView(TemplateView):
-    template_name = 'frontend/profile.html'
+    template_name = 'account/profile.html'
