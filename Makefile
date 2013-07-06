@@ -34,18 +34,18 @@ bin/activate:
 freeze:
 	$(ACTIVATE) && pip freeze > requirements.txt
 
-lib/python2.6/site-packages/distribute-0.6.25-py2.6.egg-info: lib
-	$(ACTIVATE) && pip install -U distribute
+install-distribute: lib
+	$(ACTIVATE) && pip install distribute
 
-lib/python2.6/site-packages/ez_setup.py: lib
+install-ez_setup: lib
 	$(ACTIVATE) && pip install ez_setup
 
 install-packages: requirements.txt
 	$(ACTIVATE) && pip install -r requirements.txt
 
-install: lib/python2.6/site-packages/ez_setup.py lib/python2.6/site-packages/distribute-0.6.25-py2.6.egg-info install-packages
+install: install-ez_setup install-distribute install-packages
 
-prepare-serve: install
+prepare-serve:
 	$(ACTIVATE) && python manage.py collectstatic --noinput
 	$(ACTIVATE) && python manage.py syncdb
 
@@ -87,5 +87,5 @@ lint: install
 ###############################################################################
 ###############################################################################
 
-serve: prepare-serve install
+serve: prepare-serve
 	$(ACTIVATE) && python manage.py runserver
