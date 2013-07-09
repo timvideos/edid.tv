@@ -45,10 +45,12 @@ install-packages: requirements.txt
 
 install: install-ez_setup install-distribute install-packages
 
+createinitialrevisions:
+	$(ACTIVATE) && python manage.py createinitialrevisions
+
 prepare-serve:
 	$(ACTIVATE) && python manage.py collectstatic --noinput
 	$(ACTIVATE) && python manage.py syncdb
-	$(ACTIVATE) && python manage.py createinitialrevisions
 
 
 #### Tests
