@@ -5,8 +5,6 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-import reversion
-
 from edid_parser.edid_parser import (Display_Type, Display_Stereo_Mode,
                                      Timing_Sync_Scheme)
 
@@ -484,8 +482,6 @@ class EDID(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.manufacturer.name, self.monitor_name)
 
-reversion.register(EDID)
-
 
 class Timing(models.Model):
     EDID = models.ForeignKey(EDID)
@@ -526,8 +522,6 @@ class StandardTiming(Timing):
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active,
                                self.refresh_rate)
-
-reversion.register(StandardTiming)
 
 
 class DetailedTiming(Timing):
@@ -595,5 +589,3 @@ class DetailedTiming(Timing):
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active,
                                self.pixel_clock / 1000)
-
-reversion.register(DetailedTiming)
