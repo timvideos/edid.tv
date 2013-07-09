@@ -7,8 +7,8 @@ from django.core.urlresolvers import reverse
 
 import reversion
 
-from edid_parser.edid_parser import Display_Type, Display_Stereo_Mode, \
-                                    Timing_Sync_Scheme
+from edid_parser.edid_parser import (Display_Type, Display_Stereo_Mode,
+                                     Timing_Sync_Scheme)
 
 
 class Manufacturer(models.Model):

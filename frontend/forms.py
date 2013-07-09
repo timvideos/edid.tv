@@ -3,8 +3,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Fieldset, Layout, Submit
-from crispy_forms.bootstrap import AppendedText, FormActions, InlineRadios, \
-                                   Tab, TabHolder
+from crispy_forms.bootstrap import (AppendedText, FormActions, InlineRadios,
+                                    Tab, TabHolder)
 
 from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
 

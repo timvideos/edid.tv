@@ -3,14 +3,14 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, TemplateView, View
-from django.views.generic.edit import FormView, CreateView, UpdateView, \
-                                      DeleteView
+from django.views.generic.edit import (FormView, CreateView, UpdateView,
+                                       DeleteView)
 
 from braces.views import LoginRequiredMixin, PrefetchRelatedMixin
 
 from frontend.models import EDID, StandardTiming, DetailedTiming
-from frontend.forms import EDIDUpdateForm, EDIDUploadForm, \
-                           StandardTimingForm, DetailedTimingForm
+from frontend.forms import (EDIDUpdateForm, EDIDUploadForm,
+                            StandardTimingForm, DetailedTimingForm)
 
 
 ### EDID
