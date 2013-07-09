@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Update EDID - EDID Database{% endblock %}
+{% load staticfiles %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -91,4 +92,8 @@
 {% endif %}
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/edid_form.js' %}"></script>
 {% endblock %}

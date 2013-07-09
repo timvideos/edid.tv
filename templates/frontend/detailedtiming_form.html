@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Update Detailed Timing - EDID Database{% endblock %}
+{% load staticfiles %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -9,4 +10,8 @@
     {% crispy form %}
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/detailedtiming_form.js' %}"></script>
 {% endblock %}
