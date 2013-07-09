@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Signup - EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <div class="page-header">
+      <h1>Signup</h1>
+    </div>
+
+    <div class="alert alert-info">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      Already have an account? Then please <a href="{{ login_url }}">sign in</a>.
+    </div>
+
+    <form method="post" class="form-horizontal">{% csrf_token %}
+      <div class="control-group{% if form.username.errors %} error{% endif %}">
+        <label class="control-label" for="id_username">Username</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"><i class="icon-user"></i></span>
+            <input class="span2"  id="id_username" name="username" type="text" value="{{ form.username.value }}">
+          </div>
+  {% for error in form.oldpassword.errors %}
+          <span class="help-inline">{{ error|escape }}</span>
+  {% endfor %}
+        </div>
+      </div>
+
+      <div class="control-group{% if form.email.errors %} error{% endif %}">
+        <label class="control-label" for="id_email">E-mail (optional)</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"><i class="icon-envelope"></i></span>
+            <input class="span2"  id="id_email" name="email" type="text" value="{{ form.email.value }}">
+          </div>
+  {% for error in form.email.errors %}
+          <span class="help-inline">{{ error|escape }}</span>
+  {% endfor %}
+        </div>
+      </div>
+
+      <div class="control-group{% if form.password1.errors %} error{% endif %}">
+        <label class="control-label" for="id_password1">Password</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"><i class="icon-lock"></i></span>
+            <input class="span2"  id="id_password1" name="password1" type="password">
+          </div>
+  {% for error in form.password1.errors %}
+          <span class="help-inline">{{ error|escape }}</span>
+  {% endfor %}
+        </div>
+      </div>
+
+      <div class="control-group{% if form.password2.errors %} error{% endif %}">
+        <label class="control-label" for="id_password2">Retype password</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"><i class="icon-lock"></i></span>
+            <input class="span2"  id="id_password2" name="password2" type="password">
+          </div>
+  {% for error in form.password2.errors %}
+          <span class="help-inline">{{ error|escape }}</span>
+  {% endfor %}
+        </div>
+      </div>
+
+  {% if redirect_field_value %}
+      <input type="hidden" name="{{redirect_field_name}}" value="{{redirect_field_value}}"/>
+  {% endif %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Sign Up</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

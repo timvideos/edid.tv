@@ -3,9 +3,11 @@
 
 {% block content %}
 <div class="row">
-
   <div class="span12">
-    <h1>E-mail Addresses</h1>
+    <div class="page-header">
+      <h1>E-mail Addresses</h1>
+    </div>
+
   {% if user.emailaddress_set.all %}
     <p>The following e-mail addresses are associated to your account:</p>
 
@@ -46,25 +48,30 @@
       </div>
     </form>
   {% else %}
-    <div class="alert alert-info">
+    <div class="alert alert-block alert-info">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <strong>Warning:</strong> You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc.
+      <h4>Warning:</h4> You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc.
     </div>
   {% endif %}
   </div>
+</div>
 
+<div class="row">
   <div class="span12">
     <form method="post" class="form-horizontal">{% csrf_token %}
       <fieldset>
         <legend>Add E-mail Address</legend>
 
-        <div class="control-group">
+        <div class="control-group{% if add_email_form.email.errors %} error{% endif %}">
           <label class="control-label" for="id_email">Email address</label>
           <div class="controls">
             <div class="input-prepend">
               <span class="add-on"><i class="icon-envelope"></i></span>
-              <input class="span2"  id="id_email" name="email" type="text">
+              <input class="span2"  id="id_email" name="email" type="text"{% if add_email_form.email.value %} value="{{ add_email_form.email.value }}"{% endif %}>
             </div>
+  {% for error in add_email_form.email.errors %}
+            <span class="help-inline">{{ error|escape }}</span>
+  {% endfor %}
           </div>
         </div>
 
@@ -74,17 +81,18 @@
       </fieldset>
     </form>
   </div>
-
 </div>
+{% endblock %}
 
-<script type="text/javascript">
-$(function(){
-  $("button[name='action_remove']").click(function(){
-    if (confirm("Do you really want to remove the selected e-mail address?")) {
-      return true;
-    }
-    return false;
-  });
-});
-</script>
+{% block extra_js %}
+  <script type="text/javascript">
+    $(function(){
+      $("button[name='action_remove']").click(function(){
+        if (confirm("Do you really want to remove the selected e-mail address?")) {
+          return true;
+        }
+        return false;
+      });
+    });
+  </script>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Sign Out - EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <div class="page-header">
+      <h1>Sign Out</h1>
+    </div>
+
+    <h3>Are you sure you want to sign out?</h3>
+
+    <form method="post">{% csrf_token %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Sign Out</button>
+      </div>
+  {% if redirect_field_value %}
+      <input type="hidden" name="{{redirect_field_name}}" value="{{redirect_field_value}}"/>
+  {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}
