@@ -10,6 +10,12 @@ urlpatterns = patterns('',
     url(r'^edid/(?P<pk>\d+)/update/$', views.EDIDUpdate.as_view(),
         name='edid-update'),
 
+    # EDID Revisions
+    url(r'^edid/(?P<edid_pk>\d+)/revision/$', views.EDIDRevisionsList.as_view(),
+        name='edid-revision-list'),
+    url(r'^edid/(?P<edid_pk>\d+)/revision/(?P<revision_pk>\d+)/$',
+        views.EDIDRevisionsDetail.as_view(), name='edid-revision-detail'),
+
     # Standard Timing
     url(r'^edid/(?P<edid_pk>\d+)/standard_timing/new/$',
         views.StandardTimingCreate.as_view(), name='standard-timing-create'),
@@ -44,4 +50,4 @@ urlpatterns = patterns('',
 
     # Index
     url(r'^$', views.EDIDList.as_view(), name='index'),
-   )
+)

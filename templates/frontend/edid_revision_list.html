@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <div class="page-header">
+      <h1>EDID Revisions History</h1>
+    </div>
+
+  {% if versions_list %}
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <td>Date</td>
+          <td>User</td>
+          <td>Revision</td>
+          <td>Comment</td>
+        </tr>
+      </thead>
+      <tbody>
+    {% for version in versions_list %}
+        <tr>
+          <td><a href="{% url 'edid-revision-detail' edid_pk version.revision.pk %}">{{ version.revision.date_created|date }}</a></td>
+          <td>{% if version.revision.user %}{{ version.revision.user }}{% endif %}</td>
+          <td>{{ version }}</td>
+          <td>{{ version.revision.comment }}</td>
+        </tr>
+    {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+      <p>No revisions found in the database for this EDID.</p>
+  {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -19,8 +19,18 @@
   {% endif %}
     </ul>
   </div>
+
   <div class="span9">
     <h2>{{ edid.manufacturer.name }} {{ edid.manufacturer_serial_number }}</h2>
+
+  {% if is_revision %}
+    <div class="alert alert-block alert-info">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>This is an old revision!</h4>
+      It is provided for archival purposes. You may want to check <a href="{% url 'edid-detail' edid.pk %}">latest updated revision</a>.
+    </div>
+  {% endif %}
+
     <section id="basic_display_parameters">
       <h3>Basic Display Parameters</h3>
       <table class="table table-striped table-bordered">

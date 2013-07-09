@@ -1,12 +1,13 @@
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import (FormView, CreateView, UpdateView,
                                        DeleteView)
 
 from braces.views import LoginRequiredMixin, PrefetchRelatedMixin
+import reversion
 
 from frontend.models import EDID, StandardTiming, DetailedTiming
 from frontend.forms import (EDIDUpdateForm, EDIDUploadForm,
@@ -66,6 +67,70 @@ class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
         form.instance.user = self.request.user
 
         return super(EDIDUpdate, self).form_valid(form)
+
+
+### EDID Revisions Mixin
+class EDIDRevisionsMixin(object):
+    def get_context_data(self, **kwargs):
+        """
+        Adds edid_pk, needed for EDIDRevisionsList.
+        Adds is_revision=true, needed for EDIDRevisionsDetail.
+
+        Injects them to template context.
+        """
+
+        context = {'edid_pk': self.kwargs['edid_pk'],
+                   'is_revision': True}
+
+        context.update(kwargs)
+        return super(EDIDRevisionsMixin, self).get_context_data(**context)
+
+    def get_queryset(self):
+        """
+        Returns versions list based on edid_pk.
+
+        Used for ListView.
+        """
+
+        edid_pk = self.kwargs.get('edid_pk', None)
+
+        edid = get_object_or_404(EDID, pk=edid_pk)
+        versions_list = reversion.get_unique_for_object(edid)
+
+        return versions_list
+
+    def get_object(self, queryset=None):
+        """
+        Returns EDID versioned instance based on edid_pk and revision_pk.
+
+        Used for DetailView.
+        """
+        edid_pk = self.kwargs.get('edid_pk', None)
+        revision_pk = self.kwargs.get('revision_pk', None)
+
+        version = reversion.get_for_object_reference(EDID, edid_pk)
+        version = version.filter(revision__pk=revision_pk)
+
+        try:
+            version = version.get()
+        except version.model.DoesNotExist:
+            raise Http404('No revision matches the given query.')
+
+        # Return EDID instance
+        return version.object_version.object
+
+
+### EDID Revisions
+class EDIDRevisionsList(EDIDRevisionsMixin, ListView):
+    context_object_name = 'versions_list'
+    template_name = 'frontend/edid_revision_list.html'
+
+
+class EDIDRevisionsDetail(EDIDRevisionsMixin, DetailView):
+    model = EDID
+    prefetch_related = ['standardtiming_set', 'detailedtiming_set']
+    template_name = 'frontend/edid_detail.html'
+
 
 ### Timing Mixin
 class TimingMixin(object):
