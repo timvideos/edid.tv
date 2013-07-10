@@ -52,6 +52,8 @@ class EDIDUpload(FormView):
         # Create EDID entry
         edid_object = EDID()
 
+        edid_object.checksum = form.edid_checksum
+
         # Set the user
         if self.request.user.is_authenticated():
             edid_object.user = self.request.user

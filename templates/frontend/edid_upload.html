@@ -4,11 +4,23 @@
 {% block content %}
 <div class="row">
   <div class="span12">
-    <form method="POST" enctype="multipart/form-data">
-      {% csrf_token %}
-      <p>Upload your EDID file:</p>
-      <input type="file" name="edid_file">
-      <input type="submit" name="submit" value="Upload!">
+    <div class="page-header">
+      <h1>Upload EDID</h1>
+    </div>
+
+    <form method="post" class="form-horizontal" enctype="multipart/form-data">{% csrf_token %}
+      <div class="control-group">
+        <div class="controls">
+          <input id="id_edid_file" name="edid_file" type="file">
+{% for error in form.edid_file.errors %}
+          <span class="help-inline">{{ error|escape }}</span>
+{% endfor %}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Upload</button>
+      </div>
     </form>
   </div>
 </div>

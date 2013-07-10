@@ -60,6 +60,8 @@ class EDID(models.Model):
 
     file = models.FileField(upload_to='edid/%Y/%m/%d')
 
+    checksum = models.TextField()
+
     ### Header
     # ID Product Code
     manufacturer_product_code = models.CharField(max_length=4, blank=True)
