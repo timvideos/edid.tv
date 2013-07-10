@@ -3,6 +3,12 @@ from django.conf.urls import patterns, include, url
 from frontend import views
 
 urlpatterns = patterns('',
+    # Manufacturer
+    url(r'^manufacturer/$', views.ManufacturerList.as_view(),
+        name='manufacturer-list'),
+    url(r'^manufacturer/(?P<pk>\d+)/$', views.ManufacturerDetail.as_view(),
+        name='manufacturer-detail'),
+
     # EDID
     url(r'^edid/upload/$', views.EDIDUpload.as_view(), name='edid-upload'),
     url(r'^edid/(?P<pk>\d+)/$', views.EDIDDetailView.as_view(),

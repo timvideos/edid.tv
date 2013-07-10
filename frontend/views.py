@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect, Http404
@@ -9,9 +10,32 @@ from django.views.generic.edit import (FormView, CreateView, UpdateView,
 from braces.views import LoginRequiredMixin, PrefetchRelatedMixin
 import reversion
 
-from frontend.models import EDID, StandardTiming, DetailedTiming
+from frontend.models import Manufacturer, EDID, StandardTiming, DetailedTiming
 from frontend.forms import (EDIDUpdateForm, EDIDUploadForm,
                             StandardTimingForm, DetailedTimingForm)
+
+
+### Manufacturer
+class ManufacturerList(ListView):
+    model = Manufacturer
+    context_object_name = 'manufacturer_list'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = super(ManufacturerList, self).get_queryset()
+
+        # Add count of EDIDs to items
+        queryset = queryset.annotate(Count('edid'))
+
+        # Filter items with EDID count > 0 only
+        queryset = queryset.filter(edid__count__gt=0)
+
+        return queryset
+
+
+class ManufacturerDetail(PrefetchRelatedMixin, DetailView):
+    model = Manufacturer
+    prefetch_related = ['edid_set']
 
 
 ### EDID
