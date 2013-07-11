@@ -16,6 +16,9 @@
           <td>User</td>
           <td>Revision</td>
           <td>Comment</td>
+      {% if user.is_staff %}
+          <td></td>
+      {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -25,6 +28,9 @@
           <td>{% if version.revision.user %}{{ version.revision.user }}{% endif %}</td>
           <td>{{ version }}</td>
           <td>{{ version.revision.comment }}</td>
+      {% if user.is_staff %}
+          <td><a class="btn btn-danger" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a></td>
+      {% endif %}
         </tr>
     {% endfor %}
       </tbody>

@@ -7,7 +7,8 @@ from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import (FormView, CreateView, UpdateView,
                                        DeleteView)
 
-from braces.views import LoginRequiredMixin, PrefetchRelatedMixin
+from braces.views import (LoginRequiredMixin, PrefetchRelatedMixin,
+                          StaffuserRequiredMixin)
 import reversion
 
 from frontend.models import Manufacturer, EDID, StandardTiming, DetailedTiming
@@ -79,6 +80,20 @@ class EDIDDetailView(PrefetchRelatedMixin, DetailView):
     model = EDID
     prefetch_related = ['standardtiming_set', 'detailedtiming_set']
 
+    def get_object(self, queryset=None):
+        """
+        Injects timings sets as attributes to EDID object.
+
+        See EDIDRevisionDetail for details.
+        """
+
+        object = super(EDIDDetailView, self).get_object(queryset)
+
+        object.standardtimings = object.standardtiming_set.all()
+        object.detailedtimings = object.detailedtiming_set.all()
+
+        return object
+
 
 class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
     model = EDID
@@ -95,67 +110,136 @@ class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
         return super(EDIDUpdate, self).form_valid(form)
 
 
-### EDID Revisions Mixin
-class EDIDRevisionsMixin(object):
-    def get_context_data(self, **kwargs):
-        """
-        Adds edid_pk, needed for EDIDRevisionsList.
-        Adds is_revision=true, needed for EDIDRevisionsDetail.
-
-        Injects them to template context.
-        """
-
-        context = {'edid_pk': self.kwargs['edid_pk'],
-                   'is_revision': True}
-
-        context.update(kwargs)
-        return super(EDIDRevisionsMixin, self).get_context_data(**context)
+### EDID Revisions
+class EDIDRevisionList(ListView):
+    context_object_name = 'versions_list'
+    template_name = 'frontend/edid_revision_list.html'
 
     def get_queryset(self):
         """
-        Returns versions list based on edid_pk.
-
-        Used for ListView.
+        Returns versions list queryset based on edid_pk.
         """
 
         edid_pk = self.kwargs.get('edid_pk', None)
 
         edid = get_object_or_404(EDID, pk=edid_pk)
-        versions_list = reversion.get_unique_for_object(edid)
+        versions_list = reversion.get_for_object(edid)
 
         return versions_list
+
+    def get_context_data(self, **kwargs):
+        """
+        Injects edid_pk into template context.
+        """
+
+        context = super(EDIDRevisionList, self).get_context_data(**kwargs)
+        context['edid_pk'] = self.kwargs['edid_pk']
+
+        return context
+
+
+class EDIDRevisionDetail(DetailView):
+    template_name = 'frontend/edid_detail.html'
 
     def get_object(self, queryset=None):
         """
         Returns EDID versioned instance based on edid_pk and revision_pk.
+        Injects timings sets as attributes to EDID object.
 
-        Used for DetailView.
+        We can't use RelaltedManager to get versioned timings, instead we store
+        timings in EDID object attributes.
         """
+
         edid_pk = self.kwargs.get('edid_pk', None)
         revision_pk = self.kwargs.get('revision_pk', None)
 
-        version = reversion.get_for_object_reference(EDID, edid_pk)
-        version = version.filter(revision__pk=revision_pk)
+        # Get version based on edid_pk and revision_pk or return 404.
+        version = reversion.get_for_object_reference(EDID, edid_pk) \
+                           .filter(revision__pk=revision_pk)
 
         try:
             version = version.get()
         except version.model.DoesNotExist:
-            raise Http404('No revision matches the given query.')
+            raise Http404('No revision were found.')
+
+        # Assign EDID instance to edid
+        edid =  version.object_version.object
+
+        # Flag EDID instance as revision
+        edid.is_revision = True
+
+        # Get set of all versions (objects) in the revision
+        revision_versions = version.revision.version_set.all()
+
+        # Split timings by type
+        standardtimings = []
+        detailedtimings = []
+
+        for related_version in revision_versions:
+            if isinstance(related_version.object_version.object,
+                          StandardTiming):
+                standardtimings.append(related_version.object_version.object)
+            elif isinstance(related_version.object_version.object,
+                            DetailedTiming):
+                detailedtimings.append(related_version.object_version.object)
+
+        edid.standardtimings = standardtimings
+        edid.detailedtimings = detailedtimings
+
+        # Return EDID instance
+        return edid
+
+
+class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
+                         DeleteView):
+    """
+    Provides reverting a revision.
+    """
+
+    template_name = 'frontend/edid_revision_revert.html'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        revision = self.kwargs.get('revision')
+
+        revision.revert()
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_object(self, queryset=None):
+        """
+        Returns revision based on edid_pk and revision_pk.
+        """
+
+        edid_pk = self.kwargs.get('edid_pk', None)
+        revision_pk = self.kwargs.get('revision_pk', None)
+
+        # Get version based on edid_pk and revision_pk or return 404.
+        version = reversion.get_for_object_reference(EDID, edid_pk) \
+                           .filter(revision__pk=revision_pk)
+
+        try:
+            version = version.get()
+        except version.model.DoesNotExist:
+            raise Http404('No revision were found.')
+
+        self.kwargs['revision'] = version.revision
 
         # Return EDID instance
         return version.object_version.object
 
+    def get_context_data(self, **kwargs):
+        context = super(EDIDRevisionRevert, self).get_context_data(**kwargs)
 
-### EDID Revisions
-class EDIDRevisionsList(EDIDRevisionsMixin, ListView):
-    context_object_name = 'versions_list'
-    template_name = 'frontend/edid_revision_list.html'
+        context['revision'] = self.kwargs.get('revision')
 
+        return context
 
-class EDIDRevisionsDetail(EDIDRevisionsMixin, DetailView):
-    model = EDID
-    prefetch_related = ['standardtiming_set', 'detailedtiming_set']
-    template_name = 'frontend/edid_detail.html'
+    def get_success_url(self):
+        edid_pk = self.kwargs.get('edid_pk')
+
+        return reverse('edid-detail', kwargs={'pk': edid_pk})
 
 
 ### Timing Mixin

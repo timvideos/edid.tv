@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <div class="page-header">
+      <h1>Revert EDID Revision</h1>
+    </div>
+
+    <h3>Are sure you want to revert back to revision {{ revision.pk }} from {{ revision.date_created|date }}?</h3>
+
+    <form method="post">{% csrf_token %}
+      <div class="form-actions text-right">
+        <a class="btn" href="{% url 'edid-revision-detail' edid.pk revision.pk %}">Cancel</a>
+        <input type="submit" name="revert" value="Revert" class="btn btn-danger" id="revert-id-revert" />
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

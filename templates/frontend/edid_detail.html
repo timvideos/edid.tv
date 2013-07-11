@@ -8,10 +8,10 @@
       <li><a href="#basic_display_parameters"><i class="icon-chevron-right"></i> Basic Display Parameters</a></li>
       <li><a href="#chromaticity"><i class="icon-chevron-right"></i> Chromaticity</a></li>
       <li><a href="#established_timings"><i class="icon-chevron-right"></i> Established Timings</a></li>
-  {% if edid.standardtiming_set.exists %}
+  {% if edid.standardtimings %}
       <li><a href="#standard_timings"><i class="icon-chevron-right"></i> Standard Timings</a></li>
   {% endif %}
-  {% if edid.detailedtiming_set.exists %}
+  {% if edid.detailedtimings %}
       <li><a href="#detailed_timings"><i class="icon-chevron-right"></i> Detailed Timings</a></li>
   {% endif %}
   {% if edid.monitor_range_limits %}
@@ -23,7 +23,7 @@
   <div class="span9">
     <h2>{{ edid.manufacturer.name }} {{ edid.manufacturer_serial_number }}</h2>
 
-  {% if is_revision %}
+  {% if edid.is_revision %}
     <div class="alert alert-block alert-info">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>This is an old revision!</h4>
@@ -161,10 +161,10 @@
       </table>
     </section>
 
-{% if edid.standardtiming_set.exists %}
+{% if edid.standardtimings %}
     <section id="standard_timings">
       <div class="row">
-  {% for timing in edid.standardtiming_set.all %}
+  {% for timing in edid.standardtimings %}
         <div class="span4">
           <h3>Standard Timings {{ timing.identification }}</h3>
           {% include 'frontend/standardtiming_table.html' %}
@@ -178,10 +178,10 @@
     </section>
 {% endif %}
 
-{% if edid.detailedtiming_set.exists %}
+{% if edid.detailedtimings %}
     <section id="detailed_timings">
       <div class="row">
-    {% for timing in edid.detailedtiming_set.all %}
+    {% for timing in edid.detailedtimings %}
         <div class="span4">
           <h3>Detailed Timings {{ timing.identification }}</h3>
           {% include 'frontend/detailedtiming_table.html' %}

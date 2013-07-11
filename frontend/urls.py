@@ -17,10 +17,12 @@ urlpatterns = patterns('',
         name='edid-update'),
 
     # EDID Revisions
-    url(r'^edid/(?P<edid_pk>\d+)/revision/$', views.EDIDRevisionsList.as_view(),
+    url(r'^edid/(?P<edid_pk>\d+)/revision/$', views.EDIDRevisionList.as_view(),
         name='edid-revision-list'),
     url(r'^edid/(?P<edid_pk>\d+)/revision/(?P<revision_pk>\d+)/$',
-        views.EDIDRevisionsDetail.as_view(), name='edid-revision-detail'),
+        views.EDIDRevisionDetail.as_view(), name='edid-revision-detail'),
+    url(r'^edid/(?P<edid_pk>\d+)/revision/(?P<revision_pk>\d+)/revert/$',
+        views.EDIDRevisionRevert.as_view(), name='edid-revision-revert'),
 
     # Standard Timing
     url(r'^edid/(?P<edid_pk>\d+)/standard_timing/new/$',
