@@ -21,14 +21,21 @@
   </div>
 
   <div class="span9">
-    <h2>{{ edid.manufacturer.name }} {{ edid.manufacturer_serial_number }}</h2>
+    <h2><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a> {{ edid.manufacturer_serial_number }}</h2>
 
   {% if edid.is_revision %}
     <div class="alert alert-block alert-info">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>This is an old revision!</h4>
-      It is provided for archival purposes. You may want to check <a href="{% url 'edid-detail' edid.pk %}">latest updated revision</a>.
+      It is provided for archival purposes. You may want to check <a href="{% url 'edid-detail' edid.pk %}">latest updated revision</a> or go back to <a href="{% url 'edid-revision-list' edid.pk %}">revisions list</a>.
     </div>
+  {% else %}
+    <p>
+    {% if user.is_authenticated %}
+      <a class="btn" href="{% url 'edid-update' edid.pk %}"><i class="icon-edit"></i> Update</a>
+    {% endif %}
+      <a class="btn" href="{% url 'edid-revision-list' edid.pk %}">Revisions</a>
+    </p>
   {% endif %}
 
     <section id="basic_display_parameters">

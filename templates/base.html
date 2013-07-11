@@ -38,23 +38,19 @@
               <li class="dropdown">
 {% if user.is_authenticated %}
   {% load account %}
-                <a href="#" class="dropdown-toggle"
-                   data-toggle="dropdown">{% user_display user %}
-                    <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% user_display user %} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
-                  <li><a href="{% url 'account_change_password' %}">Change Password</a></li>
+                  <li><a href="{% url 'account_email' %}"><i class="icon-envelope"></i> Change E-mail</a></li>
+                  <li><a href="{% url 'account_change_password' %}"><i class="icon-lock"></i> Change Password</a></li>
   {% url 'socialaccount_connections' as connections_url %}
   {% if connections_url %}
                   <li><a href="{{ connections_url }}">Connected Accounts</a></li>
   {% endif %}
                   <li class="divider"></li>
-                  <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+                  <li><a href="{% url 'account_logout' %}"><i class="icon-off"></i> Sign Out</a></li>
                 </ul>
 {% else %}
-                <a href="#" class="dropdown-toggle"
-                   data-toggle="dropdown">Account
-                    <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   <li><a href="{% url 'account_login' %}">Sign In</a></li>
                   <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
