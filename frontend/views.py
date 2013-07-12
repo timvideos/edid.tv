@@ -34,9 +34,28 @@ class ManufacturerList(ListView):
         return queryset
 
 
-class ManufacturerDetail(PrefetchRelatedMixin, DetailView):
+class ManufacturerDetail(DetailView):
     model = Manufacturer
-    prefetch_related = ['edid_set']
+
+    def get_context_data(self, **kwargs):
+        """
+        Retrieves list of related EDIDs and annotates their timings count.
+
+        Adds `edid_list` to template context to be used in place of
+        `manufacturer.edid_set` RelatedManager.
+        """
+
+        context = super(ManufacturerDetail, self).get_context_data(**kwargs)
+
+        queryset = EDID.objects.filter(manufacturer=context['manufacturer'].pk)
+
+        # Add count of timings to EDIDs
+        queryset = queryset.annotate(Count('standardtiming', distinct=True))
+        queryset = queryset.annotate(Count('detailedtiming', distinct=True))
+
+        context['edid_list'] = queryset
+
+        return context
 
 
 ### EDID
