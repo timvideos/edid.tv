@@ -21,7 +21,7 @@ lib: bin/activate
 distclean: virtualenv-clean clean
 
 virtualenv-clean:
-	rm -rf bin include lib lib64 share src
+	rm -rf bin include local lib lib64 share src
 
 clean:
 	find . \( -name \*\.pyc \) -delete
