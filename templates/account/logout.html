@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="row">
-  <div class="span12">
+  <div class="span6 offset3 well">
     <div class="page-header">
       <h1>Sign Out</h1>
     </div>
@@ -11,8 +11,10 @@
     <h3>Are you sure you want to sign out?</h3>
 
     <form method="post">{% csrf_token %}
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit">Sign Out</button>
+      <div class="control-group">
+        <div class="controls text-center">
+          <button class="btn btn-danger btn-large" type="submit">Sign Out</button>
+        </div>
       </div>
   {% if redirect_field_value %}
       <input type="hidden" name="{{redirect_field_name}}" value="{{redirect_field_value}}"/>
