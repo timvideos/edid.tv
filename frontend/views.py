@@ -50,8 +50,8 @@ class ManufacturerDetail(DetailView):
         queryset = EDID.objects.filter(manufacturer=context['manufacturer'].pk)
 
         # Add count of timings to EDIDs
-        queryset = queryset.annotate(Count('standardtiming', distinct=True))
-        queryset = queryset.annotate(Count('detailedtiming', distinct=True))
+        queryset = queryset.annotate(Count('standardtiming', distinct=True)) \
+                           .annotate(Count('detailedtiming', distinct=True))
 
         context['edid_list'] = queryset
 
@@ -61,7 +61,25 @@ class ManufacturerDetail(DetailView):
 ### EDID
 class EDIDList(ListView):
     model = EDID
-    context_object_name = 'edid_list'
+
+    def get_context_data(self, **kwargs):
+        """
+        Retrieves list of EDIDs and annotates their timings count.
+
+        Adds `edid_list` to template context.
+        """
+
+        context = super(EDIDList, self).get_context_data(**kwargs)
+
+        queryset = self.get_queryset()
+
+        # Add count of timings to EDIDs
+        queryset = queryset.annotate(Count('standardtiming', distinct=True)) \
+                           .annotate(Count('detailedtiming', distinct=True))
+
+        context['edid_list'] = queryset
+
+        return context
 
 
 class EDIDUpload(FormView):

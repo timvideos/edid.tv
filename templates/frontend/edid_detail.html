@@ -153,17 +153,23 @@
     <section id="established_timings">
       <h3>Established Timings</h3>
       <table class="table table-striped table-bordered">
-        <tbody>
-{% with est_timings=edid.get_est_timings %}
-  {% for timing, supported in est_timings %}
-    {% if supported %}
+        <thead>
           <tr>
-            <td>{{ timing }}</td>
-            <td><i class="icon-ok"></i></td>
+            <td>Horizontal Active</td>
+            <td>Vertical Active</td>
+            <td>Refresh Rate</td>
           </tr>
-    {% endif %}
-  {% endfor %}
-{% endwith %}
+        </thead>
+        <tbody>
+{% for timing in edid.get_est_timings %}
+  {% if timing.supported %}
+        <tr>
+          <td>{{ timing.horizontal_active }} pixels</td>
+          <td>{{ timing.vertical_active }} pixels</td>
+          <td>{{ timing.refresh_rate }} Hz</td>
+        </tr>
+  {% endif %}
+{% endfor %}
         </tbody>
       </table>
     </section>

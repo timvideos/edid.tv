@@ -8,15 +8,8 @@
   </div>
   <div class="span12">
     <h2>EDID List</h2>
-    {% if edid_list %}
-    <ul>
-      {% for edid in edid_list %}
-      <li>{{ edid.manufacturer.name }} {{ edid.monitor_name }} {{ edid.manufacturer_serial_number }}</li>
-      {% endfor %}
-    </ul>
-    {% else %}
-      <p>No EDID in the database.</p>
-    {% endif %}
+
+    {% include 'frontend/edid_table.html' %}
   </div>
 </div>
 {% endblock %}

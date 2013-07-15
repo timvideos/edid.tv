@@ -1,0 +1,41 @@
+{% if edid_list %}
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <td>ID</td>
+    {% if not manufacturer %}
+      <td>Manufacturer</td>
+    {% endif %}
+      <td>Serial Number</td>
+      <td>Manufacturing</td>
+      <td>Video Input</td>
+      <td>Monitor Range Limits</td>
+      <td>Standard Timings</td>
+      <td>Detailed Timings</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for edid in edid_list %}
+    <tr>
+      <td><a href="{% url 'edid-detail' edid.pk %}">{{ edid.pk }}</a></td>
+    {% if not manufacturer %}
+      <td><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a></td>
+    {% endif %}
+      <td>{{ edid.manufacturer_serial_number }}</td>
+      <td>
+    {% if edid.week_of_manufacture and edid.week_of_manufacture != 255 %}
+        Week {{ edid.week_of_manufacture }} of
+    {% endif %}
+        {{ edid.year_of_manufacture }}
+      </td>
+      <td>{{ edid.get_bdp_video_input_display }}</td>
+      <td><i class="icon-{{ edid.monitor_range_limits|yesno:"ok,remove" }}"></i></td>
+      <td>{{ edid.standardtiming__count }}</td>
+      <td>{{ edid.detailedtiming__count }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <p>No EDID in the database.</p>
+{% endif %}
