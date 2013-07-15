@@ -4,7 +4,7 @@ from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Button, Fieldset, Layout, Submit
+from crispy_forms.layout import Fieldset, HTML, Layout, Submit
 from crispy_forms.bootstrap import (AppendedText, FormActions, InlineRadios,
                                     Tab, TabHolder)
 
@@ -214,8 +214,9 @@ class EDIDUpdateForm(BaseForm):
             ),
             FormActions(
                 Submit('submit', 'Submit'),
-                # TODO: Use edid-detail link
-                Button('cancel', 'Cancel', onclick='history.go(-1);')
+                HTML('<a class="btn" href="'
+                     "{% url 'edid-detail' form.instance.pk %}"
+                     '">Cancel</a>'),
             )
         )
         super(EDIDUpdateForm, self).__init__(*args, **kwargs)
@@ -400,8 +401,9 @@ class StandardTimingForm(BaseForm):
             'aspect_ratio',
             FormActions(
                 Submit('submit', 'Submit'),
-                # TODO: Use edid-detail link
-                Button('cancel', 'Cancel', onclick='history.go(-1);')
+                HTML('<a class="btn" href="'
+                     "{% url 'edid-update' form.EDID.pk %}"
+                     '">Cancel</a>'),
             )
         )
 
@@ -519,8 +521,9 @@ class DetailedTimingForm(BaseForm):
             ),
             FormActions(
                 Submit('submit', 'Submit'),
-                # TODO: Use edid-detail link
-                Button('cancel', 'Cancel', onclick='history.go(-1);')
+                HTML('<a class="btn" href="'
+                     "{% url 'edid-update' form.EDID.pk %}"
+                     '">Cancel</a>'),
             )
         )
         super(DetailedTimingForm, self).__init__(*args, **kwargs)
