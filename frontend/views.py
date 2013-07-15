@@ -90,7 +90,7 @@ class EDIDUpload(FormView):
         # Create EDID entry
         edid_object = EDID()
 
-        edid_object.checksum = form.edid_checksum
+        edid_object.file_base64 = form.edid_base64
 
         # Set the user
         if self.request.user.is_authenticated():
@@ -98,9 +98,6 @@ class EDIDUpload(FormView):
 
         # Add basic data
         edid_object.populate_from_edid_parser(form.edid_data)
-
-        # Save the binary file
-        edid_object.file.save('edid.bin', ContentFile(form.edid_binary))
 
         # Save the entry
         edid_object.save()

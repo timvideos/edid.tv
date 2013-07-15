@@ -58,9 +58,8 @@ class EDID(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
 
-    file = models.FileField(upload_to='edid/%Y/%m/%d')
-
-    checksum = models.TextField()
+    # Binary file encoded in base64
+    file_base64 = models.TextField(editable=False)
 
     ### Header
     # ID Product Code
@@ -365,7 +364,7 @@ class EDID(models.Model):
     def populate_timings_from_edid_parser(self, edid):
         for item in edid['Standard_Timings']:
             data = edid['Standard_Timings'][item]
-            id = re.search("^Identification_(\d+)$", item, re.IGNORECASE)
+            id = re.search(r"^Identification_(\d+)$", item, re.IGNORECASE)
 
             if data['Image_aspect_ratio'] == (1, 1):
                 aspect_ratio = StandardTiming.ASPECT_RATIO_1_1
@@ -391,7 +390,7 @@ class EDID(models.Model):
 
         for item in edid['Descriptors']:
             data = edid['Descriptors'][item]
-            id = re.search("^Timing_Descriptor_(\d+)$", item, re.IGNORECASE)
+            id = re.search(r"^Timing_Descriptor_(\d+)$", item, re.IGNORECASE)
             if not id:
                 # Not timing descriptor
                 break

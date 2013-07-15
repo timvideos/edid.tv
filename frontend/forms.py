@@ -1,4 +1,4 @@
-import hashlib
+import base64
 
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -17,7 +17,7 @@ class EDIDUploadForm(forms.Form):
     edid_file = forms.FileField(label='EDID File')
     edid_binary = None
     edid_data = None
-    edid_checksum = None
+    edid_base64 = None
 
     def clean_edid_file(self):
         edid_file = self.cleaned_data['edid_file']
@@ -30,11 +30,11 @@ class EDIDUploadForm(forms.Form):
         except EDIDParsingError as msg:
             raise forms.ValidationError(msg)
 
-        # Compute checksum
-        self.edid_checksum = hashlib.sha1(self.edid_binary).hexdigest()
+        # Encode in base64
+        self.edid_base64 = base64.b64encode(self.edid_binary)
 
         # Check for checksum in DB
-        if EDID.objects.filter(checksum=self.edid_checksum).exists():
+        if EDID.objects.filter(file_base64=self.edid_base64).exists():
             raise forms.ValidationError('This file have been uploaded before.')
 
         return edid_file
