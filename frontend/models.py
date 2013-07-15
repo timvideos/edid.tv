@@ -362,25 +362,6 @@ class EDID(models.Model):
         self.est_timings_1280_1024_75 = \
             edid['Established_Timings']['1280x1024@75Hz']
 
-    def get_est_timings(self):
-        return [('720x400@70Hz', self.est_timings_720_400_70),
-                ('720x400@88Hz', self.est_timings_720_400_88),
-                ('640x480@60Hz', self.est_timings_640_480_60),
-                ('640x480@67Hz', self.est_timings_640_480_67),
-                ('640x480@72Hz', self.est_timings_640_480_72),
-                ('640x480@75Hz', self.est_timings_640_480_75),
-                ('800x600@56Hz', self.est_timings_800_600_56),
-                ('800x600@60Hz', self.est_timings_800_600_60),
-                ('800x600@72Hz', self.est_timings_800_600_72),
-                ('800x600@75Hz', self.est_timings_800_600_75),
-                ('832x624@75Hz', self.est_timings_832_624_75),
-                ('1024x768@87Hz', self.est_timings_1024_768_87),
-                ('1024x768@60Hz', self.est_timings_1024_768_60),
-                ('1024x768@70Hz', self.est_timings_1024_768_70),
-                ('1024x768@75Hz', self.est_timings_1024_768_75),
-                ('1280x1024@75Hz', self.est_timings_1280_1024_75),
-        ]
-
     def populate_timings_from_edid_parser(self, edid):
         for item in edid['Standard_Timings']:
             data = edid['Standard_Timings'][item]
@@ -480,6 +461,107 @@ class EDID(models.Model):
 
     def get_absolute_url(self):
         return reverse('edid-detail', kwargs={'pk': self.pk})
+
+    def get_est_timings(self):
+        """
+        Returns established timings in a dictionary.
+        """
+
+        return [
+            {'horizontal_active': 720, 'vertical_active': 400,
+             'refresh_rate': 70, 'supported': self.est_timings_720_400_70},
+            {'horizontal_active': 720, 'vertical_active': 400,
+             'refresh_rate': 88, 'supported': self.est_timings_720_400_88},
+
+            {'horizontal_active': 640, 'vertical_active': 480,
+             'refresh_rate': 60, 'supported': self.est_timings_640_480_60},
+            {'horizontal_active': 640, 'vertical_active': 480,
+             'refresh_rate': 67, 'supported': self.est_timings_640_480_67},
+            {'horizontal_active': 640, 'vertical_active': 480,
+             'refresh_rate': 72, 'supported': self.est_timings_640_480_72},
+            {'horizontal_active': 640, 'vertical_active': 480,
+             'refresh_rate': 75, 'supported': self.est_timings_640_480_75},
+
+            {'horizontal_active': 800, 'vertical_active': 600,
+             'refresh_rate': 56, 'supported': self.est_timings_800_600_56},
+            {'horizontal_active': 800, 'vertical_active': 600,
+             'refresh_rate': 60, 'supported': self.est_timings_800_600_60},
+            {'horizontal_active': 800, 'vertical_active': 600,
+             'refresh_rate': 72, 'supported': self.est_timings_800_600_72},
+            {'horizontal_active': 800, 'vertical_active': 600,
+             'refresh_rate': 75, 'supported': self.est_timings_800_600_75},
+
+            {'horizontal_active': 832, 'vertical_active': 624,
+             'refresh_rate': 75, 'supported': self.est_timings_832_624_75},
+
+            {'horizontal_active': 1024, 'vertical_active': 768,
+             'refresh_rate': 87, 'supported': self.est_timings_1024_768_87},
+            {'horizontal_active': 1024, 'vertical_active': 768,
+             'refresh_rate': 60, 'supported': self.est_timings_1024_768_60},
+            {'horizontal_active': 1024, 'vertical_active': 768,
+             'refresh_rate': 70, 'supported': self.est_timings_1024_768_70},
+            {'horizontal_active': 1024, 'vertical_active': 768,
+             'refresh_rate': 75, 'supported': self.est_timings_1024_768_75},
+
+            {'horizontal_active': 1280, 'vertical_active': 1024,
+             'refresh_rate': 75, 'supported': self.est_timings_1280_1024_75},
+        ]
+
+    def get_maximum_resolution(self):
+        """
+        Returns parameters of the maximum resolution supported by timings.
+        """
+
+        maximum_resolution = {
+            'horizontal_active': 0, 'vertical_active': 0, 'refresh_rate': 0
+        }
+
+        for timing in self.get_est_timings():
+            if timing['supported']:
+                maximum_resolution = self._update_maximum_resolution(
+                    maximum_resolution,
+                    timing['horizontal_active'],
+                    timing['vertical_active'],
+                    timing['refresh_rate']
+                )
+
+        for timing in self.standardtiming_set.all():
+            maximum_resolution = self._update_maximum_resolution(
+                maximum_resolution,
+                timing.horizontal_active,
+                timing.vertical_active,
+                timing.refresh_rate
+            )
+
+        for timing in self.detailedtiming_set.all():
+            maximum_resolution = self._update_maximum_resolution(
+                maximum_resolution,
+                timing.horizontal_active,
+                timing.vertical_active,
+                timing.pixel_clock / 1000
+            )
+
+        return maximum_resolution
+
+    def _update_maximum_resolution(self, maximum_resolution, horizontal_active,
+                                   vertical_active, refresh_rate):
+        """
+        Updates maximum_resolution if the new timing have higher resolution.
+
+        Higher resolution is determined by the total number of pixels.
+        """
+
+        maximum_resolution_pixels = maximum_resolution['horizontal_active'] \
+                                    * maximum_resolution['vertical_active']
+
+        if (horizontal_active * vertical_active) > maximum_resolution_pixels:
+            maximum_resolution = {
+                'horizontal_active': horizontal_active,
+                'vertical_active': vertical_active,
+                'refresh_rate': refresh_rate
+            }
+
+        return maximum_resolution
 
     def __unicode__(self):
         return "%s %s" % (self.manufacturer.name, self.monitor_name)

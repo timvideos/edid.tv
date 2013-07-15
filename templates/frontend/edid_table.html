@@ -12,6 +12,7 @@
       <td>Monitor Range Limits</td>
       <td>Standard Timings</td>
       <td>Detailed Timings</td>
+      <td>Maximum Resolution</td>
     </tr>
   </thead>
   <tbody>
@@ -32,6 +33,9 @@
       <td><i class="icon-{{ edid.monitor_range_limits|yesno:"ok,remove" }}"></i></td>
       <td>{{ edid.standardtiming__count }}</td>
       <td>{{ edid.detailedtiming__count }}</td>
+    {% with timing=edid.get_maximum_resolution %}
+      <td>{{ timing.horizontal_active }}x{{ timing.vertical_active }}@{{ timing.refresh_rate }}Hz</td>
+    {% endwith %}
     </tr>
   {% endfor %}
   </tbody>
