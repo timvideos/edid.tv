@@ -57,14 +57,14 @@ prepare-serve:
 
 test: clitest firefoxtest
 
-clitest: install
-	$(ACTIVATE) && python manage.py test -v2 frontend.django_tests
+clitest:
+	$(ACTIVATE) && python manage.py test -v 2 --settings=test_settings frontend.django_tests
 
-firefoxtest: install
-	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test -v 2 frontend.selenium_tests
+firefoxtest:
+	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test -v 2 frontend.selenium_tests --settings=test_settings
 
-chrometest: install
-	$(ACTIVATE) && TEST_DRIVER="chrome" TEST_DISPLAY=1 python manage.py test -v 2 frontend.selenium_tests
+#chrometest:
+#	$(ACTIVATE) && TEST_DRIVER="chrome" TEST_DISPLAY=1 python manage.py test -v 2 frontend.selenium_tests --settings=test_settings
 
 lint: install
 	@# R0904 - Disable "Too many public methods" warning
