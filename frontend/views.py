@@ -202,7 +202,7 @@ class EDIDRevisionDetail(DetailView):
         # Flag EDID instance as revision
         edid.is_revision = True
 
-        # Get set of all versions (objects) in the revision
+        # Get set of all versions (related objects) in the revision
         revision_versions = version.revision.version_set.all()
 
         # Split timings by type
@@ -210,12 +210,11 @@ class EDIDRevisionDetail(DetailView):
         detailedtimings = []
 
         for related_version in revision_versions:
-            if isinstance(related_version.object_version.object,
-                          StandardTiming):
-                standardtimings.append(related_version.object_version.object)
-            elif isinstance(related_version.object_version.object,
-                            DetailedTiming):
-                detailedtimings.append(related_version.object_version.object)
+            timing = related_version.object_version.object
+            if isinstance(timing, StandardTiming):
+                standardtimings.append(timing)
+            elif isinstance(timing, DetailedTiming):
+                detailedtimings.append(timing)
 
         edid.standardtimings = standardtimings
         edid.detailedtimings = detailedtimings
@@ -237,7 +236,10 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
 
         revision = self.kwargs.get('revision')
 
-        revision.revert()
+        # Revert the revision, delete new timings not included in the revision
+        with reversion.create_revision():
+            revision.revert(delete=True)
+            reversion.set_comment('Reverted to revision %s' % revision.pk)
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -258,10 +260,14 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
         except version.model.DoesNotExist:
             raise Http404('No revision were found.')
 
+        # Check revision and EDID date
+        if version.revision.date_created == version.object.modified:
+            raise Http404('You can not revert to the current revision.')
+
         self.kwargs['revision'] = version.revision
 
         # Return EDID instance
-        return version.object_version.object
+        return version.object
 
     def get_context_data(self, **kwargs):
         context = super(EDIDRevisionRevert, self).get_context_data(**kwargs)

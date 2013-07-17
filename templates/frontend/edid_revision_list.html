@@ -29,7 +29,13 @@
           <td>{{ version }}</td>
           <td>{{ version.revision.comment }}</td>
       {% if user.is_staff %}
-          <td><a class="btn btn-danger" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a></td>
+          <td>
+        {% if forloop.first %}
+            <span class="label label-info">Current Revision</span>
+        {% else %}
+            <a class="btn btn-danger" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a>
+        {% endif %}
+          </td>
       {% endif %}
         </tr>
     {% endfor %}
