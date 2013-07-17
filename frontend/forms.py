@@ -83,7 +83,7 @@ class EDIDUpdateForm(BaseForm):
             # Main Fields
             'manufacturer', 'manufacturer_product_code',
             'manufacturer_serial_number', 'week_of_manufacture',
-            'year_of_manufacture', 'EDID_version', 'monitor_name',
+            'year_of_manufacture', 'version', 'monitor_name',
             'monitor_serial_number', 'monitor_data_string',
             # Basic Display Parameters
             'bdp_video_input', 'bdp_signal_level_standard',
@@ -140,7 +140,7 @@ class EDIDUpdateForm(BaseForm):
                     'manufacturer_serial_number',
                     'week_of_manufacture',
                     'year_of_manufacture',
-                    'EDID_version',
+                    'version',
                     'monitor_name',
                     'monitor_serial_number',
                     'monitor_data_string',
@@ -442,15 +442,15 @@ class StandardTimingForm(BaseForm):
     def clean_aspect_ratio(self):
         aspect_ratio = self.cleaned_data['aspect_ratio']
 
-        old_versions = [EDID.EDID_version_1_0, EDID.EDID_version_1_1,
-                        EDID.EDID_version_1_2]
+        old_versions = [EDID.VERSION_1_0, EDID.VERSION_1_1,
+                        EDID.VERSION_1_2]
 
         if aspect_ratio == StandardTiming.ASPECT_RATIO_1_1:
-            if not self.EDID.EDID_version in old_versions:
+            if not self.EDID.version in old_versions:
                 raise forms.ValidationError('1:1 aspect ratio is not allowed'
                                             ' with EDID 1.3 or newer.')
         elif aspect_ratio == StandardTiming.ASPECT_RATIO_16_10:
-            if self.EDID.EDID_version in old_versions:
+            if self.EDID.version in old_versions:
                 raise forms.ValidationError('16:10 aspect ratio is not allowed'
                                             ' prior to EDID 1.3.')
 

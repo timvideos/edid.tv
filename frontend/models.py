@@ -73,20 +73,21 @@ class EDID(models.Model):
     year_of_manufacture = models.PositiveSmallIntegerField()
 
     # EDID version and revision
-    EDID_version_1_0 = 0
-    EDID_version_1_1 = 1
-    EDID_version_1_2 = 2
-    EDID_version_1_3 = 3
-    EDID_version_1_4 = 4
-    EDID_version_2_0 = 5
-    EDID_version_choices = ((EDID_version_1_0, '1.0'),
-                            (EDID_version_1_1, '1.1'),
-                            (EDID_version_1_2, '1.2'),
-                            (EDID_version_1_3, '1.3'),
-                            (EDID_version_1_4, '1.4'),
-                            (EDID_version_2_0, '2.0'))
-    EDID_version = models.PositiveSmallIntegerField(
-                            choices=EDID_version_choices)
+    VERSION_1_0 = 0
+    VERSION_1_1 = 1
+    VERSION_1_2 = 2
+    VERSION_1_3 = 3
+    VERSION_1_4 = 4
+    VERSION_2_0 = 5
+    VERSION_CHOICES = (
+        (VERSION_1_0, '1.0'),
+        (VERSION_1_1, '1.1'),
+        (VERSION_1_2, '1.2'),
+        (VERSION_1_3, '1.3'),
+        (VERSION_1_4, '1.4'),
+        (VERSION_2_0, '2.0'),
+    )
+    version = models.PositiveSmallIntegerField(choices=VERSION_CHOICES)
 
     ### ASCII Text Descriptors
     # Monitor Name, from Monitor Descriptor Description (type 0xFC)
@@ -246,20 +247,20 @@ class EDID(models.Model):
 
         if edid['EDID_version'] == 1:
             if edid['EDID_revision'] == 0:
-                self.EDID_version = self.EDID_version_1_0
+                self.version = self.VERSION_1_0
             elif edid['EDID_revision'] == 1:
-                self.EDID_version = self.EDID_version_1_1
+                self.version = self.VERSION_1_1
             elif edid['EDID_revision'] == 2:
-                self.EDID_version = self.EDID_version_1_2
+                self.version = self.VERSION_1_2
             elif edid['EDID_revision'] == 3:
-                self.EDID_version = self.EDID_version_1_3
+                self.version = self.VERSION_1_3
             elif edid['EDID_revision'] == 4:
-                self.EDID_version = self.EDID_version_1_4
+                self.version = self.VERSION_1_4
         elif edid['EDID_version'] == 2:
             if edid['EDID_revision'] == 0:
-                self.EDID_version = self.EDID_version_2_0
+                self.version = self.VERSION_2_0
 
-        if not self.EDID_version:
+        if not self.version:
             raise Exception('Invalid EDID version and revision.')
 
         ### ASCII Text Descriptors
@@ -379,12 +380,14 @@ class EDID(models.Model):
             else:
                 raise Exception('Invalid aspect ratio can not be parsed.')
 
-            timing = StandardTiming(identification=id.group(1),
-                                user=self.user,
-                                horizontal_active=data['Horizontal_active'],
-                                vertical_active=data['Vertical_active'],
-                                refresh_rate=data['Refresh_Rate'],
-                                aspect_ratio=aspect_ratio)
+            timing = StandardTiming(
+                identification=id.group(1),
+                user=self.user,
+                horizontal_active=data['Horizontal_active'],
+                vertical_active=data['Vertical_active'],
+                refresh_rate=data['Refresh_Rate'],
+                aspect_ratio=aspect_ratio
+            )
 
             self.standardtiming_set.add(timing)
 
@@ -395,26 +398,26 @@ class EDID(models.Model):
                 # Not timing descriptor
                 break
 
-            timing = DetailedTiming(identification=id.group(1),
-                        user=self.user,
-                        pixel_clock=data['Pixel_clock'],
-                        horizontal_active=data['Horizontal_Active'],
-                        horizontal_blanking=data['Horizontal_Blanking'],
-                        horizontal_sync_offset=data['Horizontal_Sync_Offset'],
-                        horizontal_sync_pulse_width=
-                            data['Horizontal_Sync_Pulse_Width'],
-                        horizontal_image_size=data['Horizontal_Image_Size'],
-                        horizontal_border=data['Horizontal_Border'],
-                        vertical_active=data['Vertical_Active'],
-                        vertical_blanking=data['Vertical_Blanking'],
-                        vertical_sync_offset=data['Vertical_Sync_Offset'],
-                        vertical_sync_pulse_width=
-                            data['Vertical_Sync_Pulse_Width'],
-                        vertical_image_size=data['Vertical_Image_Size'],
-                        vertical_border=data['Vertical_Border'],
-                        flags_interlaced=data['Flags']['Interlaced'],
-                        flags_stereo_mode=data['Flags']['Stereo_Mode'],
-                        flags_sync_scheme=data['Flags']['Sync_Scheme'])
+            timing = DetailedTiming(
+                identification=id.group(1),
+                user=self.user,
+                pixel_clock=data['Pixel_clock'],
+                horizontal_active=data['Horizontal_Active'],
+                horizontal_blanking=data['Horizontal_Blanking'],
+                horizontal_sync_offset=data['Horizontal_Sync_Offset'],
+                horizontal_sync_pulse_width=data['Horizontal_Sync_Pulse_Width'],
+                horizontal_image_size=data['Horizontal_Image_Size'],
+                horizontal_border=data['Horizontal_Border'],
+                vertical_active=data['Vertical_Active'],
+                vertical_blanking=data['Vertical_Blanking'],
+                vertical_sync_offset=data['Vertical_Sync_Offset'],
+                vertical_sync_pulse_width=data['Vertical_Sync_Pulse_Width'],
+                vertical_image_size=data['Vertical_Image_Size'],
+                vertical_border=data['Vertical_Border'],
+                flags_interlaced=data['Flags']['Interlaced'],
+                flags_stereo_mode=data['Flags']['Stereo_Mode'],
+                flags_sync_scheme=data['Flags']['Sync_Scheme']
+            )
 
             if (timing.flags_sync_scheme ==
                     DetailedTiming.Sync_Scheme.Digital_Separate):
