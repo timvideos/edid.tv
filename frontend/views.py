@@ -373,22 +373,13 @@ class TimingMixin(object):
 
     def delete(self, request, *args, **kwargs):
         """
-        Deletes the timing and reorder the subsequent timings and then
-        redirects to the success URL.
+        Deletes the timing and then redirects to the success URL.
 
         Used for DeleteView.
         """
 
         self.object = self.get_object()
         self.object.delete()
-
-        # Reorder the subsequent timings
-        timings = self.model.objects.filter(EDID=self.object.EDID,
-                      identification__gt=self.object.identification).all()
-
-        for timing in timings:
-            timing.identification = timing.identification - 1
-            timing.save()
 
         # Did not actually update EDID, just to make sure EDID and all its
         # related objects are included in the revision

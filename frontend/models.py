@@ -584,6 +584,20 @@ class Timing(models.Model):
         abstract = True
         ordering = ['identification']
 
+    def delete(self, using=None):
+        super(Timing, self).delete(using)
+
+        # Get all subsequent timings
+        timings = self.__class__.objects.filter(
+            EDID=self.EDID,
+            identification__gt=self.identification
+        ).all()
+
+        # Move them up
+        for timing in timings:
+            timing.identification -= 1
+            timing.save()
+
 
 class StandardTiming(Timing):
     # Horizontal active, 256-2288 pixels
