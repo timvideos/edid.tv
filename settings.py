@@ -131,25 +131,9 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'reversion',
     'crispy_forms',
-
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.bitly',
-    'allauth.socialaccount.providers.dropbox',
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.linkedin',
-    'allauth.socialaccount.providers.openid',
-    'allauth.socialaccount.providers.persona',
-    'allauth.socialaccount.providers.soundcloud',
-    'allauth.socialaccount.providers.stackexchange',
-    'allauth.socialaccount.providers.twitch',
-    'allauth.socialaccount.providers.twitter',
-    'allauth.socialaccount.providers.vimeo',
-    'allauth.socialaccount.providers.weibo',
-
     'frontend',
 )
 
@@ -204,7 +188,9 @@ AUTHENTICATION_BACKENDS = (
 )
 
 #Import local_settings (if any) to override above settings
+EXTEND_APPS = None
 try:
     from local_settings import *
+    INSTALLED_APPS += EXTEND_APPS
 except ImportError:
     pass
