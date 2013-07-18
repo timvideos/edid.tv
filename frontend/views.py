@@ -106,6 +106,9 @@ class EDIDUpload(FormView):
         # Save the updated entry
         edid_object.save()
 
+        # Set revision comment
+        reversion.set_comment('EDID parsed.')
+
         return HttpResponseRedirect(reverse('edid-detail',
                                             kwargs={'pk': edid_object.pk}))
 
@@ -140,6 +143,10 @@ class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
         """
 
         form.instance.user = self.request.user
+
+        # Set revision comment
+        # TODO: Include updated fields list
+        reversion.set_comment('Updated EDID.')
 
         return super(EDIDUpdate, self).form_valid(form)
 
@@ -237,9 +244,10 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
         revision = self.kwargs.get('revision')
 
         # Revert the revision, delete new timings not included in the revision
-        with reversion.create_revision():
-            revision.revert(delete=True)
-            reversion.set_comment('Reverted to revision %s' % revision.pk)
+        revision.revert(delete=True)
+
+        # Set revision comment
+        reversion.set_comment('Reverted to revision %s' % revision.pk)
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -338,6 +346,7 @@ class TimingMixin(object):
         Used for CreateView and UpdateView.
         """
 
+        # For CreateView, set EDID
         if not form.instance.EDID_id:
             form.instance.EDID = form.EDID
             if not form.instance.identification:
@@ -349,6 +358,16 @@ class TimingMixin(object):
 
         # Set the user
         form.instance.user = self.request.user
+
+        # Set revision comment
+        if isinstance(self, CreateView):
+            comment = 'Created %s %s.'
+        elif isinstance(self, UpdateView):
+            comment = 'Updated %s %s.'
+
+        reversion.set_comment(comment % (
+            form.instance._meta.verbose_name, form.instance
+        ))
 
         return super(TimingMixin, self).form_valid(form)
 
@@ -363,12 +382,22 @@ class TimingMixin(object):
         self.object = self.get_object()
         self.object.delete()
 
+        # Reorder the subsequent timings
         timings = self.model.objects.filter(EDID=self.object.EDID,
                       identification__gt=self.object.identification).all()
 
         for timing in timings:
             timing.identification = timing.identification - 1
             timing.save()
+
+        # Did not actually update EDID, just to make sure EDID and all its
+        # related objects are included in the revision
+        self.object.EDID.save()
+
+        # Set revision comment
+        reversion.set_comment('Deleted %s %s.' % (
+            self.object._meta.verbose_name, self.object
+        ))
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -430,6 +459,11 @@ class TimingReorderMixin(object):
             current_timing.user = request.user
             current_timing.save()
 
+            # Set revision comment
+            reversion.set_comment('Moved %s %s up.' % (
+                current_timing._meta.verbose_name, current_timing
+            ))
+
             return HttpResponseRedirect(self.get_success_url())
         elif direction == 'down':
             count = self.model.objects.filter(EDID_id=edid_pk).count()
@@ -450,6 +484,11 @@ class TimingReorderMixin(object):
             current_timing.identification += 1
             current_timing.user = request.user
             current_timing.save()
+
+            # Set revision comment
+            reversion.set_comment('Moved %s %s down.' % (
+                current_timing._meta.verbose_name, current_timing
+            ))
 
             return HttpResponseRedirect(self.get_success_url())
 
