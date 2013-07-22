@@ -55,7 +55,8 @@ class BaseForm(forms.ModelForm):
                 # No value found for it
                 if cleaned_data.get(field) is None:
                     self._errors[field] = self.error_class(
-                        ['This field is required.'])
+                        ['This field is required.']
+                    )
 
                     # This field is no longer valid. Remove it from the
                     # cleaned data.
@@ -119,14 +120,15 @@ class EDIDUpdateForm(BaseForm):
 
         # Change widget for NullBooleanField fields to act like regular
         # BooleanField
-        widgets = {'bdp_blank_to_black_setup': forms.CheckboxInput,
-                   'bdp_separate_syncs': forms.CheckboxInput,
-                   'bdp_composite_sync': forms.CheckboxInput,
-                   'bdp_sync_on_green_video': forms.CheckboxInput,
-                   'bdp_vsync_serration': forms.CheckboxInput,
-                   'bdp_video_input_DFP_1': forms.CheckboxInput,
-                   'mrl_secondary_GTF_curve_supported': forms.CheckboxInput,
-                   }
+        widgets = {
+            'bdp_blank_to_black_setup': forms.CheckboxInput,
+            'bdp_separate_syncs': forms.CheckboxInput,
+            'bdp_composite_sync': forms.CheckboxInput,
+            'bdp_sync_on_green_video': forms.CheckboxInput,
+            'bdp_vsync_serration': forms.CheckboxInput,
+            'bdp_video_input_DFP_1': forms.CheckboxInput,
+            'mrl_secondary_GTF_curve_supported': forms.CheckboxInput,
+        }
 
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
@@ -416,11 +418,11 @@ class StandardTimingForm(BaseForm):
             MaxValueValidator(2288))
 
         # Vertical active
-        # Horizontal active = 256 and aspect_ratio == 16/9
-        self.fields['horizontal_active'].validators.append(
+        # Vertical active = 256 and aspect_ratio == 16/9
+        self.fields['vertical_active'].validators.append(
             MinValueValidator(144))
-        # Horizontal active = 2288 and aspect_ratio == 5/4
-        self.fields['horizontal_active'].validators.append(
+        # Vertical active = 2288 and aspect_ratio == 5/4
+        self.fields['vertical_active'].validators.append(
             MaxValueValidator(1831))
 
         # Refresh rate, 60-123 Hz
@@ -442,8 +444,7 @@ class StandardTimingForm(BaseForm):
     def clean_aspect_ratio(self):
         aspect_ratio = self.cleaned_data['aspect_ratio']
 
-        old_versions = [EDID.VERSION_1_0, EDID.VERSION_1_1,
-                        EDID.VERSION_1_2]
+        old_versions = [EDID.VERSION_1_0, EDID.VERSION_1_1, EDID.VERSION_1_2]
 
         if aspect_ratio == StandardTiming.ASPECT_RATIO_1_1:
             if not self.EDID.version in old_versions:

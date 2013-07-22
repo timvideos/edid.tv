@@ -1,7 +1,6 @@
 from django.db.models import Count
-from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseForbidden, HttpResponseRedirect, Http404
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import (FormView, CreateView, UpdateView,
@@ -434,13 +433,16 @@ class TimingReorderMixin(object):
 
         if direction == 'up':
             if identification == 1:
-                return HttpResponseForbidden('You can not move up a timing if'
-                                             ' its identification is 1.')
+                return HttpResponseBadRequest(
+                    'You can not move up a timing if it is the first one.'
+                )
 
-            prev_timing = self.model.objects.get(EDID_id=edid_pk,
-                              identification=identification - 1)
-            current_timing = self.model.objects.get(EDID_id=edid_pk,
-                                 identification=identification)
+            prev_timing = self.model.objects.get(
+                EDID_id=edid_pk, identification=identification - 1
+            )
+            current_timing = self.model.objects.get(
+                EDID_id=edid_pk, identification=identification
+            )
 
             prev_timing.identification += 1
             prev_timing.user = request.user
@@ -460,13 +462,16 @@ class TimingReorderMixin(object):
             count = self.model.objects.filter(EDID_id=edid_pk).count()
 
             if identification == count:
-                return HttpResponseForbidden('You can not move down a timing'
-                                             ' if it is the last one.')
+                return HttpResponseBadRequest(
+                    'You can not move down a timing if it is the last one.'
+                )
 
-            current_timing = self.model.objects.get(EDID_id=edid_pk,
-                                 identification=identification)
-            next_timing = self.model.objects.get(EDID_id=edid_pk,
-                              identification=identification + 1)
+            current_timing = self.model.objects.get(
+                EDID_id=edid_pk, identification=identification
+            )
+            next_timing = self.model.objects.get(
+                EDID_id=edid_pk, identification=identification + 1
+            )
 
             next_timing.identification -= 1
             next_timing.user = request.user

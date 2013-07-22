@@ -101,10 +101,12 @@ class EDID(models.Model):
     bdp_video_input_analog = 0
     bdp_video_input_digital = 1
     bdp_video_input_choices = ((bdp_video_input_analog, 'Analog'),
-                              (bdp_video_input_digital, 'Digital'))
-    bdp_video_input = models.PositiveSmallIntegerField('video input',
-                               choices=bdp_video_input_choices,
-                               default=bdp_video_input_analog)
+                               (bdp_video_input_digital, 'Digital'))
+    bdp_video_input = models.PositiveSmallIntegerField(
+        'video input',
+        choices=bdp_video_input_choices,
+        default=bdp_video_input_analog
+    )
 
     # Analog Input
     bdp_signal_level_standard_0700_0300 = 0
@@ -612,11 +614,13 @@ class StandardTiming(Timing):
     ASPECT_RATIO_4_3 = 2
     ASPECT_RATIO_5_4 = 3
     ASPECT_RATIO_16_9 = 4
-    ASPECT_RATIO_CHOICES = ((ASPECT_RATIO_1_1, '1:1'),
-                            (ASPECT_RATIO_16_10, '16:10'),
-                            (ASPECT_RATIO_4_3, '4:3'),
-                            (ASPECT_RATIO_5_4, '5:4'),
-                            (ASPECT_RATIO_16_9, '16:9'))
+    ASPECT_RATIO_CHOICES = (
+        (ASPECT_RATIO_1_1, '1:1'),
+        (ASPECT_RATIO_16_10, '16:10'),
+        (ASPECT_RATIO_4_3, '4:3'),
+        (ASPECT_RATIO_5_4, '5:4'),
+        (ASPECT_RATIO_16_9, '16:9'),
+    )
     aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
 
     def __unicode__(self):
@@ -659,18 +663,22 @@ class DetailedTiming(Timing):
         (Stereo_Mode.Interleaved_side_by_side,
             'Side-by-Side interleaved stereo.'),
     )
-    flags_stereo_mode = models.PositiveSmallIntegerField('stereo mode',
-                                 choices=STEREO_MODE_CHOICES)
+    flags_stereo_mode = models.PositiveSmallIntegerField(
+        'stereo mode',
+        choices=STEREO_MODE_CHOICES
+    )
 
     Sync_Scheme = Timing_Sync_Scheme
-    SYNC_SCHEME_CHOICES = ((Sync_Scheme.Analog_Composite, 'Analog Composite'),
-                            (Sync_Scheme.Bipolar_Analog_Composite,
-                                'Bipolar Analog Composite'),
-                            (Sync_Scheme.Digital_Composite,
-                                'Digital Composite'),
-                            (Sync_Scheme.Digital_Separate, 'Digital Separate'))
-    flags_sync_scheme = models.PositiveSmallIntegerField('sync scheme',
-                                 choices=SYNC_SCHEME_CHOICES)
+    SYNC_SCHEME_CHOICES = (
+        (Sync_Scheme.Analog_Composite, 'Analog Composite'),
+        (Sync_Scheme.Bipolar_Analog_Composite, 'Bipolar Analog Composite'),
+        (Sync_Scheme.Digital_Composite, 'Digital Composite'),
+        (Sync_Scheme.Digital_Separate, 'Digital Separate'),
+    )
+    flags_sync_scheme = models.PositiveSmallIntegerField(
+        'sync scheme',
+        choices=SYNC_SCHEME_CHOICES
+    )
 
     # If flags_sync_scheme == Digital_Separate
     flags_horizontal_polarity = models.NullBooleanField('horizontal polarity')
