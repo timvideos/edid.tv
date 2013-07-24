@@ -67,11 +67,24 @@
           </tr>
       {% if edid.bdp_video_input == edid.bdp_video_input_analog %}
           <tr>
-            <td><i class="icon-{{ edid.bdp_blank_to_black_setup|yesno:"ok,remove" }}"></i> Blank-to-black setup</td>
-            <td><i class="icon-{{ edid.bdp_separate_syncs|yesno:"ok,remove" }}"></i> Separate syncs</td>
-            <td><i class="icon-{{ edid.bdp_composite_sync|yesno:"ok,remove" }}"></i> Composite syncs</td>
-            <td><i class="icon-{{ edid.bdp_sync_on_green_video|yesno:"ok,remove" }}"></i> Sync_on_green_video</td>
-            <td><i class="icon-{{ edid.bdp_vsync_serration|yesno:"ok,remove" }}"></i> Vsync_serration</td>
+            <td>Blank-to-black setup</td>
+            <td><i class="icon-{{ edid.bdp_blank_to_black_setup|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Separate syncs</td>
+            <td><i class="icon-{{ edid.bdp_separate_syncs|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Composite syncs</td>
+            <td><i class="icon-{{ edid.bdp_composite_sync|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Sync on green video</td>
+            <td><i class="icon-{{ edid.bdp_sync_on_green_video|yesno:"ok,remove" }}"></i></td>
+          </tr>
+          <tr>
+            <td>Vsync serration</td>
+            <td><i class="icon-{{ edid.bdp_vsync_serration|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Signal Level Standard</td>
@@ -166,43 +179,26 @@
           </tr>
         </thead>
         <tbody>
-{% for timing in edid.get_est_timings %}
-  {% if timing.supported %}
+  {% for timing in edid.get_est_timings %}
+    {% if timing.supported %}
         <tr>
           <td>{{ timing.horizontal_active }} pixels</td>
           <td>{{ timing.vertical_active }} pixels</td>
           <td>{{ timing.refresh_rate }} Hz</td>
         </tr>
-  {% endif %}
-{% endfor %}
+    {% endif %}
+  {% endfor %}
         </tbody>
       </table>
     </section>
 
-{% if edid.standardtimings %}
+  {% if edid.standardtimings %}
     <section id="standard_timings">
       <div class="row">
-  {% for timing in edid.standardtimings %}
+    {% for timing in edid.standardtimings %}
         <div class="span4">
           <h3>Standard Timings {{ timing.identification }}</h3>
           {% include 'frontend/standardtiming_table.html' %}
-        </div>
-    {% if forloop.counter|divisibleby:2 and not forloop.last %}
-      </div>
-      <div class="row">
-    {% endif %}
-  {% endfor %}
-      </div>
-    </section>
-{% endif %}
-
-{% if edid.detailedtimings %}
-    <section id="detailed_timings">
-      <div class="row">
-    {% for timing in edid.detailedtimings %}
-        <div class="span4">
-          <h3>Detailed Timings {{ timing.identification }}</h3>
-          {% include 'frontend/detailedtiming_table.html' %}
         </div>
       {% if forloop.counter|divisibleby:2 and not forloop.last %}
       </div>
@@ -211,9 +207,26 @@
     {% endfor %}
       </div>
     </section>
-{% endif %}
+  {% endif %}
 
-{% if edid.monitor_range_limits %}
+  {% if edid.detailedtimings %}
+    <section id="detailed_timings">
+      <div class="row">
+      {% for timing in edid.detailedtimings %}
+        <div class="span4">
+          <h3>Detailed Timings {{ timing.identification }}</h3>
+          {% include 'frontend/detailedtiming_table.html' %}
+        </div>
+        {% if forloop.counter|divisibleby:2 and not forloop.last %}
+      </div>
+      <div class="row">
+        {% endif %}
+      {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if edid.monitor_range_limits %}
     <section id="monitor_range_limits">
       <h3>Monitor Range Limits</h3>
       <table class="table table-striped table-bordered">
@@ -242,7 +255,7 @@
             <td>Secondary GTF curve supported</td>
             <td><i class="icon-{{ edid.mrl_secondary_GTF_curve_supported|yesno:"ok,remove" }}"></i></td>
           </tr>
-  {% if edid.mrl_secondary_GTF_curve_supported %}
+    {% if edid.mrl_secondary_GTF_curve_supported %}
           <tr>
             <td>Start frequency</td>
             <td>{{ edid.mrl_max_pixel_clock }} kHz</td>
@@ -263,11 +276,11 @@
             <td>J</td>
             <td>{{ edid.mrl_secondary_GTF_J }}</td>
           </tr>
-  {% endif %}
+    {% endif %}
         </tbody>
       </table>
     </section>
-{% endif %}
+  {% endif %}
 
   {% if not edid.is_revision %}
     <section id="comments">
