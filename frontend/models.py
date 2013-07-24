@@ -722,7 +722,7 @@ class Comment(models.Model):
         ordering = ('submitted', 'level',)
 
     def get_max_thread_level(self):
-        if settings.EDID_COMMENT_MAX_THREAD_LEVEL:
+        if hasattr(settings, 'EDID_COMMENT_MAX_THREAD_LEVEL'):
             return settings.EDID_COMMENT_MAX_THREAD_LEVEL
 
         return EDID_COMMENT_MAX_THREAD_LEVEL
