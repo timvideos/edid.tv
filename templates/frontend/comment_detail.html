@@ -1,0 +1,20 @@
+{% for comment in comments %}
+  {% ifequal comment.parent parent %}
+  <div class="comment{% if comment.level %} offset{{ comment.level }}{% endif %}" id="comment-{{ comment.pk }}">
+    <h4>{{ comment.user }}{% if comment.user.is_staff %} <i class="label label-info">Staff</i>{% endif %}</h4>
+
+    {% ifnotequal comment.level comment.get_max_thread_level %}
+    <a class="pull-right comment-reply" href="#comment-form" data-comment-id="{{ comment.pk }}"><i class="icon-comment"></i> Reply</a>
+    {% endifnotequal %}
+
+    <p>{{ comment.content|striptags|escape }}</p>
+  </div>
+
+    {% if comment.comment_set.exists %}
+      {# include recursion only works if file name is a variable #}
+      {% with filename='frontend/comment_detail.html' comments=comment.comment_set.all  parent=comment %}
+        {% include filename %}
+      {% endwith %}
+    {% endif %}
+  {% endifequal %}
+{% endfor %}

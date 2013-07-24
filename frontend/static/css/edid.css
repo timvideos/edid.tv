@@ -2,6 +2,32 @@ body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 
+/* django-crispy-forms adds asterisk to required fields, hide it here */
+.asteriskField {
+  display: none;
+}
+
+
+/* Comments
+------------------------- */
+
+#comments-list {
+  margin-bottom: 20px;
+}
+
+#comments .offset1 {
+  margin-left: 30px;
+}
+
+#comments .offset2 {
+  margin-left: 60px;
+}
+
+#comments .comment {
+  border-top: 1px solid #dddddd;
+  padding: 8px;
+}
+
 
 /* Sidenav
 -------------------------------------------------- */

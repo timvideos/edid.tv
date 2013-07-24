@@ -50,6 +50,10 @@ urlpatterns = patterns('',
         r'move_(?P<direction>up|down)/$',
         views.DetailedTimingReorder.as_view(), name='detailed-timing-reorder'),
 
+    # Comment
+    url(r'^edid/(?P<edid_pk>\d+)/comment/new/$',
+        views.CommentCreate.as_view(), name='comment-create'),
+
     # django-allauth
     (r'^accounts/', include('allauth.urls')),
 

@@ -10,8 +10,9 @@ from braces.views import (LoginRequiredMixin, PrefetchRelatedMixin,
                           StaffuserRequiredMixin)
 import reversion
 
-from frontend.models import Manufacturer, EDID, StandardTiming, DetailedTiming
-from frontend.forms import (EDIDUpdateForm, EDIDUploadForm,
+from frontend.models import (Manufacturer, EDID, StandardTiming,
+                             DetailedTiming, Comment)
+from frontend.forms import (EDIDUpdateForm, EDIDUploadForm, CommentForm,
                             StandardTimingForm, DetailedTimingForm)
 
 
@@ -114,7 +115,8 @@ class EDIDUpload(FormView):
 
 class EDIDDetailView(PrefetchRelatedMixin, DetailView):
     model = EDID
-    prefetch_related = ['standardtiming_set', 'detailedtiming_set']
+    prefetch_related = ['standardtiming_set', 'detailedtiming_set',
+                        'comment_set']
 
     def get_object(self, queryset=None):
         """
@@ -129,6 +131,16 @@ class EDIDDetailView(PrefetchRelatedMixin, DetailView):
         object.detailedtimings = object.detailedtiming_set.all()
 
         return object
+
+    def get_context_data(self, **kwargs):
+        """
+        Inject comment form in context.
+        """
+        context = super(EDIDDetailView, self).get_context_data(**kwargs)
+
+        context['comment_form'] = CommentForm(initial={'edid': self.object})
+
+        return context
 
 
 class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
@@ -507,6 +519,55 @@ class StandardTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
 class DetailedTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
     model = DetailedTiming
 
+
+### Comment
+class CommentCreate(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    http_method_names = [u'post']
+
+    def get_initial(self):
+        """
+        Uses edid_pk argument from URLConf to grab EDID object and inject it
+        in the view.
+        """
+
+        initial = super(CommentCreate, self).get_initial()
+
+        edid_pk = self.kwargs.get('edid_pk', None)
+
+        edid = get_object_or_404(EDID, pk=edid_pk)
+        initial.update({'edid': edid})
+
+        return initial
+
+    def get_success_url(self):
+        """
+        Returns url of EDID detail page.
+        """
+
+        edid_pk = self.kwargs.get('edid_pk')
+
+        return reverse('edid-detail', kwargs={'pk': edid_pk})
+
+    def form_valid(self, form):
+        """
+        Sets EDID, parent and user.
+        """
+
+        # Set EDID
+        form.instance.EDID = form.EDID
+
+        # Set user
+        form.instance.user = self.request.user
+
+        # Set nesting level
+        if form.instance.parent:
+            form.instance.level = form.instance.parent.level + 1
+        else:
+            form.instance.level = 0
+
+        return super(CommentCreate, self).form_valid(form)
 
 ### User Profile
 class ProfileView(TemplateView):

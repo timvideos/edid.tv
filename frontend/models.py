@@ -697,3 +697,35 @@ class DetailedTiming(Timing):
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active,
                                self.pixel_clock / 1000)
+
+
+# Default settings for Comment model
+EDID_COMMENT_MAX_THREAD_LEVEL = 2
+
+
+class Comment(models.Model):
+    EDID = models.ForeignKey(EDID)
+
+    # Parent comment
+    parent = models.ForeignKey('self', null=True)
+
+    # Nested level
+    level = models.PositiveSmallIntegerField()
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+    submitted = models.DateTimeField(auto_now_add=True)
+
+    content = models.TextField()
+
+    class Meta:
+        ordering = ('submitted', 'level',)
+
+    def get_max_thread_level(self):
+        if settings.EDID_COMMENT_MAX_THREAD_LEVEL:
+            return settings.EDID_COMMENT_MAX_THREAD_LEVEL
+
+        return EDID_COMMENT_MAX_THREAD_LEVEL
+
+    def __unicode__(self):
+        return "%s: %s" % (self.user, self.content[:100])

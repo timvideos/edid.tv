@@ -1,16 +1,17 @@
 import base64
 
 from django import forms
+from django.core.urlresolvers import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset, HTML, Layout, Submit
+from crispy_forms.layout import Field, Fieldset, HTML, Layout, Submit
 from crispy_forms.bootstrap import (AppendedText, FormActions, InlineRadios,
                                     Tab, TabHolder)
 
 from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
 
-from frontend.models import EDID, StandardTiming, DetailedTiming
+from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
 
 
 class EDIDUploadForm(forms.Form):
@@ -605,3 +606,40 @@ class DetailedTimingForm(BaseForm):
         cleaned_data = self._nullify_fields(cleaned_data, fields_to_nullify)
 
         return cleaned_data
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['EDID', 'parent', 'content']
+        widgets = {'EDID': forms.HiddenInput,
+                   'parent': forms.HiddenInput}
+
+    def __init__(self, *args, **kwargs):
+        # Store EDID object in the form
+        self.EDID = kwargs['initial'].get('edid')
+
+        self.helper = FormHelper()
+        self.helper.form_action = reverse('comment-create',
+                                          kwargs={'edid_pk': self.EDID.pk})
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Field('content', rows=3, required=True),
+            FormActions(
+                Submit('submit', 'Submit'),
+            ),
+        )
+        super(CommentForm, self).__init__(*args, **kwargs)
+
+        self.fields['EDID'].initial = self.EDID.pk
+        self.fields['parent'].required = False
+        self.fields['content'].label = 'Add Comment'
+
+    def clean_parent(self):
+        parent = self.cleaned_data['parent']
+
+        if parent:
+            if parent.level == parent.get_max_thread_level():
+                raise forms.ValidationError('Comment nesting limit exceeded.')
+
+        return parent

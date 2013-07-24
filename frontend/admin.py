@@ -2,7 +2,8 @@ from django.contrib import admin
 
 import reversion
 
-from frontend.models import Manufacturer, EDID, StandardTiming, DetailedTiming
+from frontend.models import (Manufacturer, EDID, StandardTiming,
+                             DetailedTiming, Comment)
 
 
 class ManufacturerAdmin(admin.ModelAdmin):
@@ -40,3 +41,13 @@ class EDIDAdmin(reversion.VersionAdmin):
         return qs
 
 admin.site.register(EDID, EDIDAdmin)
+
+
+class CommentAdmin(admin.ModelAdmin):
+    fields = ['user', 'parent', 'level', 'content']
+    list_display = ('EDID', 'user', 'content')
+    list_display_links = ('content',)
+    list_filter = ('user',)
+
+
+admin.site.register(Comment, CommentAdmin)
