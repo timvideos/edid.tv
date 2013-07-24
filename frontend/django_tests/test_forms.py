@@ -2,8 +2,8 @@ from django.test import TestCase
 
 from frontend.django_tests.base import EDIDTestMixin
 from frontend.forms import (EDIDUpdateForm, StandardTimingForm,
-                            DetailedTimingForm)
-from frontend.models import EDID, StandardTiming, DetailedTiming
+                            DetailedTimingForm, CommentForm)
+from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
 
 
 class FormTestMixin(object):
@@ -268,4 +268,41 @@ class DetailedTimingFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         self._test_nulled_fields(
             data, ['flags_serrate', 'flags_composite_polarity',
                    'flags_sync_on_RGB']
+        )
+
+
+class CommentFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
+    def setUp(self):
+        super(CommentFormTestCase, self).setUp()
+
+        self.valid_data = {'EDID': self.edid.pk,
+                           'parent': '',
+                           'content': 'This is a test.'}
+
+    def _get_form(self, data):
+        return CommentForm(data, initial={'edid': self.edid})
+
+    def test_valid(self):
+        # Test valid data
+        form = self._get_form(self.valid_data)
+        self.assertTrue(isinstance(form.instance, Comment))
+        self.assertEqual(len(form.errors), 0)
+
+    def test_parent(self):
+        # Create nested comments up to the limit
+        user = self._login()
+        comment_1 = Comment(EDID=self.edid, user=user, level=0,
+                            content='').save()
+        comment_2 = Comment(EDID=self.edid, user=user, level=1,
+                            parent=comment_1, content='').save()
+        comment_3 = Comment(EDID=self.edid, user=user, level=2,
+                            parent=comment_2, content='').save()
+
+        # Try to submit comment with over-limit nesting
+        data = self.valid_data
+        data['parent'] = 3
+
+        self._test_field_error(
+            data, 'parent',
+            u'Comment nesting limit exceeded.'
         )

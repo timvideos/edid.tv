@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from frontend.django_tests.base import EDIDTestMixin
-from frontend.models import EDID, Manufacturer
+from frontend.models import EDID, Manufacturer, Comment
 
 
 ### EDID Tests
@@ -71,4 +71,21 @@ class StandardTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
 class DetailedTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
     def _get_timings_set(self):
         return self.edid.detailedtiming_set
+
+
+### Comment Tests
+class CommentTestCase(EDIDTestMixin, TestCase):
+    def test_max_thread_level(self):
+        """
+        Test Comment.get_max_thread_level() method.
+        """
+
+        # Create Comment instance
+        user = self._login()
+        comment = Comment(EDID=self.edid, user=user, level=0, content='')
+
+        self.assertEqual(comment.get_max_thread_level(), 2)
+
+        with self.settings(EDID_COMMENT_MAX_THREAD_LEVEL=5):
+            self.assertEqual(comment.get_max_thread_level(), 5)
 

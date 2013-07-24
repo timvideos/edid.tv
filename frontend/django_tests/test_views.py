@@ -7,7 +7,8 @@ from django.test import TestCase
 from frontend.django_tests.base import EDIDTestMixin
 from frontend.forms import (EDIDUpdateForm, StandardTimingForm,
                             DetailedTimingForm)
-from frontend.models import EDID, Manufacturer, StandardTiming, DetailedTiming
+from frontend.models import (EDID, Manufacturer, StandardTiming,
+                             DetailedTiming, Comment)
 
 
 ### EDID Tests
@@ -556,3 +557,84 @@ class DetailedTimingReorderTestCase(TimingReorderMixin, EDIDTestMixin,
                                     TestCase):
     model = DetailedTiming
     urlconf_name = 'detailed-timing-reorder'
+
+
+### Comment Tests
+
+class CommentTestCase(EDIDTestMixin, TestCase):
+    def setUp(self):
+        super(CommentTestCase, self).setUp()
+
+        self.post_url = reverse('comment-create',
+                                kwargs={'edid_pk': self.edid.pk})
+        self.valid_data = {'EDID': self.edid.pk,
+                           'parent': '',
+                           'content': 'This is a test.'}
+
+    def test_login_required(self):
+        # Test login is required to submit comment
+        response = self.client.post(self.post_url, self.valid_data)
+
+        self.assertNotEqual(response['Location'], reverse(
+            'edid-detail', kwargs={'pk': 1}
+        ))
+
+    def test_valid(self):
+        # Test valid data
+        self._login()
+        response = self.client.post(self.post_url, self.valid_data)
+
+        self.assertRedirects(
+            response, reverse('edid-detail', kwargs={'pk': 1})
+        )
+        self.assertEqual(self.edid.comment_set.count(), 1)
+
+        # Get the comment and check its fields
+        comment = Comment.objects.get(pk=1)
+        self.assertEqual(comment.parent, None)
+        self.assertEqual(comment.level, 0)
+
+    def test_nesting(self):
+        self._login()
+
+        # First comment
+        self.client.post(self.post_url, self.valid_data)
+        comment = Comment.objects.get(pk=1)
+        self.assertEqual(comment.parent, None)
+        self.assertEqual(comment.level, 0)
+
+        # Second comment, nested under first comment, level 1
+        data = self.valid_data
+        data['parent'] = 1
+        self.client.post(self.post_url, data)
+        comment = Comment.objects.get(pk=2)
+        self.assertEqual(comment.parent.pk, 1)
+        self.assertEqual(comment.level, 1)
+
+        # Third comment, nested under second comment, level 2
+        data = self.valid_data
+        data['parent'] = 2
+        self.client.post(self.post_url, data)
+        comment = Comment.objects.get(pk=3)
+        self.assertEqual(comment.parent.pk, 2)
+        self.assertEqual(comment.level, 2)
+
+    # TODO: Fix form template
+    # def test_excessive_nesting(self):
+    #     # Create nested comments up to the limit
+    #     user = self._login()
+    #     comment_1 = Comment(EDID=self.edid, user=user, level=0,
+    #                         content='').save()
+    #     comment_2 = Comment(EDID=self.edid, user=user, level=1,
+    #                         parent=comment_1, content='').save()
+    #     comment_3 = Comment(EDID=self.edid, user=user, level=2,
+    #                         parent=comment_2, content='').save()
+    #
+    #     # Post comment with over-limit nesting
+    #     data = self.valid_data
+    #     data['parent'] = 3
+    #
+    #     response = self.client.post(self.post_url, data)
+    #
+    #     # self.assertFormError(response, 'form', 'parent',
+    #     #                      'Comment nesting limit exceeded.')
