@@ -1,6 +1,6 @@
 import base64
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from edid_parser.edid_parser import EDID_Parser
 
@@ -41,9 +41,17 @@ class EDIDTestMixin(object):
         self.edid = edid_object
 
     def _login(self, username='tester', password='test', superuser=False):
+        """
+        Creates user and login then returns the user.
+        """
+
         if superuser:
-            User.objects.create_superuser(username, '', password)
+            user = get_user_model().objects.create_superuser(username, '',
+                                                             password)
         else:
-            User.objects.create_user(username, password=password)
+            user = get_user_model().objects.create_user(username,
+                                                        password=password)
 
         self.client.login(username=username, password=password)
+
+        return user
