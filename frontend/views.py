@@ -308,7 +308,7 @@ class TimingMixin(object):
     def get_initial(self):
         """
         Uses edid_pk argument from URLConf to grab EDID object and inject it
-        in the view.
+        in form initial data.
 
         Used for CreateView and UpdateView.
         """
@@ -529,7 +529,7 @@ class CommentCreate(LoginRequiredMixin, CreateView):
     def get_initial(self):
         """
         Uses edid_pk argument from URLConf to grab EDID object and inject it
-        in the view.
+        in form initial data.
         """
 
         initial = super(CommentCreate, self).get_initial()
@@ -540,6 +540,21 @@ class CommentCreate(LoginRequiredMixin, CreateView):
         initial.update({'edid': edid})
 
         return initial
+
+    def get_context_data(self, **kwargs):
+        """
+        Uses edid_pk argument from URLConf to grab EDID object and inject it
+        in template context.
+        """
+
+        context = super(CommentCreate, self).get_context_data(**kwargs)
+
+        edid_pk = self.kwargs.get('edid_pk', None)
+
+        edid = get_object_or_404(EDID, pk=edid_pk)
+        context.update({'edid': edid})
+
+        return context
 
     def get_success_url(self):
         """

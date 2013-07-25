@@ -9,11 +9,11 @@
     </div>
 
     <form method="post" class="form-horizontal" enctype="multipart/form-data">{% csrf_token %}
-      <div class="control-group">
+      <div class="control-group{% if form.edid_file.errors %} error{% endif %}">
         <div class="controls">
           <input id="id_edid_file" name="edid_file" type="file">
 {% for error in form.edid_file.errors %}
-          <span class="help-inline">{{ error|escape }}</span>
+          <span class="help-block">{{ error|escape }}</span>
 {% endfor %}
         </div>
       </div>

@@ -1,0 +1,31 @@
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% if edid.comment_set.exists %}
+<div id="comments-list">
+  {% include 'frontend/comment_detail.html' with comments=edid.comment_set.all parent=None %}
+</div>
+{% else %}
+<div>
+  <div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <h4>No comments</h4>
+  </div>
+</div>
+{% endif %}
+
+<div id="comment-form">
+{% if user.is_authenticated and user.is_active %}
+  {% crispy form %}
+{% else %}
+  <div class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <h4>Logging Required</h4>
+    Only users can post comments.
+  </div>
+{% endif %}
+</div>
+
+{% block extra_js %}
+    <script src="{% static 'js/comment_form.js' %}"></script>
+{% endblock %}

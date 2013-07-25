@@ -285,40 +285,9 @@
   {% if not edid.is_revision %}
     <section id="comments">
       <h3>Comments</h3>
-      <div class="row">
-    {% if edid.comment_set.exists %}
-        <div class="span9" id="comments-list">
-          {% include 'frontend/comment_detail.html' with comments=edid.comment_set.all parent=None %}
-        </div>
-    {% else %}
-        <div class="span9">
-          <div class="alert alert-info">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <h4>No comments</h4>
-          </div>
-        </div>
-    {% endif %}
-      </div>
-
-      <div class="row">
-        <div class="span9" id="comment-form">
-    {% if user.is_authenticated and user.is_active %}
-          {% crispy comment_form %}
-    {% else %}
-          <div class="alert alert-danger">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <h4>Logging Required</h4>
-            Only users can post comments.
-          </div>
-    {% endif %}
-        </div>
-      </div>
+      {% include 'frontend/comment_list.html' with form=comment_form %}
     </section>
   {% endif %}
   </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-    <script src="{% static 'js/comment_form.js' %}"></script>
 {% endblock %}
