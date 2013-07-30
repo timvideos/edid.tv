@@ -466,6 +466,35 @@ class EDID(models.Model):
     def get_absolute_url(self):
         return reverse('edid-detail', kwargs={'pk': self.pk})
 
+    def get_comments(self):
+        comments = list(Comment.objects.filter(EDID=self)
+                                       .select_related('user').all())
+
+        ordered_comments = self._get_nested_comments(comments, 0)
+
+        return ordered_comments
+
+    def _get_nested_comments(self, comments, level, parent=None):
+        nested_comments = []
+
+        for comment in comments:
+            if comment.level == level and comment.parent == parent:
+                deep_nested_comments = {'comment': comment}
+
+                deeper_nested_comments = self._get_nested_comments(
+                    comments, comment.level + 1, comment
+                )
+                if deeper_nested_comments:
+                    deep_nested_comments['subcomments'] = \
+                        deeper_nested_comments
+
+                nested_comments.append(deep_nested_comments)
+
+        if not nested_comments:
+            return None
+
+        return nested_comments
+
     def get_est_timings(self):
         """
         Returns established timings in a dictionary.
@@ -719,7 +748,7 @@ class Comment(models.Model):
     content = models.TextField()
 
     class Meta:
-        ordering = ('submitted', 'level',)
+        ordering = ('level', 'submitted',)
 
     def get_max_thread_level(self):
         if hasattr(settings, 'EDID_COMMENT_MAX_THREAD_LEVEL'):
@@ -728,4 +757,4 @@ class Comment(models.Model):
         return EDID_COMMENT_MAX_THREAD_LEVEL
 
     def __unicode__(self):
-        return "%s: %s" % (self.user, self.content[:100])
+        return "%s: %s" % (self.pk, self.content[:100])

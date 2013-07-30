@@ -1,5 +1,5 @@
 {% for comment in comments %}
-  {% ifequal comment.parent parent %}
+  {% with comment=comment.comment %}
   <div class="comment{% if comment.level %} offset{{ comment.level }}{% endif %}" id="comment-{{ comment.pk }}">
     <h4>{{ comment.user }}{% if comment.user.is_staff %} <i class="label label-info">Staff</i>{% endif %}</h4>
 
@@ -9,12 +9,12 @@
 
     <p>{{ comment.content|striptags|escape }}</p>
   </div>
+  {% endwith %}
 
-    {% if comment.comment_set.exists %}
-      {# include recursion only works if file name is a variable #}
-      {% with filename='frontend/comment_detail.html' comments=comment.comment_set.all  parent=comment %}
-        {% include filename %}
-      {% endwith %}
-    {% endif %}
-  {% endifequal %}
+  {% if comment.subcomments %}
+    {# recursion in include tag only works if file name is a variable #}
+    {% with filename='frontend/comment_detail.html' comments=comment.subcomments %}
+      {% include filename %}
+    {% endwith %}
+  {% endif %}
 {% endfor %}

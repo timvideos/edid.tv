@@ -38,6 +38,42 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(self.edid.standardtiming_set.count(), 2)
         self.assertEqual(self.edid.detailedtiming_set.count(), 2)
 
+    def test_get_comments(self):
+        # Create nested comments
+        user = self._login()
+        comment_1 = Comment(EDID=self.edid, user=user, level=0, content='')
+        comment_1.save()
+
+        comment_2 = Comment(EDID=self.edid, user=user, level=1,
+                            parent=comment_1, content='')
+        comment_2.save()
+
+        comment_3 = Comment(EDID=self.edid, user=user, level=0, content='')
+        comment_3.save()
+
+        comment_4 = Comment(EDID=self.edid, user=user, level=2,
+                            parent=comment_2, content='')
+        comment_4.save()
+
+        # Get all comments for EDID
+        comments = self.edid.get_comments()
+
+        # Check comments are ordered
+        self.assertEqual(comments,
+            [
+                {'comment': comment_1,
+                 'subcomments': [
+                                    {'comment': comment_2,
+                                     'subcomments': [
+                                                        {'comment': comment_4}
+                                                    ],
+                                    }
+                                ],
+                },
+                {'comment': comment_3},
+            ]
+        )
+
 
 ### Timing Tests
 class TimingTestMixin(object):
@@ -88,4 +124,3 @@ class CommentTestCase(EDIDTestMixin, TestCase):
 
         with self.settings(EDID_COMMENT_MAX_THREAD_LEVEL=5):
             self.assertEqual(comment.get_max_thread_level(), 5)
-

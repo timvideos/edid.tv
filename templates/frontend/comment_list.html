@@ -1,9 +1,9 @@
 {% load staticfiles %}
 {% load crispy_forms_tags %}
 
-{% if edid.comment_set.exists %}
+{% if comments %}
 <div id="comments-list">
-  {% include 'frontend/comment_detail.html' with comments=edid.comment_set.all parent=None %}
+  {% include 'frontend/comment_detail.html' %}
 </div>
 {% else %}
 <div>

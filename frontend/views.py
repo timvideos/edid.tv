@@ -138,6 +138,7 @@ class EDIDDetailView(PrefetchRelatedMixin, DetailView):
         """
         context = super(EDIDDetailView, self).get_context_data(**kwargs)
 
+        context['comments'] = self.object.get_comments()
         context['comment_form'] = CommentForm(initial={'edid': self.object})
 
         return context
@@ -552,7 +553,7 @@ class CommentCreate(LoginRequiredMixin, CreateView):
         edid_pk = self.kwargs.get('edid_pk', None)
 
         edid = get_object_or_404(EDID, pk=edid_pk)
-        context.update({'edid': edid})
+        context.update({'edid': edid, 'comments': edid.get_comments()})
 
         return context
 
