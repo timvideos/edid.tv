@@ -594,6 +594,18 @@ class CommentTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(comment.parent, None)
         self.assertEqual(comment.level, 0)
 
+    def test_empty_content(self):
+        # Post comment with no content
+        user = self._login()
+
+        data = self.valid_data
+        data['content'] = ''
+
+        response = self.client.post(self.post_url, data)
+
+        self.assertFormError(response, 'form', 'content',
+                             'This field is required.')
+
     def test_nesting(self):
         self._login()
 
@@ -619,22 +631,21 @@ class CommentTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(comment.parent.pk, 2)
         self.assertEqual(comment.level, 2)
 
-    # TODO: Fix form template
-    # def test_excessive_nesting(self):
-    #     # Create nested comments up to the limit
-    #     user = self._login()
-    #     comment_1 = Comment(EDID=self.edid, user=user, level=0,
-    #                         content='').save()
-    #     comment_2 = Comment(EDID=self.edid, user=user, level=1,
-    #                         parent=comment_1, content='').save()
-    #     comment_3 = Comment(EDID=self.edid, user=user, level=2,
-    #                         parent=comment_2, content='').save()
-    #
-    #     # Post comment with over-limit nesting
-    #     data = self.valid_data
-    #     data['parent'] = 3
-    #
-    #     response = self.client.post(self.post_url, data)
-    #
-    #     # self.assertFormError(response, 'form', 'parent',
-    #     #                      'Comment nesting limit exceeded.')
+    def test_excessive_nesting(self):
+        # Create nested comments up to the limit
+        user = self._login()
+        comment_1 = Comment(EDID=self.edid, user=user, level=0,
+                            content='').save()
+        comment_2 = Comment(EDID=self.edid, user=user, level=1,
+                            parent=comment_1, content='').save()
+        comment_3 = Comment(EDID=self.edid, user=user, level=2,
+                            parent=comment_2, content='').save()
+
+        # Post comment with over-limit nesting
+        data = self.valid_data
+        data['parent'] = 3
+
+        response = self.client.post(self.post_url, data)
+
+        self.assertFormError(response, 'form', 'parent',
+                             'Comment nesting limit exceeded.')
