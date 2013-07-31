@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 
-from frontend import views
+from frontend import feeds, views
 
 urlpatterns = patterns('',
     # Manufacturer
@@ -53,6 +53,10 @@ urlpatterns = patterns('',
     # Comment
     url(r'^edid/(?P<edid_pk>\d+)/comment/new/$',
         views.CommentCreate.as_view(), name='comment-create'),
+
+    # Feeds
+    url(r'^feed/uploaded/$', feeds.UploadedEDIDsFeed(), name='uploaded-feed'),
+    url(r'^feed/updated/$', feeds.UpdatedEDIDsFeed(), name='updated-feed'),
 
     # django-allauth
     (r'^accounts/', include('allauth.urls')),

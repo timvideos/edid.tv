@@ -1,0 +1,5 @@
+Video input: {{ obj.get_bdp_video_input_display }}<br>
+{% with timing=obj.get_maximum_resolution %}
+Maximum resolution: {{ timing.horizontal_active }}x{{ timing.vertical_active }}@{{ timing.refresh_rate }}Hz<br>
+{% endwith %}
+Monitor range limits: {{ obj.monitor_range_limits|yesno:'Supported,Not supported' }}
