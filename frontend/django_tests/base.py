@@ -9,6 +9,8 @@ from frontend.models import Manufacturer, EDID
 
 class EDIDTestMixin(object):
     def setUp(self):
+        super(EDIDTestMixin, self).setUp()
+
         Manufacturer.objects.bulk_create([
             Manufacturer(name_id='TSB', name='Toshiba'),
             Manufacturer(name_id='UNK', name='Unknown'),

@@ -15,4 +15,5 @@ pylint==0.28.0
 python-openid==2.2.5
 requests==1.2.3
 requests-oauthlib==0.3.2
+selenium==2.33.0
 wsgiref==0.1.2

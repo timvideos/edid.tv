@@ -9,7 +9,7 @@
     </div>
 
   {% if versions_list %}
-    <table class="table table-striped table-bordered">
+    <table class="table table-striped table-bordered" id="revision-list">
       <thead>
         <tr>
           <td></td>
@@ -24,8 +24,8 @@
       </thead>
       <tbody>
     {% for version in versions_list %}
-        <tr>
-          <td><a href="{% url 'edid-revision-detail' edid_pk version.revision.pk %}">{{ version.revision.pk }}</a></td>
+        <tr id="revision-{{ version.revision.pk }}">
+          <td><a class="revision-link" href="{% url 'edid-revision-detail' edid_pk version.revision.pk %}">{{ version.revision.pk }}</a></td>
           <td>{{ version.revision.date_created|date }}</td>
           <td>{% if version.revision.user %}{{ version.revision.user }}{% endif %}</td>
           <td>{{ version }}</td>
@@ -35,7 +35,7 @@
         {% if forloop.first %}
             <span class="label label-info">Current Revision</span>
         {% else %}
-            <a class="btn btn-danger" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a>
+            <a class="btn btn-danger revision-revert-link" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a>
         {% endif %}
           </td>
       {% endif %}
