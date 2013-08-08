@@ -32,10 +32,10 @@
           </button>
           <a class="brand" href="{% url 'index' %}">EDID Database</a>
           <div class="nav-collapse collapse">
+            {# TODO: Fix active item in list #}
             <ul class="nav">
               <li class="active"><a href="{% url 'index' %}">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><a href="{% url 'manufacturer-list' %}">Manufacturers</a></li>
             </ul>
             <ul class="nav pull-right">
               <li class="dropdown">
