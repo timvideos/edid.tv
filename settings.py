@@ -191,6 +191,7 @@ AUTHENTICATION_BACKENDS = (
 EXTEND_APPS = None
 try:
     from local_settings import *
-    INSTALLED_APPS += EXTEND_APPS
+    if EXTEND_APPS:
+        INSTALLED_APPS += EXTEND_APPS
 except ImportError:
     pass
