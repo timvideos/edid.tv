@@ -27,7 +27,7 @@
         <tr id="revision-{{ version.revision.pk }}">
           <td><a class="revision-link" href="{% url 'edid-revision-detail' edid_pk version.revision.pk %}">{{ version.revision.pk }}</a></td>
           <td>{{ version.revision.date_created|date }}</td>
-          <td>{% if version.revision.user %}{{ version.revision.user }}{% endif %}</td>
+          <td>{% if version.revision.user %}{{ version.revision.user.get_full_name }}{% endif %}</td>
           <td>{{ version }}</td>
           <td>{{ version.revision.comment }}</td>
       {% if user.is_staff %}

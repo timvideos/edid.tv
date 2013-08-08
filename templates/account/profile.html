@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}EDID Database{% endblock %}
-{% load account %}
 {% load socialaccount %}
 {% get_social_accounts user as accounts %}
 
@@ -8,16 +7,16 @@
 <div class="row">
   <div class="span12">
     <div class="page-header">
-      <h1>Welcome to your profile, {% user_display user %}!</h1>
+      <h1>Welcome to your profile, {{ user.get_full_name }}!</h1>
     </div>
 
-{% if accounts %}
+  {% if accounts %}
     <ul>
-  {% for account in accounts %}
+    {% for account in accounts %}
       <li>{{ account }}</li>
-  {% endfor %}
+    {% endfor %}
     </ul>
-{% endif %}
+  {% endif %}
   </div>
 </div>
 {% endblock %}

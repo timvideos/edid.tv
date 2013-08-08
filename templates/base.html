@@ -40,8 +40,7 @@
             <ul class="nav pull-right">
               <li class="dropdown">
 {% if user.is_authenticated %}
-  {% load account %}
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="account_menu">{% user_display user %} <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="account_menu">{{ user.get_full_name }} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   <li><a href="{% url 'account_email' %}"><i class="icon-envelope"></i> Change E-mail</a></li>
                   <li><a href="{% url 'account_change_password' %}"><i class="icon-lock"></i> Change Password</a></li>
