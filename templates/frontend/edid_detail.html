@@ -50,7 +50,7 @@
       {% if edid.bdp_display_gamma %}
           <tr>
             <td>Display gamma</td>
-            <td>{{ edid.bdp_display_gamma }}</td>
+            <td>{{ edid.bdp_display_gamma|floatformat:2 }}</td>
           </tr>
       {% endif %}
           <tr>
