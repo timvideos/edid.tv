@@ -88,16 +88,12 @@ class EDIDUpload(FormView):
 
     def form_valid(self, form):
         # Create EDID entry
-        edid_object = EDID()
-
-        edid_object.file_base64 = form.edid_base64
+        edid_object = EDID.create(file_base64=form.edid_base64,
+                                  edid_data=form.edid_data)
 
         # Set the user
         if self.request.user.is_authenticated():
             edid_object.user = self.request.user
-
-        # Add basic data
-        edid_object.populate_from_edid_parser(form.edid_data)
 
         # Save the entry
         edid_object.save()

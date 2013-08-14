@@ -33,9 +33,8 @@ class EDIDTestMixin(object):
         edid_base64 = base64.b64encode(edid_binary)
 
         # Create EDID entry
-        edid_object = EDID()
-        edid_object.file_base64 = edid_base64
-        edid_object.populate_from_edid_parser(edid_data)
+        edid_object = EDID.create(file_base64=edid_base64,
+                                  edid_data=edid_data)
         edid_object.save()
         edid_object.populate_timings_from_edid_parser(edid_data)
         edid_object.save()

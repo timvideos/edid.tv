@@ -232,7 +232,16 @@ class EDID(models.Model):
     mrl_secondary_GTF_J = models.PositiveSmallIntegerField(
         'J', blank=True, null=True)
 
-    def populate_from_edid_parser(self, edid):
+    @classmethod
+    def create(cls, file_base64, edid_data):
+        edid = cls(file_base64=file_base64)
+
+        # Add basic data
+        edid._populate_from_edid_parser(edid_data)
+
+        return edid
+
+    def _populate_from_edid_parser(self, edid):
         ### Header
         try:
             self.manufacturer = Manufacturer.objects.get(
