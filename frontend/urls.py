@@ -58,6 +58,9 @@ urlpatterns = patterns('',
     url(r'^feed/uploaded/$', feeds.UploadedEDIDsFeed(), name='uploaded-feed'),
     url(r'^feed/updated/$', feeds.UpdatedEDIDsFeed(), name='updated-feed'),
 
+    # API
+    url(r'^api/upload/$', views.APIUpload.as_view(), name='api-upload'),
+
     # django-allauth
     (r'^accounts/', include('allauth.urls')),
 

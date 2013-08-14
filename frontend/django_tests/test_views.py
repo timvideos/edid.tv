@@ -1,5 +1,6 @@
 from copy import copy
 from tempfile import TemporaryFile
+import json
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -560,7 +561,6 @@ class DetailedTimingReorderTestCase(TimingReorderMixin, EDIDTestMixin,
 
 
 ### Comment Tests
-
 class CommentTestCase(EDIDTestMixin, TestCase):
     def setUp(self):
         super(CommentTestCase, self).setUp()
@@ -649,3 +649,75 @@ class CommentTestCase(EDIDTestMixin, TestCase):
 
         self.assertFormError(response, 'form', 'parent',
                              'Comment nesting limit exceeded.')
+
+
+### API Upload Tests
+class APIUploadTestCase(TestCase):
+    def setUp(self):
+        Manufacturer.objects.bulk_create([
+            Manufacturer(name_id='TSB', name='Toshiba'),
+            Manufacturer(name_id='UNK', name='Unknown'),
+        ])
+
+        self.post_url = reverse('api-upload')
+        self.valid_base64_1 = 'AP///////wBSYgYCAQEBAf8TAQOAWTJ4CvCdo1VJmyYPR' \
+                              '0ohCACBgIvAAQEBAQEBAQEBAQEBAjqAGHE4LUBYLEUAdv' \
+                              'IxAAAeZiFQsFEAGzBAcDYAdvIxAAAeAAAA/ABUT1NISUJ' \
+                              'BLVRWCiAgAAAA/QAXPQ9EDwAKICAgICAgASQ='
+        self.valid_base64_2 = 'AP///////wAEcqGt3vdQgyMSAQMILx546t6Vo1RMmSYPU' \
+                              'FS/75CpQHFPgUCLwJUAlQ+QQAEBITmQMGIaJ0BosDYA2i' \
+                              'gRAAAZAAAA/QA4TR9UEQAKICAgICAgAAAA/wBMQTEwQzA' \
+                              '0MTQwMzAKAAAA/ABBTDIyMTZXCiAgICAgAFI='
+
+    def test_valid(self):
+        # Prepare data
+        data = json.dumps(
+            {'edid_list': [self.valid_base64_1, self.valid_base64_2]}
+        )
+
+        # Post list of EDIDs
+        response = self.client.post(
+            self.post_url, data, content_type='application/json'
+        )
+
+        # Check JSON output
+        self.assertJSONEqual(
+            response.content, json.dumps({'failed': 0, 'succeeded': 2})
+        )
+
+    def test_invalid(self):
+        # Sabotage base64 fields
+        self.valid_base64_1 = self.valid_base64_1[:54] + 'M' \
+                              + self.valid_base64_1[55:]
+        self.valid_base64_2 = self.valid_base64_2[:54] + 'M' \
+                              + self.valid_base64_2[55:]
+
+        # Prepare data
+        data = json.dumps(
+            {'edid_list': [self.valid_base64_1, self.valid_base64_2]}
+        )
+
+        # Post list of EDIDs
+        response = self.client.post(
+            self.post_url, data, content_type='application/json'
+        )
+
+        # Check JSON output
+        self.assertJSONEqual(
+            response.content, json.dumps({'failed': 2, 'succeeded': 0})
+        )
+
+    def test_no_list(self):
+        # Empty data
+        data = {}
+
+        # Post list of EDIDs
+        response = self.client.post(
+            self.post_url, data, content_type='application/json'
+        )
+
+        # Check JSON output
+        self.assertJSONEqual(
+            response.content,
+            json.dumps({'error_message': 'List of EDIDs is missing.'})
+        )

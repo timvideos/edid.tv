@@ -1,3 +1,6 @@
+import base64
+import json
+
 from django.db.models import Count
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
@@ -6,9 +9,12 @@ from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import (FormView, CreateView, UpdateView,
                                        DeleteView)
 
-from braces.views import (LoginRequiredMixin, PrefetchRelatedMixin,
+from braces.views import (CsrfExemptMixin, JSONResponseMixin,
+                          LoginRequiredMixin, PrefetchRelatedMixin,
                           StaffuserRequiredMixin)
 import reversion
+
+from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
 
 from frontend.models import (Manufacturer, EDID, StandardTiming,
                              DetailedTiming, Comment)
@@ -580,6 +586,65 @@ class CommentCreate(LoginRequiredMixin, CreateView):
             form.instance.level = 0
 
         return super(CommentCreate, self).form_valid(form)
+
+
+### API Upload
+# TODO: Use braces.JsonRequestResponseMixin when it's released
+class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
+    http_method_names = ['post']
+
+    def post(self, request, *args, **kwargs):
+        content = json.loads(request.body)
+
+        if not 'edid_list' in content:
+            return HttpResponseBadRequest(
+                json.dumps({'error_message': 'List of EDIDs is missing.'})
+            )
+
+        self.succeeded = 0
+        self.failed = 0
+
+        for edid_base64 in content['edid_list']:
+            self._process_edid(edid_base64)
+
+        return self.render_json_response({'succeeded': self.succeeded,
+                                          'failed': self.failed})
+
+    def _process_edid(self, edid_base64):
+        if EDID.objects.filter(file_base64=edid_base64).exists():
+            self.failed += 1
+        else:
+            edid_binary = base64.b64decode(edid_base64)
+
+            # Parse EDID file
+            try:
+                edid_data = EDID_Parser(edid_binary).data
+                self._create_edid(edid_base64, edid_data)
+                self.succeeded += 1
+            except EDIDParsingError:
+                self.failed += 1
+
+    def _create_edid(self, edid_base64, edid_data):
+        # Override RevisionMiddleware
+        # RevisionMiddleware creates a revision per request,
+        # we want a revision per EDID object created
+        with reversion.create_revision(manage_manually=True):
+            # Create EDID entry
+            edid_object = EDID.create(file_base64=edid_base64,
+                                      edid_data=edid_data)
+            # Save the entry
+            edid_object.save()
+
+            # Add timings
+            edid_object.populate_timings_from_edid_parser(edid_data)
+            # Save the updated entry
+            edid_object.save()
+
+            # Set revision comment
+            reversion.set_comment('EDID parsed.')
+            # Create revision for EDID
+            reversion.default_revision_manager.save_revision([edid_object])
+
 
 ### User Profile
 class ProfileView(TemplateView):
