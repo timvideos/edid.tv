@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/timsvideo/edid.tv.png?branch=master)](https://travis-ci.org/timsvideo/edid.tv)
+
 EDID.tv
 ===============
 

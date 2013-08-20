@@ -3,3 +3,4 @@
 *.pyc
 mysql.cnf
 local_settings.py
+!.travis.yml
