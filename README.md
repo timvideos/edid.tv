@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/timsvideo/edid.tv.png?branch=master)](https://travis-ci.org/timsvideo/edid.tv)
+[![Build Status](https://travis-ci.org/timvideos/edid.tv.png?branch=master)](https://travis-ci.org/timvideos/edid.tv)
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3546d4188a3ed02851bd28932c1abdf3 "githalytics.com")](http://githalytics.com/timvideos/edid.tv)
 
 EDID.tv
 ===============
