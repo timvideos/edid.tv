@@ -2,6 +2,9 @@ language: python
 python:
   - "2.7"
 # command to install dependencies
-install: make install
+install:
+  - make install
+  - make install-coveralls
 # command to run tests
 script: make clitest
+after_success: coveralls

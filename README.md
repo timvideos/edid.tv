@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/timvideos/edid.tv.png?branch=master)](https://travis-ci.org/timvideos/edid.tv)
+[![Build Status](https://travis-ci.org/timvideos/edid.tv.png)](https://travis-ci.org/timvideos/edid.tv)
+[![Coverage Status](https://coveralls.io/repos/timvideos/edid.tv/badge.png)](https://coveralls.io/r/timvideos/edid.tv)
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3546d4188a3ed02851bd28932c1abdf3 "githalytics.com")](http://githalytics.com/timvideos/edid.tv)
 
 EDID.tv
@@ -23,6 +24,10 @@ Installation Instructions
 
 Running Tests
 ---
+
+Tests are run automatically through [Travis CI](http://travis-ci.org), coverage report can be found at [Coveralls](https://coveralls.io).
+
+To run tests locally you will need to install coveralls first using `make install-coveralls`.
 
 * `make clitest` for unittests.
 * `make firefoxtest` for Firefox integration tests.

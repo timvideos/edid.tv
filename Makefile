@@ -45,6 +45,9 @@ install-packages: requirements.txt
 
 install: install-ez_setup install-distribute install-packages
 
+install-coveralls:
+	$(ACTIVATE) && pip install coveralls
+
 createinitialrevisions:
 	$(ACTIVATE) && python manage.py createinitialrevisions
 
@@ -58,7 +61,7 @@ prepare-serve:
 test: clitest firefoxtest
 
 clitest:
-	$(ACTIVATE) && python manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && coverage run --source=frontend python manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
 
 firefoxtest:
 	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
@@ -66,7 +69,7 @@ firefoxtest:
 #chrometest:
 #	$(ACTIVATE) && TEST_DRIVER="chrome" TEST_DISPLAY=1 python manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
 
-lint: install
+lint:
 	@# R0904 - Disable "Too many public methods" warning
 	@# W0221 - Disable "Arguments differ from parent", as get and post will.
 	@# E1103 - Disable "Instance of 'x' has no 'y' member (but some types could not be inferred)"
