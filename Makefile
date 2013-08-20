@@ -61,7 +61,7 @@ prepare-serve:
 test: clitest firefoxtest
 
 clitest:
-	$(ACTIVATE) && coverage run --source=frontend python manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
 
 firefoxtest:
 	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests

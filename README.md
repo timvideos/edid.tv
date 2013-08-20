@@ -25,7 +25,7 @@ Installation Instructions
 Running Tests
 ---
 
-Tests are run automatically through [Travis CI](http://travis-ci.org), coverage report can be found at [Coveralls](https://coveralls.io).
+Tests are run automatically through [Travis CI](https://travis-ci.org/timvideos/edid.tv), coverage report can be found at [Coveralls](https://coveralls.io/r/timvideos/edid.tv).
 
 To run tests locally you will need to install coveralls first using `make install-coveralls`.
 
