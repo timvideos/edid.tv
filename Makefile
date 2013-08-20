@@ -45,8 +45,8 @@ install-packages: requirements.txt
 
 install: install-ez_setup install-distribute install-packages
 
-install-coveralls:
-	$(ACTIVATE) && pip install coveralls
+install-coverage:
+	$(ACTIVATE) && pip install coverage
 
 createinitialrevisions:
 	$(ACTIVATE) && python manage.py createinitialrevisions

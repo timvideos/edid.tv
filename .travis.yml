@@ -4,7 +4,8 @@ python:
 # command to install dependencies
 install:
   - make install
-  - make install-coveralls
+  - make install-coverage
+  - pip install coveralls --use-mirrors
 # command to run tests
 script: make clitest
 after_success: coveralls
