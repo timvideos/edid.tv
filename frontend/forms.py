@@ -41,6 +41,56 @@ class EDIDUploadForm(forms.Form):
         return edid_file
 
 
+class EDIDTextUploadForm(forms.Form):
+    text = forms.CharField(widget=forms.Textarea)
+    text_type = forms.CharField(widget=forms.HiddenInput)
+
+    edid_list = []
+
+    def clean_text_type(self):
+        text_type = self.cleaned_data['text_type']
+
+        if text_type not in ['hex', 'xrandr']:
+            raise forms.ValidationError('Text type is invalid.')
+
+        return text_type
+
+    def clean(self):
+        cleaned_data = super(EDIDTextUploadForm, self).clean()
+
+        text = cleaned_data.get('text')
+        text_type = cleaned_data.get('text_type')
+
+        if not text or not text_type:
+            raise forms.ValidationError('Please fill the form.')
+
+        if text_type == 'hex':
+            raise forms.ValidationError('Not yet supported!')
+            # self.edid_list == []
+        elif text_type == 'xrandr':
+            inside_edid = False
+            edid_hex = ''
+
+            # Parse text line-by-line
+            for line in text.splitlines():
+                # If inside edid block
+                if inside_edid:
+                    if line.startswith(u'\t\t'):
+                        edid_hex += line[2:]
+                    # edid block ended
+                    else:
+                        inside_edid = False
+                        self.edid_list.append(edid_hex.decode('hex'))
+                # Look for edid block
+                elif line == u'\tEDID:':
+                    inside_edid = True
+
+        if self.edid_list == []:
+            raise forms.ValidationError('No EDID was parsed.')
+
+        return cleaned_data
+
+
 class BaseForm(forms.ModelForm):
     """Base class for forms, provides common functions."""
 

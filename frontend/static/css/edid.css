@@ -8,6 +8,14 @@ body {
 }
 
 
+#text_upload_form #id_text {
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 16px;
+    width: 100%;
+}
+
 /* Comments
 ------------------------- */
 

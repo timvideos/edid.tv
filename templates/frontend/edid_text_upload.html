@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Submit - EDID Database{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <div class="page-header">
+      <h1>Submit EDID</h1>
+    </div>
+
+  {% if valid %}
+    <div class="alert alert-success">
+      <h4>Thanks!</h4>
+      {{ succeeded }} EDIDs submitted successfully, {{ failed }} failed parsing and {{ duplicate }} were already submitted.
+    </div>
+
+    {% include 'frontend/edid_table.html' with hide_on_empty=True %}
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-error">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <strong>Error!</strong>
+    {% for error in form.non_field_errors %}
+      {{ error }}{% if not forloop.last %}<br>{% endif %}
+    {% endfor %}
+    </div>
+  {% endif %}
+
+    <form method="post" id="text_upload_form">{% csrf_token %}
+      <div class="row">
+        <div class="span9">
+          <div class="control-group{% if form.text.errors %} error{% endif %}">
+            <div class="controls">
+              <textarea id="id_text" name="text" cols="40" rows="10">{% if form.text.value %}{{ form.text.value }}{% endif %}</textarea>
+  {% for error in form.text.errors %}
+              <span class="help-block">{{ error|escape }}</span>
+  {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="span3">
+          <div class="control-group{% if form.text.errors %} error{% endif %}">
+            <div class="controls">
+              <label class="radio">
+                <input type="radio" id="id_text_type_hex" name="text_type" value="hex"{% ifequal form.text_type.value 'hex' %} checked{% endifequal %}> Hex
+              </label>
+              <p>Non-hex characters and hex addresses should not be included, spaces and newlines will be removed automatically.</p>
+
+              <label class="radio">
+                <input type="radio" id="id_text_type_xrandr" name="text_type" value="xrandr"{% ifequal form.text_type.value 'xrandr' %} checked{% endifequal %}> XRandR
+              </label>
+              <p>Linux users, run <code>xrandr --props</code> and paste its output.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" id="submit-id-submit" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

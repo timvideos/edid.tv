@@ -18,8 +18,9 @@ from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
 
 from frontend.models import (Manufacturer, EDID, StandardTiming,
                              DetailedTiming, Comment)
-from frontend.forms import (EDIDUpdateForm, EDIDUploadForm, CommentForm,
-                            StandardTimingForm, DetailedTimingForm)
+from frontend.forms import (EDIDTextUploadForm, EDIDUpdateForm, EDIDUploadForm,
+                            StandardTimingForm, DetailedTimingForm,
+                            CommentForm)
 
 
 ### Manufacturer
@@ -113,6 +114,67 @@ class EDIDUpload(FormView):
 
         return HttpResponseRedirect(reverse('edid-detail',
                                             kwargs={'pk': edid_object.pk}))
+
+
+class EDIDTextUpload(FormView):
+    form_class = EDIDTextUploadForm
+    template_name = 'frontend/edid_text_upload.html'
+
+    def form_valid(self, form):
+        self.succeeded = 0
+        self.failed = 0
+        self.duplicate = 0
+        self.edid_list = []
+
+        for edid_bytes in form.edid_list:
+            self._process_edid(edid_bytes)
+
+        return self.render_to_response(self.get_context_data(
+            form=form,
+            valid=True,
+            succeeded=self.succeeded,
+            failed=self.failed,
+            duplicate=self.duplicate,
+            edid_list=self.edid_list
+        ))
+
+    def _process_edid(self, edid_bytes):
+        # Encode in base64
+        edid_base64 = base64.b64encode(edid_bytes)
+
+        if EDID.objects.filter(file_base64=edid_base64).exists():
+            self.duplicate += 1
+        else:
+            # Parse EDID file and add it
+            try:
+                edid_data = EDID_Parser(edid_bytes).data
+                self._create_edid(edid_base64, edid_data)
+                self.succeeded += 1
+            except EDIDParsingError:
+                self.failed += 1
+
+    def _create_edid(self, edid_base64, edid_data):
+        # Override RevisionMiddleware
+        # RevisionMiddleware creates a revision per request,
+        # we want a revision per EDID object created
+        with reversion.create_revision(manage_manually=True):
+            # Create EDID entry
+            edid_object = EDID.create(file_base64=edid_base64,
+                                      edid_data=edid_data)
+            # Save the entry
+            edid_object.save()
+
+            # Add timings
+            edid_object.populate_timings_from_edid_parser(edid_data)
+            # Save the updated entry
+            edid_object.save()
+
+            # Set revision comment
+            reversion.set_comment('EDID parsed.')
+            # Create revision for EDID
+            reversion.default_revision_manager.save_revision([edid_object])
+
+            self.edid_list.append(edid_object)
 
 
 class EDIDDetailView(PrefetchRelatedMixin, DetailView):

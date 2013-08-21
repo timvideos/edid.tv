@@ -41,5 +41,7 @@
   </tbody>
 </table>
 {% else %}
-  <p>No EDID in the database.</p>
+  {% if not hide_on_empty %}
+  <p>No EDID found.</p>
+  {% endif %}
 {% endif %}
