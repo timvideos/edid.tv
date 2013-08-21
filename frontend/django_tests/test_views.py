@@ -160,10 +160,10 @@ LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 344mm x 
             {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
-        # # Check an EDID was parsed and added
-        # self.assertEqual(response.context_data['succeeded'], 1)
-        # self.assertEqual(response.context_data['failed'], 0)
-        # self.assertEqual(response.context_data['duplicate'], 0)
+        # Check an EDID was parsed and added
+        self.assertEqual(response.context_data['succeeded'], 1)
+        self.assertEqual(response.context_data['failed'], 0)
+        self.assertEqual(response.context_data['duplicate'], 0)
 
         # Check some of EDID values
         edid = EDID.objects.get(pk=1)
@@ -183,10 +183,10 @@ LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 344mm x 
             {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
-        # # Check an EDID was parsed and rejected for duplicate
-        # self.assertEqual(response.context_data['succeeded'], 0)
-        # self.assertEqual(response.context_data['failed'], 0)
-        # self.assertEqual(response.context_data['duplicate'], 1)
+        # Check an EDID was parsed and rejected for duplicate
+        self.assertEqual(response.context_data['succeeded'], 0)
+        self.assertEqual(response.context_data['failed'], 0)
+        self.assertEqual(response.context_data['duplicate'], 1)
 
         ## Failure test
         # Sabotage XRandR output, corrupting EDID header
@@ -198,10 +198,10 @@ LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 344mm x 
             {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
-        # # Check an EDID was parsed and rejected for duplicate
-        # self.assertEqual(response.context_data['succeeded'], 0)
-        # self.assertEqual(response.context_data['failed'], 1)
-        # self.assertEqual(response.context_data['duplicate'], 0)
+        # Check an EDID was parsed and rejected for duplicate
+        self.assertEqual(response.context_data['succeeded'], 0)
+        self.assertEqual(response.context_data['failed'], 1)
+        self.assertEqual(response.context_data['duplicate'], 0)
 
 
 class EDIDTestCase(EDIDTestMixin, TestCase):

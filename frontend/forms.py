@@ -16,9 +16,12 @@ from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
 
 class EDIDUploadForm(forms.Form):
     edid_file = forms.FileField(label='EDID File')
-    edid_binary = None
-    edid_data = None
-    edid_base64 = None
+
+    def __init__(self, *args, **kwargs):
+        super(EDIDUploadForm, self).__init__(*args, **kwargs)
+        self.edid_binary = None
+        self.edid_data = None
+        self.edid_base64 = None
 
     def clean_edid_file(self):
         edid_file = self.cleaned_data['edid_file']
@@ -45,7 +48,9 @@ class EDIDTextUploadForm(forms.Form):
     text = forms.CharField(widget=forms.Textarea)
     text_type = forms.CharField(widget=forms.HiddenInput)
 
-    edid_list = []
+    def __init__(self, *args, **kwargs):
+        super(EDIDTextUploadForm, self).__init__(*args, **kwargs)
+        self.edid_list = []
 
     def clean_text_type(self):
         text_type = self.cleaned_data['text_type']
