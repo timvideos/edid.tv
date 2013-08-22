@@ -12,7 +12,7 @@ install:
   - pip install coveralls --use-mirrors
 # command to run tests
 script:
-  - coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
-  - coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
+  - coverage run --source=frontend manage.py test --settings=test_settings frontend.django_tests
+  - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.selenium_tests
 after_success:
   - coveralls
