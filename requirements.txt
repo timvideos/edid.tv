@@ -1,6 +1,7 @@
 Django==1.5.1
 MySQL-python==1.2.4
 argparse==1.2.1
+coverage==3.6
 distribute==0.6.49
 django-allauth==0.12.0
 django-braces==1.0.0

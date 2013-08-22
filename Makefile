@@ -45,9 +45,6 @@ install-packages: requirements.txt
 
 install: install-ez_setup install-distribute install-packages
 
-install-coverage:
-	$(ACTIVATE) && pip install coverage
-
 createinitialrevisions:
 	$(ACTIVATE) && python manage.py createinitialrevisions
 
@@ -61,13 +58,19 @@ prepare-serve:
 test: clitest firefoxtest
 
 clitest:
-	$(ACTIVATE) && coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && python manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
 
 firefoxtest:
 	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
 
 #chrometest:
 #	$(ACTIVATE) && TEST_DRIVER="chrome" TEST_DISPLAY=1 python manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
+
+coverage:
+	$(ACTIVATE) && coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && TEST_DISPLAY=1 coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
+	$(ACTIVATE) && coverage html -d coverage_report
+	$(ACTIVATE) && coverage erase
 
 lint:
 	@# R0904 - Disable "Too many public methods" warning

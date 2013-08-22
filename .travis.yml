@@ -1,11 +1,18 @@
 language: python
 python:
   - "2.7"
+env:
+  - DISPLAY=":99"
 # command to install dependencies
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
 install:
-  - make install
-  - make install-coverage
+  - pip install -r requirements.txt --use-mirrors
   - pip install coveralls --use-mirrors
 # command to run tests
-script: make clitest
-after_success: coveralls
+script:
+  - coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
+  - coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
+after_success:
+  - coveralls
