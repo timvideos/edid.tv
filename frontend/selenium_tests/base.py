@@ -59,7 +59,7 @@ put in your base directory.
         # self.browser.implicitly_wait(30)
 
         self.browser.get("%s" % self.live_server_url)
-        self.assertIn('EDID Database', self.browser.title)
+        self.assertIn('EDID.tv', self.browser.title)
         self.main_window_handle = self.browser.window_handles[0]
 
     def _formatMessage(self, msg, standardMsg):

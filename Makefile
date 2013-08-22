@@ -64,11 +64,11 @@ firefoxtest:
 	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test --settings=test_settings frontend.selenium_tests
 
 #chrometest:
-#	$(ACTIVATE) && TEST_DRIVER="chrome" TEST_DISPLAY=1 python manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
+#	$(ACTIVATE) && TEST_DRIVER="chrome" TEST_DISPLAY=1 python manage.py test --settings=test_settings frontend.selenium_tests
 
 coverage:
-	$(ACTIVATE) && coverage run --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.django_tests
-	$(ACTIVATE) && TEST_DISPLAY=1 coverage run -a --source=frontend manage.py test --verbosity 2 --settings=test_settings frontend.selenium_tests
+	$(ACTIVATE) && coverage run --source=frontend manage.py test --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && TEST_DISPLAY=1 coverage run -a --source=frontend manage.py test --settings=test_settings frontend.selenium_tests
 	$(ACTIVATE) && coverage html -d coverage_report
 	$(ACTIVATE) && coverage erase
 

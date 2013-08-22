@@ -1,5 +1,5 @@
 """
-EDID Parser for timvideos's HDMI2USB's EDID database website!
+EDID Parser for timvideos's HDMI2USB's EDID.tv website!
 
 
 http://en.wikipedia.org/wiki/Extended_display_identification_data
