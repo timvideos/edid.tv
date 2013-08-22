@@ -25,12 +25,12 @@ Installation Instructions
 Running Tests
 ---
 
-Tests are run automatically through [Travis CI](https://travis-ci.org/timvideos/edid.tv), coverage report can be found at [Coveralls](https://coveralls.io/r/timvideos/edid.tv).
+Tests are run automatically through [Travis CI](https://travis-ci.org/timvideos/edid.tv) and coverage report can be found at [Coveralls](https://coveralls.io/r/timvideos/edid.tv).
 
-To run tests locally you will need to install coverage first using `make install-coverage`.
-
+* `make coverage` for running all tests and generate coverage report.
 * `make clitest` for unittests.
 * `make firefoxtest` for Firefox integration tests.
+
 
 Production Deployment
 ---
