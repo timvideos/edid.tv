@@ -1,4 +1,5 @@
 import base64
+import re
 
 from django import forms
 from django.core.urlresolvers import reverse
@@ -48,6 +49,10 @@ class EDIDTextUploadForm(forms.Form):
     text = forms.CharField(widget=forms.Textarea)
     text_type = forms.CharField(widget=forms.HiddenInput)
 
+    _hex_addresses = re.compile('0x[0-9A-Fa-f]+')
+    _whitespaces = re.compile('\s')
+    _non_hex = re.compile('[^0-9A-Fa-f]')
+
     def __init__(self, *args, **kwargs):
         super(EDIDTextUploadForm, self).__init__(*args, **kwargs)
         self.edid_list = []
@@ -70,8 +75,18 @@ class EDIDTextUploadForm(forms.Form):
             raise forms.ValidationError('Please fill the form.')
 
         if text_type == 'hex':
-            raise forms.ValidationError('Not yet supported!')
-            # self.edid_list == []
+            # Remove hex addresses, like 0x40
+            text = self._hex_addresses.sub('', text)
+
+            # Remove spaces, tabs and newlines
+            text = self._whitespaces.sub('', text)
+
+            # Check for non-hex digits
+            if bool(self._non_hex.search(text)):
+                raise forms.ValidationError('Please remove all non-hex digits.')
+
+            # Convert hex to binary and add it to EDIDs list
+            self.edid_list.append(text.decode('hex'))
         elif text_type == 'xrandr':
             inside_edid = False
             edid_hex = ''
@@ -85,6 +100,7 @@ class EDIDTextUploadForm(forms.Form):
                     # edid block ended
                     else:
                         inside_edid = False
+                        # Convert hex to binary and add it to EDIDs list
                         self.edid_list.append(edid_hex.decode('hex'))
                 # Look for edid block
                 elif line == u'\tEDID:':

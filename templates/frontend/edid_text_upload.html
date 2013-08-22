@@ -46,7 +46,7 @@
               <label class="radio">
                 <input type="radio" id="id_text_type_hex" name="text_type" value="hex"{% ifequal form.text_type.value 'hex' %} checked{% endifequal %}> Hex
               </label>
-              <p>Non-hex characters and hex addresses should not be included, spaces and newlines will be removed automatically.</p>
+              <p>Non-hex digits should not be included. Hex addresses (like <code>0x40</code>), spaces, tabs and newlines will be removed automatically.</p>
 
               <label class="radio">
                 <input type="radio" id="id_text_type_xrandr" name="text_type" value="xrandr"{% ifequal form.text_type.value 'xrandr' %} checked{% endifequal %}> XRandR

@@ -130,6 +130,68 @@ class EDIDTextUploadTestCase(TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
+    def test_hex(self):
+        hex_text = """
+0x00	 00 FF FF FF FF FF FF 00 4C A3 41 54 00 00 00 00
+0x10	 00 13 01 03 90 22 13 78 0A C8 95 9E 57 54 92 26
+0x20	 0F 50 54 00 00 00 01 01 01 01 01 01 01 01 01 01
+0x30	 01 01 01 01 01 01 7D 1E 56 18 51 00 16 30 30 20
+0x40	 25 00 58 C2 10 00 00 1A 7D 1E 56 16 51 00 16 30
+0x50	 30 20 25 00 58 C2 10 00 00 1A 00 00 00 FE 00 53
+0x60	 41 4D 53 55 4E 47 0A 20 20 20 20 20 00 00 00 FE
+0x70	 00 4C 54 4E 31 35 36 41 54 30 32 50 30 39 00 55
+"""
+
+        # Submit Hex
+        response = self.client.post(
+            reverse('edid-upload-text'),
+            {'text': hex_text, 'text_type': 'hex'}
+        )
+
+        # Check an EDID was parsed and added
+        self.assertEqual(response.context_data['succeeded'], 1)
+        self.assertEqual(response.context_data['failed'], 0)
+        self.assertEqual(response.context_data['duplicate'], 0)
+
+        # Check some of EDID values
+        edid = EDID.objects.get(pk=1)
+        self.assertEqual(
+            len([timing for timing in edid.get_est_timings()
+                 if timing['supported']]),
+            0
+        )
+        self.assertEqual(edid.manufacturer.name_id, 'SEC')
+        self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
+        self.assertEqual(edid.monitor_range_limits, False)
+
+        ## Duplicate test
+        # Submit Hex again
+        response = self.client.post(
+            reverse('edid-upload-text'),
+            {'text': hex_text, 'text_type': 'hex'}
+        )
+
+        # Check an EDID was parsed and rejected for duplicate
+        self.assertEqual(response.context_data['succeeded'], 0)
+        self.assertEqual(response.context_data['failed'], 0)
+        self.assertEqual(response.context_data['duplicate'], 1)
+
+        ## Failure test
+        # Sabotage Hex, corrupting EDID header
+        hex_text = hex_text[:19] + '00' + hex_text[21:]
+
+        # Submit Hex again
+        response = self.client.post(
+            reverse('edid-upload-text'),
+            {'text': hex_text, 'text_type': 'hex'}
+        )
+
+        # Check an EDID failed parsed
+        self.assertEqual(response.context_data['succeeded'], 0)
+        self.assertEqual(response.context_data['failed'], 1)
+        self.assertEqual(response.context_data['duplicate'], 0)
+
+
     def test_xrandr(self):
         xrandr_text = """
 Screen 0: minimum 320 x 200, current 3286 x 1080, maximum 8192 x 8192
@@ -198,7 +260,7 @@ LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 344mm x 
             {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
-        # Check an EDID was parsed and rejected for duplicate
+        # Check an EDID failed parsed
         self.assertEqual(response.context_data['succeeded'], 0)
         self.assertEqual(response.context_data['failed'], 1)
         self.assertEqual(response.context_data['duplicate'], 0)
