@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 from frontend.django_tests.base import EDIDTestMixin
-from frontend.forms import (EDIDUpdateForm, StandardTimingForm,
-                            DetailedTimingForm, CommentForm)
+from frontend.forms import (EDIDTextUploadForm, EDIDUpdateForm, CommentForm,
+                            StandardTimingForm, DetailedTimingForm)
 from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
 
 
@@ -45,7 +45,6 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
             'mrl_secondary_GTF_start_frequency', 'mrl_secondary_GTF_C',
             'mrl_secondary_GTF_M', 'mrl_secondary_GTF_K', 'mrl_secondary_GTF_J'
         ]
-
 
     def test_valid(self):
         # Test valid data
@@ -156,6 +155,43 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         form.save()
 
         self.assertEqual(self.edid.status, EDID.STATUS_EDITED)
+
+
+class EDIDTextUploadFormTestCase(FormTestMixin, TestCase):
+    def setUp(self):
+        super(EDIDTextUploadFormTestCase, self).setUp()
+
+        self.valid_data = {'text': 'Something', 'text_type': 'hex'}
+
+    def _get_form(self, data):
+        return EDIDTextUploadForm(data)
+
+    def test_text_empty(self):
+        # Test an invalid value
+        data = self.valid_data
+        data['text'] = ''
+        self._test_field_error(
+            data, 'text',
+            u'This field is required.'
+        )
+
+    def test_text_type_empty(self):
+        # Test an invalid value
+        data = self.valid_data
+        data['text_type'] = ''
+        self._test_field_error(
+            data, 'text_type',
+            u'This field is required.'
+        )
+
+    def test_text_type_invalid(self):
+        # Test an invalid value
+        data = self.valid_data
+        data['text_type'] = 'invalid'
+        self._test_field_error(
+            data, 'text_type',
+            u'Text type is invalid.'
+        )
 
 
 ### Timing Tests
