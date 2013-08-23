@@ -4,6 +4,7 @@ import os
 from time import sleep
 import warnings
 
+from django.db import transaction
 from django.test import LiveServerTestCase
 
 from selenium import webdriver
@@ -62,7 +63,7 @@ put in your base directory.
 
         self.browser_quitter = BrowserQuitter(self.browser)
 
-        self.browser.implicitly_wait(10)
+        self.browser.implicitly_wait(30)
 
         self.browser.get("%s" % self.live_server_url)
         self.assertIn('EDID.tv', self.browser.title)
@@ -108,12 +109,11 @@ class EDIDReadySeleniumTestCase(SeleniumTestCase):
     def setUp(self):
         super(EDIDReadySeleniumTestCase, self).setUp()
 
-        Manufacturer.objects.bulk_create([
-            Manufacturer(name_id='TSB', name='Toshiba'),
-            Manufacturer(name_id='UNK', name='Unknown'),
-        ])
-
-        sleep(10)
+        with transaction.commit_on_success():
+            Manufacturer.objects.bulk_create([
+                Manufacturer(name_id='TSB', name='Toshiba'),
+                Manufacturer(name_id='UNK', name='Unknown'),
+            ])
 
         edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01" \
                       "\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0" \

@@ -1,6 +1,8 @@
 from tempfile import NamedTemporaryFile
 from time import sleep
 
+from django.db import transaction
+
 from frontend.models import Manufacturer
 
 from base import SeleniumTestCase
@@ -10,12 +12,11 @@ class UploadSeleniumTestCase(SeleniumTestCase):
     def setUp(self):
         super(UploadSeleniumTestCase, self).setUp()
 
-        Manufacturer.objects.bulk_create([
-            Manufacturer(name_id='TSB', name='Toshiba'),
-            Manufacturer(name_id='UNK', name='Unknown'),
-        ])
-
-        sleep(10)
+        with transaction.commit_on_success():
+            Manufacturer.objects.bulk_create([
+                Manufacturer(name_id='TSB', name='Toshiba'),
+                Manufacturer(name_id='UNK', name='Unknown'),
+            ])
 
     def create_temp_file(self, edid_binary):
         edid_file = NamedTemporaryFile(delete=False)
