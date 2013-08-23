@@ -1,4 +1,5 @@
 from tempfile import NamedTemporaryFile
+from time import sleep
 
 from frontend.models import Manufacturer
 
@@ -13,6 +14,8 @@ class UploadSeleniumTestCase(SeleniumTestCase):
             Manufacturer(name_id='TSB', name='Toshiba'),
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
+
+        sleep(10)
 
     def create_temp_file(self, edid_binary):
         edid_file = NamedTemporaryFile(delete=False)

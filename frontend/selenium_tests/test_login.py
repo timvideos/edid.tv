@@ -1,11 +1,9 @@
 from django.contrib.auth import get_user_model
 
-from frontend.django_tests.base import EDIDTestMixin
-
-from base import SeleniumTestCase
+from base import EDIDReadySeleniumTestCase
 
 
-class LoginSeleniumTestCase(EDIDTestMixin, SeleniumTestCase):
+class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_invalid_login(self):
         """Test client-side actions on login/logout."""
 

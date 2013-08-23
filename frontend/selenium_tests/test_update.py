@@ -1,12 +1,10 @@
 from django.contrib.auth import get_user_model
 from selenium.common.exceptions import NoSuchElementException
 
-from frontend.django_tests.base import EDIDTestMixin
-
-from base import SeleniumTestCase
+from base import EDIDReadySeleniumTestCase
 
 
-class UpdateSeleniumTestCase(EDIDTestMixin, SeleniumTestCase):
+class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_valid(self):
         get_user_model().objects.create_superuser('tester', '', 'test')
         self.doLogin(username='tester', password='test')
