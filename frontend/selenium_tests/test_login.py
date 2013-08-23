@@ -30,3 +30,18 @@ class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
 
         self.assertEqual(self.browser.current_url,
                          "%s/accounts/profile/" % self.live_server_url)
+
+    def test_logout(self):
+        # Non-admin user login
+        get_user_model().objects.create_user('tester', '', 'test')
+        self.doLogin(username='tester', password='test')
+
+        self.assertEqual(self.browser.current_url,
+                         "%s/accounts/profile/" % self.live_server_url)
+
+        # Logout
+        self.doLogout()
+
+        # Check user is really logged out by looking for login link
+        self.browser.find_element_by_id('account_menu').click()
+        self.browser.find_element_by_id('login_link')

@@ -1,7 +1,6 @@
 import base64
 import cStringIO as StringIO
 import os
-from time import sleep
 import warnings
 
 from django.db import transaction
@@ -43,8 +42,8 @@ class SeleniumTestCase(LiveServerTestCase):
             firefox_bin = os.path.join(os.getcwd(), 'firefox', 'firefox')
             if os.path.exists(firefox_bin):
                 self.browser = webdriver.Firefox(
-                        firefox_profile=profile,
-                        firefox_binary=FirefoxBinary(firefox_bin)
+                    firefox_profile=profile,
+                    firefox_binary=FirefoxBinary(firefox_bin)
                 )
             else:
                 warnings.warn("Using your default firefox, this can be "
@@ -69,40 +68,26 @@ put in your base directory.
         self.assertIn('EDID.tv', self.browser.title)
         self.main_window_handle = self.browser.window_handles[0]
 
-    def _formatMessage(self, msg, standardMsg):
-        s = StringIO.StringIO()
-        s.write(LiveServerTestCase._formatMessage(self, msg, standardMsg))
-        s.write("\n")
-        s.write("\n")
-        s.write("failure url: %s\n" % self.browser.current_url)
-        s.write("failure page source\n")
-        s.write("-"*80)
-        s.write("\n")
-        s.write(self.browser.page_source.encode('utf-8'))
-        s.write("\n")
-        s.write("-"*80)
-        s.write("\n")
-        return s.getvalue()
-
     def tearDown(self):
         del self.browser_quitter
         super(SeleniumTestCase, self).tearDown()
 
     def doLogin(self, username='admin', password='admin'):
-        account_menu = self.browser.find_element_by_id('account_menu')
-        account_menu.click()
-
-        login_link = self.browser.find_element_by_id('login_link')
-        login_link.click()
+        self.browser.find_element_by_id('account_menu').click()
+        self.browser.find_element_by_id('login_link').click()
 
         self.browser.find_element_by_id('id_login').send_keys(username)
         self.browser.find_element_by_id('id_password').send_keys(password)
+
         self.browser.find_element_by_id('submit_login').click()
 
     def doLogout(self):
         self.browser.switch_to_window(self.main_window_handle)
-        logout_link = self.browser.find_element_by_id('logout_link')
-        logout_link.click()
+
+        self.browser.find_element_by_id('account_menu').click()
+        self.browser.find_element_by_id('logout_link').click()
+
+        self.browser.find_element_by_id('submit_logout').click()
 
 
 class EDIDReadySeleniumTestCase(SeleniumTestCase):

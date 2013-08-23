@@ -59,18 +59,15 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         comments = self.edid.get_comments()
 
         # Check comments are ordered
-        self.assertEqual(comments,
+        self.assertEqual(
+            comments,
             [
                 {'comment': comment_1,
                  'subcomments': [
-                                    {'comment': comment_2,
-                                     'subcomments': [
-                                                        {'comment': comment_4}
-                                                    ],
-                                    }
-                                ],
-                },
-                {'comment': comment_3},
+                     {'comment': comment_2,
+                      'subcomments': [{'comment': comment_4}]}
+                 ]},
+                {'comment': comment_3}
             ]
         )
 

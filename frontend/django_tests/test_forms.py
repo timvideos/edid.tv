@@ -18,6 +18,10 @@ class FormTestMixin(object):
         form = self._get_form(data)
         self.assertEqual(form.errors[field], [error_message])
 
+    def _test_non_field_error(self, data, error_message):
+        form = self._get_form(data)
+        self.assertEqual(form.errors, {'__all__': [error_message]})
+
     def _test_nulled_fields(self, data, fields):
         form = self._get_form(data)
         self.assertTrue(form.is_valid())
@@ -115,9 +119,9 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         # Test monitor_range_limits = False
         data = self.valid_data
         data['monitor_range_limits'] = False
-        self._test_nulled_fields(data, self.mrl_fields +
-                                       ['mrl_secondary_GTF_curve_supported'] +
-                                       self.mrl_secondary_GTF_fields
+        self._test_nulled_fields(
+            data, self.mrl_fields + ['mrl_secondary_GTF_curve_supported']
+            + self.mrl_secondary_GTF_fields
         )
 
     def test_required_field(self):
@@ -173,6 +177,22 @@ class EDIDTextUploadFormTestCase(FormTestMixin, TestCase):
         self._test_field_error(
             data, 'text',
             u'This field is required.'
+        )
+
+    def test_text_hex_invalid(self):
+        # Test non-Hex digits
+        self._test_non_field_error(
+            self.valid_data,
+            u'Please remove all non-hex digits.'
+        )
+
+    def test_text_xrandr_no_edid(self):
+        # Test XRandR with no EDIDs
+        data = self.valid_data
+        data['text_type'] = 'xrandr'
+        self._test_non_field_error(
+            self.valid_data,
+            u'No EDID was parsed.'
         )
 
     def test_text_type_empty(self):
@@ -292,7 +312,8 @@ class DetailedTimingFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
 
         # Test flags_sync_scheme = Digital_Composite
         data = self.valid_data
-        data['flags_sync_scheme'] = DetailedTiming.Sync_Scheme.Digital_Composite
+        data['flags_sync_scheme'] = DetailedTiming.Sync_Scheme \
+                                                  .Digital_Composite
         self._test_nulled_fields(
             data, ['flags_horizontal_polarity', 'flags_vertical_polarity',
                    'flags_sync_on_RGB']

@@ -83,7 +83,9 @@ class EDIDTextUploadForm(forms.Form):
 
             # Check for non-hex digits
             if bool(self._non_hex.search(text)):
-                raise forms.ValidationError('Please remove all non-hex digits.')
+                raise forms.ValidationError(
+                    'Please remove all non-hex digits.'
+                )
 
             # Convert hex to binary and add it to EDIDs list
             self.edid_list.append(text.decode('hex'))
@@ -394,19 +396,19 @@ class EDIDUpdateForm(BaseForm):
         bdp_video_input = cleaned_data.get('bdp_video_input')
         if not bdp_video_input:
             # Analog
-            cleaned_data = self._nullify_fields(cleaned_data,
-                               ['bdp_video_input_DFP_1'])
+            cleaned_data = self._nullify_fields(
+                cleaned_data, ['bdp_video_input_DFP_1'])
 
-            cleaned_data = self._check_required_field(cleaned_data,
-                               ['bdp_signal_level_standard'])
+            cleaned_data = self._check_required_field(
+                cleaned_data, ['bdp_signal_level_standard'])
         else:
             # Digital
-            cleaned_data = self._nullify_fields(cleaned_data,
-                               ['bdp_signal_level_standard',
-                                'bdp_blank_to_black_setup',
-                                'bdp_separate_syncs', 'bdp_composite_sync',
-                                'bdp_sync_on_green_video',
-                                'bdp_vsync_serration'])
+            cleaned_data = self._nullify_fields(
+                cleaned_data, ['bdp_signal_level_standard',
+                               'bdp_blank_to_black_setup',
+                               'bdp_separate_syncs', 'bdp_composite_sync',
+                               'bdp_sync_on_green_video',
+                               'bdp_vsync_serration'])
 
         ### Monitor Range Limits
         mrl_fields = ['mrl_min_horizontal_rate', 'mrl_max_horizontal_rate',
@@ -429,19 +431,19 @@ class EDIDUpdateForm(BaseForm):
             mrl_secondary_GTF_curve_supported = cleaned_data.get(
                 'mrl_secondary_GTF_curve_supported')
             if mrl_secondary_GTF_curve_supported:
-                cleaned_data = self._check_required_field(cleaned_data,
-                                   mrl_secondary_GTF_fields)
+                cleaned_data = self._check_required_field(
+                    cleaned_data, mrl_secondary_GTF_fields)
             # If Secondary GTF curve is disabled set all its fields to null
             else:
-                cleaned_data = self._nullify_fields(cleaned_data,
-                                   mrl_secondary_GTF_fields)
+                cleaned_data = self._nullify_fields(
+                    cleaned_data, mrl_secondary_GTF_fields)
         # If Monitor Range Limits is disabled set all its fields to null
         else:
             cleaned_data = self._nullify_fields(cleaned_data, mrl_fields)
-            cleaned_data = self._nullify_fields(cleaned_data,
-                               ['mrl_secondary_GTF_curve_supported'])
-            cleaned_data = self._nullify_fields(cleaned_data,
-                               mrl_secondary_GTF_fields)
+            cleaned_data = self._nullify_fields(
+                cleaned_data, ['mrl_secondary_GTF_curve_supported'])
+            cleaned_data = self._nullify_fields(
+                cleaned_data, mrl_secondary_GTF_fields)
 
         return cleaned_data
 

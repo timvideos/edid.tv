@@ -120,12 +120,15 @@ class EDIDTextUpload(FormView):
     form_class = EDIDTextUploadForm
     template_name = 'frontend/edid_text_upload.html'
 
-    def form_valid(self, form):
+    def __init__(self):
+        super(EDIDTextUpload, self).__init__()
+
         self.succeeded = 0
         self.failed = 0
         self.duplicate = 0
         self.edid_list = []
 
+    def form_valid(self, form):
         for edid_bytes in form.edid_list:
             self._process_edid(edid_bytes)
 
@@ -277,10 +280,10 @@ class EDIDRevisionDetail(DetailView):
         try:
             version = version.get()
         except version.model.DoesNotExist:
-            raise Http404('No revision were found.')
+            raise Http404()
 
         # Assign EDID instance to edid
-        edid =  version.object_version.object
+        edid = version.object_version.object
 
         # Flag EDID instance as revision
         edid.is_revision = True
@@ -342,11 +345,14 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
         try:
             version = version.get()
         except version.model.DoesNotExist:
-            raise Http404('No revision were found.')
+            raise Http404()
 
         # Check revision and EDID date
+        # FIXME: Works fine, but tests fail due to milliseconds difference
         if version.revision.date_created == version.object.modified:
-            raise Http404('You can not revert to the current revision.')
+            return HttpResponseBadRequest(
+                'You can not revert to the current revision.'
+            )
 
         self.kwargs['revision'] = version.revision
 

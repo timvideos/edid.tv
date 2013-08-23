@@ -2,7 +2,8 @@ from django.conf.urls import patterns, include, url
 
 from frontend import feeds, views
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     # Manufacturer
     url(r'^manufacturer/$', views.ManufacturerList.as_view(),
         name='manufacturer-list'),

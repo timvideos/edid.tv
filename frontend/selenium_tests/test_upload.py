@@ -1,5 +1,4 @@
 from tempfile import NamedTemporaryFile
-from time import sleep
 
 from django.db import transaction
 

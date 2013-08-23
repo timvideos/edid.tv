@@ -28,8 +28,8 @@ class EDIDPublicManager(models.Manager):
     """
 
     def get_query_set(self):
-        return super(EDIDPublicManager, self).get_query_set().\
-                                        exclude(status=EDID.STATUS_PRIVATE)
+        return super(EDIDPublicManager, self).get_query_set() \
+            .exclude(status=EDID.STATUS_PRIVATE)
 
 
 class EDID(models.Model):
@@ -416,7 +416,9 @@ class EDID(models.Model):
                 horizontal_active=data['Horizontal_Active'],
                 horizontal_blanking=data['Horizontal_Blanking'],
                 horizontal_sync_offset=data['Horizontal_Sync_Offset'],
-                horizontal_sync_pulse_width=data['Horizontal_Sync_Pulse_Width'],
+                horizontal_sync_pulse_width=data[
+                    'Horizontal_Sync_Pulse_Width'
+                ],
                 horizontal_image_size=data['Horizontal_Image_Size'],
                 horizontal_border=data['Horizontal_Border'],
                 vertical_active=data['Vertical_Active'],
@@ -594,7 +596,7 @@ class EDID(models.Model):
         """
 
         maximum_resolution_pixels = maximum_resolution['horizontal_active'] \
-                                    * maximum_resolution['vertical_active']
+            * maximum_resolution['vertical_active']
 
         if (horizontal_active * vertical_active) > maximum_resolution_pixels:
             maximum_resolution = {

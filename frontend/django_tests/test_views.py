@@ -13,7 +13,7 @@ from frontend.models import (EDID, Manufacturer, StandardTiming,
 
 
 ### EDID Tests
-class EDIDUploadTestCase(TestCase):
+class EDIDUploadTestCase(EDIDTestMixin, TestCase):
     def setUp(self):
         Manufacturer.objects.bulk_create([
             Manufacturer(name_id='TSB', name='Toshiba'),
@@ -61,6 +61,16 @@ class EDIDUploadTestCase(TestCase):
                              'This file have been uploaded before.')
 
         edid_file.close()
+
+    def test_valid_with_user(self):
+        # Login
+        user = self._login()
+        # Upload EDID
+        self.test_valid()
+        # Get EDID object
+        edid = EDID.objects.get(pk=1)
+        # Check EDID user is set correctly
+        self.assertEqual(edid.user, user)
 
     def test_invalid_size(self):
         edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x24"
@@ -191,11 +201,10 @@ class EDIDTextUploadTestCase(TestCase):
         self.assertEqual(response.context_data['failed'], 1)
         self.assertEqual(response.context_data['duplicate'], 0)
 
-
     def test_xrandr(self):
         xrandr_text = """
 Screen 0: minimum 320 x 200, current 3286 x 1080, maximum 8192 x 8192
-LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 344mm x 194mm
+LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis)
 	EDID:
 		00ffffffffffff004ca3415400000000
 		00130103902213780ac8959e57549226
@@ -252,7 +261,7 @@ LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 344mm x 
 
         ## Failure test
         # Sabotage XRandR output, corrupting EDID header
-        xrandr_text = xrandr_text[:177] + '00' + xrandr_text[179:]
+        xrandr_text = xrandr_text[:162] + '00' + xrandr_text[164:]
 
         # Submit XRandR output again
         response = self.client.post(
@@ -401,8 +410,8 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
                              .filter(EDID=1, identification=1) \
                              .values(*StandardTimingForm._meta.fields)[0]
 
-        response = self.client.post(reverse('standard-timing-create',
-            kwargs={'edid_pk': 1}), data
+        response = self.client.post(
+            reverse('standard-timing-create', kwargs={'edid_pk': 1}), data
         )
         self.assertRedirects(response, reverse('edid-update', kwargs={
             'pk': 1
@@ -422,8 +431,10 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
                              .values(*StandardTimingForm._meta.fields)[0]
         data['refresh_rate'] = 120
 
-        response = self.client.post(reverse('standard-timing-update',
-            kwargs={'edid_pk': 1, 'identification': 1}), data
+        response = self.client.post(
+            reverse('standard-timing-update',
+                    kwargs={'edid_pk': 1, 'identification': 1}),
+            data
         )
         self.assertRedirects(response, reverse('edid-update', kwargs={
             'pk': 1
@@ -482,8 +493,8 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
                              .filter(EDID=1, identification=1) \
                              .values(*StandardTimingForm._meta.fields)[0]
 
-        response = self.client.post(reverse('standard-timing-create',
-            kwargs={'edid_pk': 1}), data
+        response = self.client.post(
+            reverse('standard-timing-create', kwargs={'edid_pk': 1}), data
         )
         self.assertRedirects(response, reverse('edid-update', kwargs={
             'pk': 1
@@ -495,27 +506,30 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(EDID.objects.get(pk=1).standardtiming_set.count(), 3)
 
         # Revert with a normal user, will redirect to login page
-        response = self.client.delete(reverse('edid-revision-revert',
-            kwargs={'edid_pk': 1, 'revision_pk': 1}
-        ))
+        response = self.client.delete(
+            reverse('edid-revision-revert',
+                    kwargs={'edid_pk': 1, 'revision_pk': 1})
+        )
         self.assertNotEqual(response['Location'], reverse(
             'edid-detail', kwargs={'pk': 1}
         ))
 
         # Revert with no logged in user, will redirect to login page
         self.client.logout()
-        response = self.client.delete(reverse('edid-revision-revert',
-            kwargs={'edid_pk': 1, 'revision_pk': 1}
-        ))
+        response = self.client.delete(
+            reverse('edid-revision-revert',
+                    kwargs={'edid_pk': 1, 'revision_pk': 1})
+        )
         self.assertNotEqual(response['Location'], reverse(
             'edid-detail', kwargs={'pk': 1}
         ))
 
         # Revert with a super user, will revert and redirect to detail page
         self._login('supertester', 'test', True)
-        response = self.client.delete(reverse('edid-revision-revert',
-            kwargs={'edid_pk': 1, 'revision_pk': 1}
-        ))
+        response = self.client.delete(
+            reverse('edid-revision-revert',
+                    kwargs={'edid_pk': 1, 'revision_pk': 1})
+        )
         self.assertRedirects(response, reverse(
             'edid-detail', kwargs={'pk': 1}
         ))
@@ -524,6 +538,27 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
         self._check_versions_list(3)
         # Check there is 2 standard timing
         self.assertEqual(EDID.objects.get(pk=1).standardtiming_set.count(), 2)
+
+    def test_no_revision_found(self):
+        self._login('supertester', 'test', True)
+        response = self.client.delete(
+            reverse('edid-revision-revert',
+                    kwargs={'edid_pk': 1, 'revision_pk': 100})
+        )
+        self.assertEqual(response.status_code, 404)
+
+    # def test_no_revert_to_current_revision(self):
+    #     self._login('supertester', 'test', True)
+    #     response = self.client.delete(reverse('edid-revision-revert',
+    #         kwargs={'edid_pk': 1, 'revision_pk': 1}
+    #     ))
+    #
+    #     print(response)
+    #     self.assertEqual(response.status_code, 400)
+    #     self.assertEqual(
+    #         response.content,
+    #         'You can not revert to the current revision.'
+    #     )
 
 
 ### Timing Tests
@@ -538,8 +573,10 @@ class TimingTestMixin(object):
                                .values(*self.form._meta.fields)[0]
 
         # Create while not logged in, get redirected to login page
-        response = self.client.post(reverse('%s-create' % self.urlconf_prefix,
-            kwargs={'edid_pk': 1}), data
+        response = self.client.post(
+            reverse('%s-create' % self.urlconf_prefix,
+                    kwargs={'edid_pk': 1}),
+            data
         )
         self.assertEqual(response.status_code, 302)
 
@@ -548,8 +585,10 @@ class TimingTestMixin(object):
 
         # Create while logged in, get redirected to EDID update page
         self._login()
-        response = self.client.post(reverse('%s-create' % self.urlconf_prefix,
-            kwargs={'edid_pk': 1}), data
+        response = self.client.post(
+            reverse('%s-create' % self.urlconf_prefix,
+                    kwargs={'edid_pk': 1}),
+            data
         )
         self.assertRedirects(response, reverse('edid-update', kwargs={
             'pk': 1
@@ -562,8 +601,10 @@ class TimingTestMixin(object):
         data['horizontal_active'] = 1400
 
         # Update while not logged in, get redirected to login page
-        response = self.client.post(reverse('%s-update' % self.urlconf_prefix,
-            kwargs={'edid_pk': 1, 'identification': 1}), data
+        response = self.client.post(
+            reverse('%s-update' % self.urlconf_prefix,
+                    kwargs={'edid_pk': 1, 'identification': 1}),
+            data
         )
         self.assertEqual(response.status_code, 302)
 
@@ -575,8 +616,10 @@ class TimingTestMixin(object):
 
         # Update while logged in, get redirected to EDID update page
         self._login()
-        response = self.client.post(reverse('%s-update' % self.urlconf_prefix,
-            kwargs={'edid_pk': 1, 'identification': 1}), data
+        response = self.client.post(
+            reverse('%s-update' % self.urlconf_prefix,
+                    kwargs={'edid_pk': 1, 'identification': 1}),
+            data
         )
         self.assertRedirects(response, reverse('edid-update', kwargs={
             'pk': 1
@@ -689,6 +732,38 @@ class TimingReorderMixin(object):
 
         self.assertEqual(moved_timing.identification, 3)
         self.assertEqual(affected_timing.identification, 4)
+
+    def test_move_down_first(self):
+        self._login()
+
+        response = self.client.get(
+            reverse(
+                self.urlconf_name,
+                kwargs={'edid_pk': 1, 'identification': 1, 'direction': 'up'}
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.content,
+            'You can not move up a timing if it is the first one.'
+        )
+
+    def test_move_down_last(self):
+        self._login()
+
+        response = self.client.get(
+            reverse(
+                self.urlconf_name,
+                kwargs={'edid_pk': 1, 'identification': 4, 'direction': 'down'}
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.content,
+            'You can not move down a timing if it is the last one.'
+        )
 
 
 class StandardTimingReorderTestCase(TimingReorderMixin, EDIDTestMixin,
@@ -831,9 +906,9 @@ class APIUploadTestCase(TestCase):
     def test_invalid(self):
         # Sabotage base64 fields
         self.valid_base64_1 = self.valid_base64_1[:54] + 'M' \
-                              + self.valid_base64_1[55:]
+            + self.valid_base64_1[55:]
         self.valid_base64_2 = self.valid_base64_2[:54] + 'M' \
-                              + self.valid_base64_2[55:]
+            + self.valid_base64_2[55:]
 
         # Prepare data
         data = json.dumps(
@@ -863,4 +938,30 @@ class APIUploadTestCase(TestCase):
         self.assertJSONEqual(
             response.content,
             json.dumps({'error_message': 'List of EDIDs is missing.'})
+        )
+
+    def test_duplicate(self):
+        # Prepare data
+        data = json.dumps(
+            {'edid_list': [self.valid_base64_1, self.valid_base64_2]}
+        )
+
+        # Post list of EDIDs
+        response = self.client.post(
+            self.post_url, data, content_type='application/json'
+        )
+
+        # Check JSON output
+        self.assertJSONEqual(
+            response.content, json.dumps({'failed': 0, 'succeeded': 2})
+        )
+
+        # Post list of EDIDs again
+        response = self.client.post(
+            self.post_url, data, content_type='application/json'
+        )
+
+        # Check JSON output
+        self.assertJSONEqual(
+            response.content, json.dumps({'failed': 2, 'succeeded': 0})
         )
