@@ -1,7 +1,10 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from edid_parser.edid_parser import EDID_Parser
+
 from frontend.django_tests.base import EDIDTestMixin
-from frontend.models import EDID, Manufacturer, Comment
+from frontend.models import EDID, Manufacturer, StandardTiming, Comment
 
 
 ### EDID Tests
@@ -72,6 +75,201 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         )
 
 
+class EDIDParsingTestCase(TestCase):
+    def setUp(self):
+        Manufacturer.objects.bulk_create([
+            Manufacturer(name_id='TSB', name='Toshiba'),
+            Manufacturer(name_id='UNK', name='Unknown'),
+        ])
+
+        self.edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
+                           "\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78" \
+                           "\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21" \
+                           "\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01" \
+                           "\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38" \
+                           "\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E" \
+                           "\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00" \
+                           "\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54" \
+                           "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
+                           "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
+                           "\x20\x20\x20\x20\x20\x20\x01\x24"
+        self.edid_data = EDID_Parser(self.edid_binary).data
+
+    def _process_edid(self, edid_data):
+        edid_object = EDID.create(file_base64='', edid_data=edid_data)
+        # Save the entry
+        edid_object.save()
+        # Add timings
+        edid_object.populate_timings_from_edid_parser(edid_data)
+        # Save the updated entry
+        edid_object.save()
+
+        return edid_object
+
+    def test_valid_version_revision(self):
+        """
+        Test all supported EDID versions and revisions.
+        """
+
+        edid_data = self.edid_data
+
+        for version in [(1, 0, EDID.VERSION_1_0), (1, 1, EDID.VERSION_1_1),
+                        (1, 2, EDID.VERSION_1_2), (1, 3, EDID.VERSION_1_3),
+                        (1, 4, EDID.VERSION_1_4), (2, 0, EDID.VERSION_2_0)]:
+            edid_data['EDID_version'] = version[0]
+            edid_data['EDID_revision'] = version[1]
+
+            edid = self._process_edid(edid_data)
+
+            # Check for correct version
+            self.assertEqual(edid.version, version[2])
+
+    def test_invalid_version_revision(self):
+        """
+        Test unsupported EDID versions and revisions and check for exception.
+        """
+
+        edid_data = self.edid_data
+
+        for version in [(0, 1), (1, 5), (2, 1)]:
+            edid_data['EDID_version'] = version[0]
+            edid_data['EDID_revision'] = version[1]
+
+            with self.assertRaises(ValidationError) as cm:
+                self._process_edid(edid_data)
+
+            # Check for exception
+            self.assertEqual(cm.exception.messages[0],
+                             'Invalid EDID version and revision.')
+
+    def test_valid_bdp_signal_level_standard(self):
+        """
+        Test all supported signal level standard.
+        """
+
+        # Change video input to Analog
+        edid_data = self.edid_data
+        edid_data['Basic_display_parameters']['Video_Input'] = 0
+        edid_data['Basic_display_parameters']['Blank-to-black_setup'] = False
+        edid_data['Basic_display_parameters']['Separate_syncs'] = False
+        edid_data['Basic_display_parameters']['Composite_sync'] = False
+        edid_data['Basic_display_parameters']['Sync_on_green_video'] = False
+        edid_data['Basic_display_parameters']['Vsync_serration'] = False
+
+        for standard in [
+            ((0.700, 0.300), EDID.bdp_signal_level_standard_0700_0300),
+            ((0.714, 0.286), EDID.bdp_signal_level_standard_0714_0286),
+            ((1.000, 0.400), EDID.bdp_signal_level_standard_1000_0400),
+            ((0.700, 0.000), EDID.bdp_signal_level_standard_0700_0000)
+        ]:
+            edid_data['Basic_display_parameters']['Signal_Level_Standard'] = \
+                standard[0]
+
+            edid = self._process_edid(edid_data)
+
+            # Check for correct standard
+            self.assertEqual(edid.bdp_signal_level_standard, standard[1])
+
+    def test_invalid_bdp_signal_level_standard(self):
+        """
+        Test unsupported signal levels.
+        """
+
+        # Change video input to Analog
+        edid_data = self.edid_data
+        edid_data['Basic_display_parameters']['Video_Input'] = 0
+        edid_data['Basic_display_parameters']['Blank-to-black_setup'] = False
+        edid_data['Basic_display_parameters']['Separate_syncs'] = False
+        edid_data['Basic_display_parameters']['Composite_sync'] = False
+        edid_data['Basic_display_parameters']['Sync_on_green_video'] = False
+        edid_data['Basic_display_parameters']['Vsync_serration'] = False
+
+        for standard in [(0.000, 0.000), (0.300, 0.700), (2.000, 1.000)]:
+            edid_data['Basic_display_parameters']['Signal_Level_Standard'] = \
+                standard[0]
+
+            with self.assertRaises(ValidationError) as cm:
+                self._process_edid(edid_data)
+
+            # Check for exception
+            self.assertEqual(
+                cm.exception.messages[0],
+                'Invalid signal level standard can not be parsed.'
+            )
+
+    def test_valid_aspect_ratio(self):
+        """
+        Test all supported image aspect ratio.
+        """
+
+        edid_data = self.edid_data
+
+        for aspect_ratio in [((1, 1), StandardTiming.ASPECT_RATIO_1_1),
+                             ((16, 10), StandardTiming.ASPECT_RATIO_16_10),
+                             ((4, 3), StandardTiming.ASPECT_RATIO_4_3),
+                             ((5, 4), StandardTiming.ASPECT_RATIO_5_4),
+                             ((16, 9), StandardTiming.ASPECT_RATIO_16_9)]:
+            edid_data['Standard_Timings']['Identification_1'][
+                'Image_aspect_ratio'] = aspect_ratio[0]
+
+            edid = self._process_edid(edid_data)
+
+            # Check for correct version
+            timing = StandardTiming.objects.get(EDID=edid,
+                                                identification=1)
+            self.assertEqual(timing.aspect_ratio, aspect_ratio[1])
+
+    def test_invalid_aspect_ratio(self):
+        """
+        Test unsupported image aspect ratio and check for exception.
+        """
+
+        edid_data = self.edid_data
+
+        for aspect_ratio in [(3, 2), (5, 3), (4, 1)]:
+            edid_data['Standard_Timings']['Identification_1'][
+                'Image_aspect_ratio'] = aspect_ratio
+
+            with self.assertRaises(ValidationError) as cm:
+                self._process_edid(edid_data)
+
+            # Check for exception
+            self.assertEqual(cm.exception.messages[0],
+                             'Invalid aspect ratio can not be parsed.')
+
+    def test_mrl_secondary_GTF_curve(self):
+        """
+        Test monitor range limits secondary GTF curve.
+        """
+
+        edid_data = self.edid_data
+
+        # Store monitor range limits in shorter variable temporarily
+        mrl = edid_data['Descriptors']['Monitor_Range_Limits_Descriptor']
+
+        # Enable secondary GTF curve
+        mrl['Secondary_GTF_curve_supported'] = True
+        mrl['Secondary_GTF'] = {'start_frequency': 64,
+                                'C': 64,
+                                'M': 64,
+                                'K': 64,
+                                'J': 64}
+
+        # Inject monitor range limits to EDID data
+        edid_data['Descriptors']['Monitor_Range_Limits_Descriptor'] = mrl
+
+        edid = self._process_edid(edid_data)
+
+        # Check stored values
+        self.assertTrue(edid.monitor_range_limits)
+        self.assertTrue(edid.mrl_secondary_GTF_curve_supported)
+        self.assertEqual(edid.mrl_secondary_GTF_start_frequency, 64)
+        self.assertEqual(edid.mrl_secondary_GTF_C, 64)
+        self.assertEqual(edid.mrl_secondary_GTF_M, 64)
+        self.assertEqual(edid.mrl_secondary_GTF_K, 64)
+        self.assertEqual(edid.mrl_secondary_GTF_J, 64)
+
+
 ### Timing Tests
 class TimingTestMixin(object):
     def setUp(self):
@@ -121,3 +319,17 @@ class CommentTestCase(EDIDTestMixin, TestCase):
 
         with self.settings(EDID_COMMENT_MAX_THREAD_LEVEL=5):
             self.assertEqual(comment.get_max_thread_level(), 5)
+
+    def test_unicode(self):
+        """
+        Test Comment.__unicode__() method.
+        """
+
+        # Create Comment instance
+        user = self._login()
+        comment = Comment(EDID=self.edid, user=user, level=0, content='')
+        comment.save()
+
+        self.assertEqual(
+            unicode(comment), "%s: %s" % (comment.pk, comment.content[:100])
+        )

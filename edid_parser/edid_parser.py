@@ -515,15 +515,15 @@ class EDIDParsingError(Exception):
         self.value = value
 
     def __str__(self):
-        return repr(self.value)
+        return self.value
 
 
 if __name__ == "__main__":
     import sys
     import pprint
 
-    with open(sys.argv[1], 'rb') as file:
-        bin_data = file.read()
+    with open(sys.argv[1], 'rb') as edid_file:
+        bin_data = edid_file.read()
 
     my_edid = EDID_Parser(bin_data)
     print pprint.pprint(my_edid.data)

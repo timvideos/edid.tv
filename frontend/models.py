@@ -2,7 +2,7 @@ import re
 
 from django.conf import settings
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 
 from edid_parser.edid_parser import (Display_Type, Display_Stereo_Mode,
@@ -123,8 +123,8 @@ class EDID(models.Model):
         'signal level standard', choices=bdp_signal_level_standard_choices,
         blank=True, null=True)
 
-    bdp_blank_to_black_setup = models.NullBooleanField('blank-to-black'
-                                                       ' setup level')
+    bdp_blank_to_black_setup = models.NullBooleanField(
+        'blank-to-black setup level')
     bdp_separate_syncs = models.NullBooleanField('separate sync')
     bdp_composite_sync = models.NullBooleanField(
         'composite sync signal on horizontal')
@@ -271,8 +271,8 @@ class EDID(models.Model):
             if edid['EDID_revision'] == 0:
                 self.version = self.VERSION_2_0
 
-        if not self.version:
-            raise Exception('Invalid EDID version and revision.')
+        if self.version is None:
+            raise ValidationError('Invalid EDID version and revision.')
 
         ### ASCII Text Descriptors
         if 'Monitor_Name' in edid:
@@ -303,8 +303,9 @@ class EDID(models.Model):
                 self.bdp_signal_level_standard = \
                     self.bdp_signal_level_standard_0700_0000
             else:
-                raise Exception('Invalid signal level standard can not'
-                                ' be parsed.')
+                raise ValidationError(
+                    'Invalid signal level standard can not be parsed.'
+                )
 
             self.bdp_blank_to_black_setup = bdp['Blank-to-black_setup']
             self.bdp_separate_syncs = bdp['Separate_syncs']
@@ -376,7 +377,8 @@ class EDID(models.Model):
     def populate_timings_from_edid_parser(self, edid):
         for item in edid['Standard_Timings']:
             data = edid['Standard_Timings'][item]
-            id = re.search(r"^Identification_(\d+)$", item, re.IGNORECASE)
+            identification = re.search(r"^Identification_(\d+)$", item,
+                                       re.IGNORECASE)
 
             if data['Image_aspect_ratio'] == (1, 1):
                 aspect_ratio = StandardTiming.ASPECT_RATIO_1_1
@@ -389,10 +391,12 @@ class EDID(models.Model):
             elif data['Image_aspect_ratio'] == (16, 9):
                 aspect_ratio = StandardTiming.ASPECT_RATIO_16_9
             else:
-                raise Exception('Invalid aspect ratio can not be parsed.')
+                raise ValidationError(
+                    'Invalid aspect ratio can not be parsed.'
+                )
 
             timing = StandardTiming(
-                identification=id.group(1),
+                identification=identification.group(1),
                 user=self.user,
                 horizontal_active=data['Horizontal_active'],
                 vertical_active=data['Vertical_active'],
@@ -404,13 +408,14 @@ class EDID(models.Model):
 
         for item in edid['Descriptors']:
             data = edid['Descriptors'][item]
-            id = re.search(r"^Timing_Descriptor_(\d+)$", item, re.IGNORECASE)
-            if not id:
+            identification = re.search(r"^Timing_Descriptor_(\d+)$", item,
+                                       re.IGNORECASE)
+            if not identification:
                 # Not timing descriptor
                 break
 
             timing = DetailedTiming(
-                identification=id.group(1),
+                identification=identification.group(1),
                 user=self.user,
                 pixel_clock=data['Pixel_clock'],
                 horizontal_active=data['Horizontal_Active'],

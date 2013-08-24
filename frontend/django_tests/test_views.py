@@ -20,6 +20,18 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
+        self.edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
+                           "\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78" \
+                           "\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21" \
+                           "\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01" \
+                           "\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38" \
+                           "\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E" \
+                           "\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00" \
+                           "\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54" \
+                           "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
+                           "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
+                           "\x20\x20\x20\x20\x20\x20\x01\x24"
+
     def create_temp_file(self, edid_binary):
         edid_file = TemporaryFile()
         edid_file.write(edid_binary)
@@ -29,17 +41,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         return edid_file
 
     def test_valid(self):
-        edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01" \
-                      "\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0" \
-                      "\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21\x08\x00\x81" \
-                      "\x80\x8B\xC0\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01" \
-                      "\x01\x01\x02\x3A\x80\x18\x71\x38\x2D\x40\x58\x2C\x45" \
-                      "\x00\x76\xF2\x31\x00\x00\x1E\x66\x21\x50\xB0\x51\x00" \
-                      "\x1B\x30\x40\x70\x36\x00\x76\xF2\x31\x00\x00\x1E\x00" \
-                      "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
-                      "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
-                      "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
-        edid_file = self.create_temp_file(edid_binary)
+        edid_file = self.create_temp_file(self.edid_binary)
 
         # Upload the file and check for redirection to EDID detail view
         response = self.client.post(reverse('edid-upload'), {
@@ -73,62 +75,59 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(edid.user, user)
 
     def test_invalid_size(self):
+        # Make truncated EDID file
         edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x24"
+
+        # Save EDID to temporary file
         edid_file = self.create_temp_file(edid_binary)
 
+        # Upload EDID file
         response = self.client.post(reverse('edid-upload'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
 
+        # Check for error message
         self.assertFormError(response, 'form', 'edid_file',
-                             "'Binary file is smaller than 128 bytes.'")
+                             'Binary file is smaller than 128 bytes.')
 
         edid_file.close()
 
     def test_invalid_header(self):
-        edid_binary = "\x00\xFF\xFF\x00\x00\xFF\xFF\x00\x52\x62\x06\x02\x01" \
-                      "\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0" \
-                      "\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21\x08\x00\x81" \
-                      "\x80\x8B\xC0\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01" \
-                      "\x01\x01\x02\x3A\x80\x18\x71\x38\x2D\x40\x58\x2C\x45" \
-                      "\x00\x76\xF2\x31\x00\x00\x1E\x66\x21\x50\xB0\x51\x00" \
-                      "\x1B\x30\x40\x70\x36\x00\x76\xF2\x31\x00\x00\x1E\x00" \
-                      "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
-                      "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
-                      "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
+        # Sabotage EDID header
+        edid_binary = self.edid_binary[:3] + '\x00\x00' + self.edid_binary[5:]
+
+        # Save EDID to temporary file
         edid_file = self.create_temp_file(edid_binary)
 
+        # Upload EDID file
         response = self.client.post(reverse('edid-upload'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
 
+        # Check for error message
         self.assertFormError(response, 'form', 'edid_file',
-                             "'Input is not an EDID file.'")
+                             'Input is not an EDID file.')
 
         edid_file.close()
 
     def test_invalid_checksum(self):
-        edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01" \
-                      "\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0" \
-                      "\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21\x08\x00\x81" \
-                      "\x80\x8B\xC0\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01" \
-                      "\x01\x01\x02\x3A\x80\x18\x71\x38\x2D\x40\x58\x2C\x45" \
-                      "\x00\x76\xF2\x31\x00\x00\x1E\x66\x21\x50\xB0\x51\x00" \
-                      "\x1B\x30\x40\x70\x36\x00\x76\xF2\x31\x00\x00\x1E\x00" \
-                      "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
-                      "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
-                      "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\xFF"
+        # Sabotage EDID checksum
+        edid_binary = self.edid_binary[:127] + '\xFF'
+
+        # Save EDID to temporary file
         edid_file = self.create_temp_file(edid_binary)
 
+        # Upload EDID file
         response = self.client.post(reverse('edid-upload'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
 
+        # Check for error message
         self.assertFormError(response, 'form', 'edid_file',
-                             "'Checksum is corrupt.'")
+                             'Checksum is corrupt.')
 
         edid_file.close()
 
