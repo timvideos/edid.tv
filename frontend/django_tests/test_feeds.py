@@ -7,6 +7,7 @@ from django.test import TestCase
 from edid_parser.edid_parser import EDID_Parser
 
 from frontend.django_tests.base import EDIDTestMixin
+from frontend.feeds import UploadedEDIDsFeed, UpdatedEDIDsFeed
 from frontend.models import EDID
 
 
@@ -44,25 +45,12 @@ class FeedTestMixin(object):
         self.edid.est_timings_720_400_70 = True
         self.edid.save()
 
-    def test_items(self):
+    def test_feed(self):
         response = self.client.get(self.feed_url())
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'],
                          'application/rss+xml; charset=utf-8')
-
-        rss_elem = ET.fromstring(response.content)
-
-        self.assertEqual(rss_elem.tag, "rss")
-        self.assertEqual(rss_elem.attrib, {"version": "2.0"})
-
-        channel_elem = rss_elem.find("channel")
-
-        title_elem = channel_elem.find("title")
-        self.assertEqual(title_elem.text, "EDID.tv")
-
-        items = rss_elem.findall("./channel/item")
-
-        return items, channel_elem
 
 
 class UploadedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
@@ -70,19 +58,20 @@ class UploadedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
         return reverse('uploaded-feed')
 
     def test_items(self):
-        items, channel_elem = super(UploadedEDIDsFeedTestCase, self) \
-            .test_items()
+        # Get feed and check its URL
+        feed = UploadedEDIDsFeed()
+        self.assertEqual(feed.feed_url(), self.feed_url())
 
-        # EDID 1 is listed second
-        self.assertEqual(
-            items[1].find("link").text,
-            "%sedid/%d/" % (channel_elem.find("link").text, self.edid.pk)
-        )
-        # EDID 2 is listed first
-        self.assertEqual(
-            items[0].find("link").text,
-            "%sedid/%d/" % (channel_elem.find("link").text, self.edid_2.pk)
-        )
+        # Get item and check their count
+        items = feed.items()
+        self.assertEqual(len(items), 2)
+
+        # Check EDID 1 is listed second
+        self.assertEqual(feed.item_link(items[1]),
+                         self.edid.get_absolute_url())
+        # Check EDID 2 is listed first
+        self.assertEqual(feed.item_link(items[0]),
+                         self.edid_2.get_absolute_url())
 
 
 class UpdatedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
@@ -90,16 +79,17 @@ class UpdatedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
         return reverse('updated-feed')
 
     def test_items(self):
-        items, channel_elem = super(UpdatedEDIDsFeedTestCase, self) \
-            .test_items()
+        # Get feed and check its URL
+        feed = UpdatedEDIDsFeed()
+        self.assertEqual(feed.feed_url(), self.feed_url())
 
-        # Updated EDID 1 is listed first
-        self.assertEqual(
-            items[0].find("link").text,
-            "%sedid/%d/" % (channel_elem.find("link").text, self.edid.pk)
-        )
-        # EDID 2 is listed second
-        self.assertEqual(
-            items[1].find("link").text,
-            "%sedid/%d/" % (channel_elem.find("link").text, self.edid_2.pk)
-        )
+        # Get item and check their count
+        items = feed.items()
+        self.assertEqual(len(items), 2)
+
+        # Check Updated EDID 1 is listed first
+        self.assertEqual(feed.item_link(items[0]),
+                         self.edid.get_absolute_url())
+        # Check EDID 2 is listed second
+        self.assertEqual(feed.item_link(items[1]),
+                         self.edid_2.get_absolute_url())
