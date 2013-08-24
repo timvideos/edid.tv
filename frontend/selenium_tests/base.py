@@ -1,5 +1,4 @@
 import base64
-import cStringIO as StringIO
 import os
 import warnings
 
@@ -33,38 +32,26 @@ class SeleniumTestCase(LiveServerTestCase):
     def setUp(self):
         super(SeleniumTestCase, self).setUp()
 
-        browser = os.environ.get("TEST_DRIVER", "firefox")
-        if browser == "firefox":
-            profile = webdriver.FirefoxProfile()
-            profile.set_preference('plugins.hide_infobar_for_missing_plugin',
-                                   True)
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('plugins.hide_infobar_for_missing_plugin', True)
 
-            firefox_bin = os.path.join(os.getcwd(), 'firefox', 'firefox')
-            if os.path.exists(firefox_bin):
-                self.browser = webdriver.Firefox(
-                    firefox_profile=profile,
-                    firefox_binary=FirefoxBinary(firefox_bin)
-                )
-            else:
-                warnings.warn("Using your default firefox, this can be "
-                              "unreliable")
-                self.browser = webdriver.Firefox(firefox_profile=profile)
-        elif browser == "chrome":
-            chromedriver_bin = os.path.join(os.getcwd(), 'chromedriver')
-            if not os.path.exists(chromedriver_bin):
-                raise SystemError("""\
-Unable to find chromedriver binary.
-
-Please download from http://code.google.com/p/chromedriver/downloads/list and
-put in your base directory.
-""")
-            self.browser = webdriver.Chrome(executable_path=chromedriver_bin)
+        firefox_bin = os.path.join(os.getcwd(), 'firefox', 'firefox')
+        if os.path.exists(firefox_bin):
+            self.browser = webdriver.Firefox(
+                firefox_profile=profile,
+                firefox_binary=FirefoxBinary(firefox_bin)
+            )
+        else:
+            warnings.warn(
+                "Using your default Firefox, this can be unreliable."
+            )
+            self.browser = webdriver.Firefox(firefox_profile=profile)
 
         self.browser_quitter = BrowserQuitter(self.browser)
 
         self.browser.implicitly_wait(30)
 
-        self.browser.get("%s" % self.live_server_url)
+        self.browser.get(self.live_server_url)
         self.assertIn('EDID.tv', self.browser.title)
         self.main_window_handle = self.browser.window_handles[0]
 
