@@ -27,9 +27,11 @@ Running Tests
 
 Tests are run automatically through [Travis CI](https://travis-ci.org/timvideos/edid.tv) and coverage report can be found at [Coveralls](https://coveralls.io/r/timvideos/edid.tv).
 
-* `make coverage` for running all tests and generate coverage report.
-* `make clitest` for unittests.
-* `make firefoxtest` for Firefox integration tests.
+To run tests manually use the following commands:
+* `make coverage` to run all tests and generate coverage report.
+* `make clitest` to run unittests.
+* `make firefoxtest` to run Selenium integration tests with Firefox.
+* `make pep8` to run [PEP 8](http://www.python.org/dev/peps/pep-0008/) checker.
 
 
 Production Deployment

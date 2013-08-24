@@ -69,6 +69,10 @@ coverage:
 	$(ACTIVATE) && coverage html -d coverage_report
 	$(ACTIVATE) && coverage erase
 
+pep8:
+	-$(ACTIVATE) && pep8 --statistics *.py
+	-$(ACTIVATE) && pep8 --statistics frontend/
+
 lint:
 	@# R0904 - Disable "Too many public methods" warning
 	@# W0221 - Disable "Arguments differ from parent", as get and post will.
