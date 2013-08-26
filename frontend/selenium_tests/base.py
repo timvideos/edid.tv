@@ -103,11 +103,12 @@ class EDIDReadySeleniumTestCase(SeleniumTestCase):
         # Encode in base64
         edid_base64 = base64.b64encode(edid_binary)
 
-        # Create EDID entry
-        edid_object = EDID.create(file_base64=edid_base64,
-                                  edid_data=edid_data)
-        edid_object.save()
-        edid_object.populate_timings_from_edid_parser(edid_data)
-        edid_object.save()
+        with transaction.commit_on_success():
+            # Create EDID entry
+            edid_object = EDID.create(file_base64=edid_base64,
+                                      edid_data=edid_data)
+            edid_object.save()
+            edid_object.populate_timings_from_edid_parser(edid_data)
+            edid_object.save()
 
         self.edid = edid_object

@@ -35,7 +35,7 @@
         {% if forloop.first %}
             <span class="label label-info">Current Revision</span>
         {% else %}
-            <a class="btn btn-danger revision-revert-link" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a>
+            <a class="btn btn-danger" id="revision-{{ version.revision.pk }}-revert-link" href="{% url 'edid-revision-revert' edid_pk version.revision.pk %}">Revert</a>
         {% endif %}
           </td>
       {% endif %}

@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+
 from selenium.common.exceptions import NoSuchElementException
 
 from base import EDIDReadySeleniumTestCase
@@ -8,7 +9,6 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_valid(self):
         get_user_model().objects.create_superuser('tester', '', 'test')
         self.doLogin(username='tester', password='test')
-
         self.assertEqual(self.browser.current_url,
                          "%s/accounts/profile/" % self.live_server_url)
 
@@ -41,23 +41,15 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         # Check 'Monitor Range Limits' is disabled
         self.assertRaises(
             NoSuchElementException,
-            self.browser.find_element_by_xpath,
-            "//ul[contains(@class, 'sidenav')]/li"
-            "/a[@href='#monitor_range_limits']"
+            self.browser.find_element_by_id,
+            'monitor_range_limits'
         )
 
         # Go to EDID revisions page
         self.browser.get(edid_revision_url)
 
-        # self.browser.find_element_by_xpath(
-        #     "//tr[@id='revision-68']/td/a[contains(@class, 'revision-link')]"
-        # ).click()
-
         # Revert revision 1
-        self.browser.find_element_by_xpath(
-            "//tr[@id='revision-1']/td"
-            "/a[contains(@class, 'revision-revert-link')]"
-        ).click()
+        self.browser.find_element_by_id('revision-1-revert-link').click()
 
         # Confirm revert action
         self.browser.find_element_by_id('revert-id-revert').click()
@@ -66,7 +58,4 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         self.assertEqual(self.browser.current_url, edid_detail_url)
 
         # Check 'Monitor Range Limits' is enabled
-        self.browser.find_element_by_xpath(
-            "//ul[contains(@class, 'sidenav')]/li"
-            "/a[@href='#monitor_range_limits']"
-        )
+        self.browser.find_element_by_id('monitor_range_limits')
