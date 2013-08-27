@@ -79,13 +79,10 @@ class SeleniumTestCase(LiveServerTestCase):
 
 class EDIDReadySeleniumTestCase(SeleniumTestCase):
     def setUp(self):
-        super(EDIDReadySeleniumTestCase, self).setUp()
-
-        with transaction.commit_on_success():
-            Manufacturer.objects.bulk_create([
-                Manufacturer(name_id='TSB', name='Toshiba'),
-                Manufacturer(name_id='UNK', name='Unknown'),
-            ])
+        Manufacturer.objects.bulk_create([
+            Manufacturer(name_id='TSB', name='Toshiba'),
+            Manufacturer(name_id='UNK', name='Unknown'),
+        ])
 
         edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01" \
                       "\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0" \
@@ -103,12 +100,12 @@ class EDIDReadySeleniumTestCase(SeleniumTestCase):
         # Encode in base64
         edid_base64 = base64.b64encode(edid_binary)
 
-        with transaction.commit_on_success():
-            # Create EDID entry
-            edid_object = EDID.create(file_base64=edid_base64,
-                                      edid_data=edid_data)
-            edid_object.save()
-            edid_object.populate_timings_from_edid_parser(edid_data)
-            edid_object.save()
+        # Create EDID entry
+        edid_object = EDID.create(file_base64=edid_base64, edid_data=edid_data)
+        edid_object.save()
+        edid_object.populate_timings_from_edid_parser(edid_data)
+        edid_object.save()
 
         self.edid = edid_object
+
+        super(EDIDReadySeleniumTestCase, self).setUp()
