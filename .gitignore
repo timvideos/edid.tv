@@ -4,3 +4,5 @@
 mysql.cnf
 local_settings.py
 !.travis.yml
+private/
+!private/__init__.py

@@ -188,10 +188,10 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-#Import local_settings (if any) to override above settings
+#Import private settings (if any) to override above settings
 EXTEND_APPS = None
 try:
-    from local_settings import *
+    from private.settings import *
     if EXTEND_APPS:
         INSTALLED_APPS += EXTEND_APPS
 except ImportError:

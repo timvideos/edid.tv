@@ -18,9 +18,33 @@ Installation Instructions
 ---
 
 1. Clone this repository.
-2. `make install`
-3. `make serve`
+2. Create `private/requirements.txt` if needed, you can use it to install additional packages, like database interfaces.
+3. Create `private/settings.py`, see `Settings` section below for details, most of the settings are needed only for production deployment only (DEBUG=False).
+4. `make install`
+5. `make serve`
   * You may need to import `frontend/sql/manufacturer.sql` manually if it failed.
+
+Settings
+---
+
+In your `private/settings.py` make sure to set these settings:
+
+* `DEBUG` and `TEMPLATE_DEBUG` to `False`.
+* `ADMINS` and `MANAGERS` for receiving emails for errors.
+* `ALLOWED_HOSTS` to to a list of served domains, like `['.edid.co', '.edid.tv']`.
+* `DATABASES` to your production database settings.
+* For static files:
+
+        import os
+        SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+        STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
+        STATIC_URL = '/'
+
+* To support additional social sites for accounts:
+
+        EXTEND_APPS = (
+            'allauth.socialaccount.providers.google',
+        )
 
 Running Tests
 ---
@@ -41,25 +65,7 @@ Currently deploying using [nginx](http://nginx.org) and [uwsgi](https://github.c
 
 nginx and uwsgi configuration files: https://gist.github.com/sewar/6182820
 
-In your `local_settings.py` make sure to set these settings:
-
-* `DEBUG` and `TEMPLATE_DEBUG` to `False`.
-* `ADMINS` and `MANAGERS` for receiving emails for errors.
-* `ALLOWED_HOSTS` to to a list of served domains, like `['.edid.co', '.edid.tv']`.
-* `DATABASES` to your production database settings.
-* For static files:
-
-        import os
-        SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
-        STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-        STATIC_URL = '/'
-
-* To support additional social sites for accounts:
-
-        EXTEND_APPS = (
-            'allauth.socialaccount.providers.google',
-        )
-
+Make sure to follow `Installation Instructions` above.
 
 When deploying new version:
 
