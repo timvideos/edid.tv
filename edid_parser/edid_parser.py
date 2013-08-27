@@ -99,13 +99,13 @@ class EDID_Parser(object):
         # ID Manufacturer Name: edid[8:10]
         if edid[0] >> 7 == 0:
             first = (edid[0] & 0b01111100) >> 2
-            second = ((edid[0] & 0b00000011) << 3) +\
+            second = ((edid[0] & 0b00000011) << 3) + \
                      ((edid[1] & 0b11100000) >> 5)
             third = edid[1] & 0b00011111
 
             self.data['ID_Manufacturer_Name'] = (chr(first + 64) +
-                                                chr(second + 64) +
-                                                chr(third + 64))
+                                                 chr(second + 64) +
+                                                 chr(third + 64))
         else:
             raise EDIDParsingError("ID Manufacturer Name field is corrupt.")
 
@@ -115,10 +115,9 @@ class EDID_Parser(object):
         #self.data['ID_Product_Code'] = edid[2] + (edid[3] << 8)
 
         # ID Serial Number: edid[12:16]
-        self.data['ID_Serial_Number'] = (edid[4] +
-                                        (edid[5] << 8) +
-                                        (edid[6] << 16) +
-                                        (edid[7] << 24))
+        self.data['ID_Serial_Number'] = (
+            edid[4] + (edid[5] << 8) + (edid[6] << 16) + (edid[7] << 24)
+        )
 
         # Week of manufacture and Year of manufacture: edid[16:17]
         if edid[8] > 0x36 and edid[8] < 0xFF:
@@ -308,7 +307,8 @@ class EDID_Parser(object):
 
                 id['Vertical_active'] = (
                     (id['Horizontal_active'] * id['Image_aspect_ratio'][1]) /
-                        id['Image_aspect_ratio'][0])
+                    id['Image_aspect_ratio'][0]
+                )
 
                 new_data['Identification_%d' % ((i / 2) + 1)] = id
 
@@ -316,7 +316,7 @@ class EDID_Parser(object):
 
     def parse_descriptors(self, edid):
         """
-        Parses "Standard Timing Identification"
+        Parses "Descriptors"
 
         edid is list of bytes 54 (36h) to 125 (7Dh)
         """
@@ -325,10 +325,10 @@ class EDID_Parser(object):
 
         for i in range(0, 71, 18):
             if (not ((edid[i] << 8) + edid[i + 1]) == 0x0000 and
-                not edid[i + 2] == 0x00 and
-                not edid[i + 4] == 0x00):
+                    not edid[i + 2] == 0x00 and
+                    not edid[i + 4] == 0x00):
                 new_data['Timing_Descriptor_%d' % ((i / 18) + 1)] = \
-                self.parse_timing_descriptor(edid[i:i + 18])
+                    self.parse_timing_descriptor(edid[i:i + 18])
             else:
                 tmp_edid = edid[i + 5:i + 18]
                 if edid[i + 3] == 0xff:
@@ -342,7 +342,7 @@ class EDID_Parser(object):
                         "Monitor_Data_String", tmp_edid)
                 elif edid[i + 3] == 0xfd:
                     new_data["Monitor_Range_Limits_Descriptor"] = \
-                    self.parse_monitor_descriptor_range_limits(tmp_edid)
+                        self.parse_monitor_descriptor_range_limits(tmp_edid)
                 elif edid[i + 3] == 0xfc:
                     self.parse_monitor_descriptor_text(
                         "Monitor_Name", tmp_edid)
@@ -472,7 +472,7 @@ class EDID_Parser(object):
             if edid[x] == 0x0a:
                 break
 
-            output = output + chr(edid[x])
+            output += chr(edid[x])
 
         self.data[name] = output
 

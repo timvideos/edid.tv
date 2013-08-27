@@ -106,7 +106,7 @@ class EDIDParsingTestCase(TestCase):
 
         return edid_object
 
-    def test_valid_version_revision(self):
+    def test_version_revision_valid(self):
         """
         Test all supported EDID versions and revisions.
         """
@@ -124,7 +124,7 @@ class EDIDParsingTestCase(TestCase):
             # Check for correct version
             self.assertEqual(edid.version, version[2])
 
-    def test_invalid_version_revision(self):
+    def test_version_revision_invalid(self):
         """
         Test unsupported EDID versions and revisions and check for exception.
         """
@@ -142,7 +142,7 @@ class EDIDParsingTestCase(TestCase):
             self.assertEqual(cm.exception.messages[0],
                              'Invalid EDID version and revision.')
 
-    def test_valid_bdp_signal_level_standard(self):
+    def test_bdp_signal_level_standard_valid(self):
         """
         Test all supported signal level standard.
         """
@@ -170,7 +170,7 @@ class EDIDParsingTestCase(TestCase):
             # Check for correct standard
             self.assertEqual(edid.bdp_signal_level_standard, standard[1])
 
-    def test_invalid_bdp_signal_level_standard(self):
+    def test_bdp_signal_level_standard_invalid(self):
         """
         Test unsupported signal levels.
         """
@@ -197,7 +197,7 @@ class EDIDParsingTestCase(TestCase):
                 'Invalid signal level standard can not be parsed.'
             )
 
-    def test_valid_aspect_ratio(self):
+    def test_aspect_ratio_valid(self):
         """
         Test all supported image aspect ratio.
         """
@@ -219,7 +219,7 @@ class EDIDParsingTestCase(TestCase):
                                                 identification=1)
             self.assertEqual(timing.aspect_ratio, aspect_ratio[1])
 
-    def test_invalid_aspect_ratio(self):
+    def test_aspect_ratio_invalid(self):
         """
         Test unsupported image aspect ratio and check for exception.
         """
@@ -255,7 +255,7 @@ class EDIDParsingTestCase(TestCase):
                                 'K': 64,
                                 'J': 64}
 
-        # Inject monitor range limits to EDID data
+        # Inject monitor range limits back to EDID data
         edid_data['Descriptors']['Monitor_Range_Limits_Descriptor'] = mrl
 
         edid = self._process_edid(edid_data)
@@ -268,6 +268,118 @@ class EDIDParsingTestCase(TestCase):
         self.assertEqual(edid.mrl_secondary_GTF_M, 64)
         self.assertEqual(edid.mrl_secondary_GTF_K, 64)
         self.assertEqual(edid.mrl_secondary_GTF_J, 64)
+
+
+class DetailedTimingParsingTestCase(TestCase):
+    def setUp(self):
+        Manufacturer.objects.bulk_create([
+            Manufacturer(name_id='TSB', name='Toshiba'),
+            Manufacturer(name_id='UNK', name='Unknown'),
+        ])
+
+    def _create_edid(self, flags, checksum):
+        edid_binary = [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x52,
+                       0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF, 0x13,
+                       0x01, 0x03, 0x80, 0x59, 0x32, 0x78, 0x0A, 0xF0, 0x9D,
+                       0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47, 0x4A, 0x21,
+                       0x08, 0x00, 0x81, 0x80, 0x8B, 0xC0, 0x01, 0x01, 0x01,
+                       0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+                       0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
+                       0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+                       0x66, 0x21, 0x50, 0xB0, 0x51, 0x00, 0x1B, 0x30, 0x40,
+                       0x70, 0x36, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+                       0x00, 0x00, 0x00, 0xFC, 0x00, 0x54, 0x4F, 0x53, 0x48,
+                       0x49, 0x42, 0x41, 0x2D, 0x54, 0x56, 0x0A, 0x20, 0x20,
+                       0x00, 0x00, 0x00, 0xFD, 0x00, 0x17, 0x3D, 0x0F, 0x44,
+                       0x0F, 0x00, 0x0A, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+                       0x01, 0x24]
+
+        # Change flags and checksum
+        edid_binary[71] = flags
+        edid_binary[127] = checksum
+
+        # Convert to string
+        edid_binary = ''.join([chr(x) for x in edid_binary])
+
+        edid_data = EDID_Parser(edid_binary).data
+
+        edid_object = EDID.create(file_base64='', edid_data=edid_data)
+        # Save the entry
+        edid_object.save()
+        # Add timings
+        edid_object.populate_timings_from_edid_parser(edid_data)
+        # Save the updated entry
+        edid_object.save()
+
+        return edid_object
+
+    def test_flags_sync_scheme_analog_composite(self):
+        """
+        Test detailed timing sync scheme flag = analog composite.
+        """
+
+        edid = self._create_edid(0b00000110, 60)
+        timing = edid.detailedtiming_set.get(identification=1)
+
+        # Check for correct flags
+        self.assertEqual(timing.flags_sync_scheme,
+                         timing.Sync_Scheme.Analog_Composite)
+        self.assertEqual(timing.flags_vertical_polarity, None)
+        self.assertEqual(timing.flags_horizontal_polarity, None)
+        self.assertEqual(timing.flags_serrate, True)
+        self.assertEqual(timing.flags_composite_polarity, None)
+        self.assertEqual(timing.flags_sync_on_RGB, True)
+
+    def test_flags_sync_scheme_bipolar_analog_composite(self):
+        """
+        Test detailed timing sync scheme flag = bipolar analog composite.
+        """
+
+        edid = self._create_edid(0b00001110, 52)
+        timing = edid.detailedtiming_set.get(identification=1)
+
+        # Check for correct flags
+        self.assertEqual(timing.flags_sync_scheme,
+                         timing.Sync_Scheme.Bipolar_Analog_Composite)
+        self.assertEqual(timing.flags_vertical_polarity, None)
+        self.assertEqual(timing.flags_horizontal_polarity, None)
+        self.assertEqual(timing.flags_serrate, True)
+        self.assertEqual(timing.flags_composite_polarity, None)
+        self.assertEqual(timing.flags_sync_on_RGB, True)
+
+    def test_flags_sync_scheme_digital_composite(self):
+        """
+        Test detailed timing sync scheme flag = digital composite.
+        """
+
+        edid = self._create_edid(0b00010110, 44)
+        timing = edid.detailedtiming_set.get(identification=1)
+
+        # Check for correct flags
+        self.assertEqual(timing.flags_sync_scheme,
+                         timing.Sync_Scheme.Digital_Composite)
+        self.assertEqual(timing.flags_vertical_polarity, None)
+        self.assertEqual(timing.flags_horizontal_polarity, None)
+        self.assertEqual(timing.flags_serrate, True)
+        self.assertEqual(timing.flags_composite_polarity, True)
+        self.assertEqual(timing.flags_sync_on_RGB, None)
+
+    def test_flags_sync_scheme_digital_separate(self):
+        """
+        Test detailed timing sync scheme flag = digital separate.
+        """
+
+        edid = self._create_edid(0b00011110, 36)
+        timing = edid.detailedtiming_set.get(identification=1)
+
+        # Check for correct flags
+        self.assertEqual(timing.flags_sync_scheme,
+                         timing.Sync_Scheme.Digital_Separate)
+        self.assertEqual(timing.flags_vertical_polarity, True)
+        self.assertEqual(timing.flags_horizontal_polarity, True)
+        self.assertEqual(timing.flags_serrate, None)
+        self.assertEqual(timing.flags_composite_polarity, None)
+        self.assertEqual(timing.flags_sync_on_RGB, None)
 
 
 ### Timing Tests
