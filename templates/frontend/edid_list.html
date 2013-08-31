@@ -4,10 +4,33 @@
 {% block content %}
 <div class="row">
   <div class="span12">
-    <h2><a href="{% url 'edid-upload' %}">Upload your EDID file</a></h2>
+    <div class="hero-unit">
+      <h1>EDID.tv</h1>
+      <p>Extended display identification data (EDID) is a data structure provided by monitor to describe its capabilities to a video source (e.g. graphics card or set-top box). It is what enables a modern personal computer to know what kinds of monitors are connected to it. EDID is defined by a standard published by the Video Electronics Standards Association (VESA). <a href="http://en.wikipedia.org/wiki/Extended_display_identification_data">(Wikipedia)</a></p>
+      <p>EDID.tv is an open collection of EDID files, updated to fix incorrect fields and add missing timings.</p>
+    </div>
+
+    <h2>Submit your EDID</h2>
+    <p>Help us grow our database by submitting your monitors EDIDs, every EDID count!</p>
+
+    <div class="row">
+      <div class="span4">
+        <h4><a href="{% url 'edid-upload-binary' %}">Binary File</a></h4>
+        <p>Upload binary EDID files.</p>
+      </div>
+      <div class="span4">
+        <h4><a href="{% url 'edid-upload-text' %}">Hex-encoded Text</a></h4>
+        <p>Got an EDID in Hex-encoded text? submit it here.</p>
+      </div>
+      <div class="span4">
+        <h4>EDID Grabber <span class="label label-info">Coming soon</span></h4>
+        <p>A small program looks for EDIDs in your operating system and submits them to EDID.tv automatically.</p>
+      </div>
+    </div>
   </div>
+
   <div class="span12">
-    <h2>EDID List</h2>
+    <h2>Latest Submitted EDIDs</h2>
 
     {% include 'frontend/edid_table.html' %}
   </div>

@@ -44,7 +44,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_file = self.create_temp_file(self.edid_binary)
 
         # Upload the file and check for redirection to EDID detail view
-        response = self.client.post(reverse('edid-upload'), {
+        response = self.client.post(reverse('edid-upload-binary'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
@@ -54,7 +54,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
 
         # Upload the file again and check error message
         edid_file.seek(0)
-        response = self.client.post(reverse('edid-upload'), {
+        response = self.client.post(reverse('edid-upload-binary'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
@@ -82,7 +82,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_file = self.create_temp_file(edid_binary)
 
         # Upload EDID file
-        response = self.client.post(reverse('edid-upload'), {
+        response = self.client.post(reverse('edid-upload-binary'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
@@ -101,7 +101,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_file = self.create_temp_file(edid_binary)
 
         # Upload EDID file
-        response = self.client.post(reverse('edid-upload'), {
+        response = self.client.post(reverse('edid-upload-binary'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
@@ -120,7 +120,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_file = self.create_temp_file(edid_binary)
 
         # Upload EDID file
-        response = self.client.post(reverse('edid-upload'), {
+        response = self.client.post(reverse('edid-upload-binary'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })
@@ -346,7 +346,7 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
         edid_file = self.create_temp_file(edid_binary)
 
         # Upload the file and check for redirection to EDID detail view
-        response = self.client.post(reverse('edid-upload'), {
+        response = self.client.post(reverse('edid-upload-binary'), {
             'name': 'edid.bin',
             'edid_file': edid_file
         })

@@ -30,7 +30,6 @@
 
   {% if edid.is_revision %}
     <div class="alert alert-block alert-info">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>This is an old revision!</h4>
       It is provided for archival purposes. You may want to check <a href="{% url 'edid-detail' edid.pk %}">latest updated revision</a> or go back to <a href="{% url 'edid-revision-list' edid.pk %}">revisions list</a>.
     </div>
@@ -38,6 +37,8 @@
     <p>
     {% if user.is_authenticated %}
       <a class="btn" href="{% url 'edid-update' edid.pk %}"><i class="icon-edit"></i> Update</a>
+    {% else %}
+      <a class="btn disabled" href="#" data-toggle="tooltip" title="Registration is required to make changes."><i class="icon-edit"></i> Update</a>
     {% endif %}
       <a class="btn" href="{% url 'edid-revision-list' edid.pk %}">Revisions</a>
     </p>

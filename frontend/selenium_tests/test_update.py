@@ -25,7 +25,7 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         # Update timing and submit form
         self.browser.find_element_by_id('id_refresh_rate').clear()
         self.browser.find_element_by_id('id_refresh_rate').send_keys('120')
-        self.browser.find_element_by_id('submit-id-submit').click()
+        self.browser.find_element_by_id('submit-id-submit').submit()
 
         # Check we got redirected to EDID update page
         self.assertEqual(self.browser.current_url, edid_update_url)
@@ -33,7 +33,7 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         # Update EDID and submit form
         self.browser.find_element_by_link_text('Monitor Range Limits').click()
         self.browser.find_element_by_id('id_monitor_range_limits').click()
-        self.browser.find_element_by_id('submit-id-submit').click()
+        self.browser.find_element_by_id('submit-id-submit').submit()
 
         # Check we got redirected to EDID detail page
         self.assertEqual(self.browser.current_url, edid_detail_url)
@@ -52,7 +52,7 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         self.browser.find_element_by_id('revision-1-revert-link').click()
 
         # Confirm revert action
-        self.browser.find_element_by_id('revert-id-revert').click()
+        self.browser.find_element_by_id('revert-id-revert').submit()
 
         # Check we got redirected to EDID detail page
         self.assertEqual(self.browser.current_url, edid_detail_url)

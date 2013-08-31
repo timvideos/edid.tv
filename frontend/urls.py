@@ -11,13 +11,14 @@ urlpatterns = patterns(
         name='manufacturer-detail'),
 
     # EDID
-    url(r'^edid/upload/$', views.EDIDUpload.as_view(), name='edid-upload'),
-    url(r'^edid/upload_text/$', views.EDIDTextUpload.as_view(),
-        name='edid-upload-text'),
     url(r'^edid/(?P<pk>\d+)/$', views.EDIDDetailView.as_view(),
         name='edid-detail'),
     url(r'^edid/(?P<pk>\d+)/update/$', views.EDIDUpdate.as_view(),
         name='edid-update'),
+    url(r'^edid/upload/binary/$', views.EDIDBinaryUpload.as_view(),
+        name='edid-upload-binary'),
+    url(r'^edid/upload/text/$', views.EDIDTextUpload.as_view(),
+        name='edid-upload-text'),
 
     # EDID Revisions
     url(r'^edid/(?P<edid_pk>\d+)/revision/$', views.EDIDRevisionList.as_view(),

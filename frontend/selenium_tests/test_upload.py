@@ -39,15 +39,13 @@ class UploadSeleniumTestCase(SeleniumTestCase):
         edid_file = self.create_temp_file(edid_binary)
         edid_file.close()
 
-        self.browser.get("%s/edid/upload" % self.live_server_url)
+        self.browser.get("%s/edid/upload/binary" % self.live_server_url)
 
         self.browser.find_element_by_id('id_edid_file')\
                     .send_keys(edid_file.name)
 
         # Submit upload form
-        self.browser.find_element_by_id('upload-id-upload').click()
-
-        self.browser.implicitly_wait(30)
+        self.browser.find_element_by_id('upload-id-upload').submit()
 
         # Check we got redirected to EDID detail page
         self.assertEqual(self.browser.current_url,

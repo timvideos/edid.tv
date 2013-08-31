@@ -88,10 +88,17 @@ class EDIDList(ListView):
 
         return context
 
+    def get_queryset(self):
+        queryset = super(EDIDList, self).get_queryset()
 
-class EDIDUpload(FormView):
+        queryset = queryset.order_by('-created')[:10]
+
+        return queryset
+
+
+class EDIDBinaryUpload(FormView):
     form_class = EDIDUploadForm
-    template_name = 'frontend/edid_upload.html'
+    template_name = 'frontend/edid_upload_binary.html'
 
     def form_valid(self, form):
         # Create EDID entry
@@ -118,7 +125,7 @@ class EDIDUpload(FormView):
 
 class EDIDTextUpload(FormView):
     form_class = EDIDTextUploadForm
-    template_name = 'frontend/edid_text_upload.html'
+    template_name = 'frontend/edid_upload_text.html'
 
     def __init__(self):
         super(EDIDTextUpload, self).__init__()
