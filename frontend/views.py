@@ -721,6 +721,25 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             reversion.default_revision_manager.save_revision([edid_object])
 
 
+class APITextUpload(CsrfExemptMixin, JSONResponseMixin, EDIDTextUpload):
+    """
+    Based on EDIDTextUpload, disables CSRF and returns JSON output.
+    """
+
+    http_method_names = ['post']
+
+    def form_valid(self, form):
+        for edid_bytes in form.edid_list:
+            self._process_edid(edid_bytes)
+
+        return self.render_json_response({'succeeded': self.succeeded,
+                                          'failed': self.failed,
+                                          'duplicate': self.duplicate})
+
+    def form_invalid(self, form):
+        return self.render_json_response({'error': 'Submittion failed!'})
+
+
 ### User Profile
 class ProfileView(TemplateView):
     template_name = 'account/profile.html'
