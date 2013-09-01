@@ -9,13 +9,13 @@ from base import SeleniumTestCase
 
 class UploadSeleniumTestCase(SeleniumTestCase):
     def setUp(self):
-        super(UploadSeleniumTestCase, self).setUp()
-
         with transaction.commit_on_success():
             Manufacturer.objects.bulk_create([
                 Manufacturer(name_id='TSB', name='Toshiba'),
                 Manufacturer(name_id='UNK', name='Unknown'),
             ])
+
+        super(UploadSeleniumTestCase, self).setUp()
 
     def create_temp_file(self, edid_binary):
         edid_file = NamedTemporaryFile(delete=False)
