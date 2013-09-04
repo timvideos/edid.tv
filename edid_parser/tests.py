@@ -413,12 +413,6 @@ class EDIDInvalidTest(EDIDTest):
         self.assertRaises(EDIDParsingError, self.parser.parse_header,
                           test_edid)
 
-        #Invalid year of manufacture, 9: 0x08
-        test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF,
-                     0x08, 0x01, 0x03]
-        self.assertRaises(EDIDParsingError, self.parser.parse_header,
-                          test_edid)
-
         #Invalid EDID version and revision, 10-11: v2.3
         test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF,
                      0x13, 0x02, 0x03]

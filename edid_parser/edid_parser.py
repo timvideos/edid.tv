@@ -124,10 +124,6 @@ class EDID_Parser(object):
             raise EDIDParsingError("Week of manufacture (%d) is invalid." %
                                    (edid[8]))
 
-        if edid[9] < 0x10:
-            raise EDIDParsingError("Year of manufacture (%d) is invalid." %
-                                   (edid[9]))
-
         self.data['Week_of_manufacture'] = edid[8]
         self.data['Year_of_manufacture'] = edid[9] + 1990
 
