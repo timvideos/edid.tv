@@ -12,7 +12,9 @@ install:
   - pip install coveralls --use-mirrors
 # command to run tests
 script:
-  - coverage run --source=frontend manage.py test --settings=test_settings frontend.django_tests
+  - pep8
+  - coverage run --source=edid_parser edid_parser/tests.py
+  - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.django_tests
   - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.selenium_tests
 after_success:
   - coveralls

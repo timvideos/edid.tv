@@ -1,6 +1,7 @@
 from copy import copy
 from tempfile import TemporaryFile
 import json
+import os
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -139,17 +140,13 @@ class EDIDTextUploadTestCase(TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
+    def _read_from_file(self, filename):
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        with open(os.path.join(data_dir, filename), 'r') as text_file:
+            return text_file.read()
+
     def test_hex(self):
-        hex_text = """
-0x00	 00 FF FF FF FF FF FF 00 4C A3 41 54 00 00 00 00
-0x10	 00 13 01 03 90 22 13 78 0A C8 95 9E 57 54 92 26
-0x20	 0F 50 54 00 00 00 01 01 01 01 01 01 01 01 01 01
-0x30	 01 01 01 01 01 01 7D 1E 56 18 51 00 16 30 30 20
-0x40	 25 00 58 C2 10 00 00 1A 7D 1E 56 16 51 00 16 30
-0x50	 30 20 25 00 58 C2 10 00 00 1A 00 00 00 FE 00 53
-0x60	 41 4D 53 55 4E 47 0A 20 20 20 20 20 00 00 00 FE
-0x70	 00 4C 54 4E 31 35 36 41 54 30 32 50 30 39 00 55
-"""
+        hex_text = self._read_from_file('hex.log')
 
         # Submit Hex
         response = self.client.post(
@@ -187,7 +184,7 @@ class EDIDTextUploadTestCase(TestCase):
 
         ## Failure test
         # Sabotage Hex, corrupting EDID header
-        hex_text = hex_text[:19] + '00' + hex_text[21:]
+        hex_text = hex_text[:18] + '00' + hex_text[20:]
 
         # Submit Hex again
         response = self.client.post(
@@ -201,28 +198,7 @@ class EDIDTextUploadTestCase(TestCase):
         self.assertEqual(response.context_data['duplicate'], 0)
 
     def test_xrandr(self):
-        xrandr_text = """
-Screen 0: minimum 320 x 200, current 3286 x 1080, maximum 8192 x 8192
-LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis)
-	EDID:
-		00ffffffffffff004ca3415400000000
-		00130103902213780ac8959e57549226
-		0f505400000001010101010101010101
-		0101010101017d1e5618510016303020
-		250058c21000001a7d1e561651001630
-		3020250058c21000001a000000fe0053
-		414d53554e470a2020202020000000fe
-		004c544e313536415430325030390055
-	BACKLIGHT: 10 (0x0000000a)	range:  (0,10)
-	Backlight: 10 (0x0000000a)	range:  (0,10)
-	scaling mode:	Full aspect
-		supported: None         Full         Center       Full aspect
-   1366x768       60.0*+   60.1
-   1360x768       59.8     60.0
-   1024x768       60.0
-   800x600        60.3     56.2
-   640x480        59.9
-"""
+        xrandr_text = self._read_from_file('xrandr.log')
 
         # Submit XRandR output
         response = self.client.post(
