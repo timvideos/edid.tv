@@ -343,7 +343,7 @@ class EDID_Parser(object):
                     self.parse_monitor_descriptor_text(
                         "Monitor_Name", tmp_edid)
                 elif edid[i + 3] == 0xfb:
-                    print "Descriptor contains additional color point data," \
+                    print "Descriptor contains additional color point data." \
                           " NOT supported yet."
                 elif edid[i + 3] == 0xfa:
                     print "Descriptor contains additional Standard Timing" \
