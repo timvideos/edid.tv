@@ -140,6 +140,8 @@ class EDIDTextUploadTestCase(TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
+        self.post_url = reverse('edid-upload-text')
+
     def _read_from_file(self, filename):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         with open(os.path.join(data_dir, filename), 'r') as text_file:
@@ -150,8 +152,7 @@ class EDIDTextUploadTestCase(TestCase):
 
         # Submit Hex
         response = self.client.post(
-            reverse('edid-upload-text'),
-            {'text': hex_text, 'text_type': 'hex'}
+            self.post_url, {'text': hex_text, 'text_type': 'hex'}
         )
 
         # Check an EDID was parsed and added
@@ -173,8 +174,7 @@ class EDIDTextUploadTestCase(TestCase):
         ## Duplicate test
         # Submit Hex again
         response = self.client.post(
-            reverse('edid-upload-text'),
-            {'text': hex_text, 'text_type': 'hex'}
+            self.post_url, {'text': hex_text, 'text_type': 'hex'}
         )
 
         # Check an EDID was parsed and rejected for duplicate
@@ -188,8 +188,7 @@ class EDIDTextUploadTestCase(TestCase):
 
         # Submit Hex again
         response = self.client.post(
-            reverse('edid-upload-text'),
-            {'text': hex_text, 'text_type': 'hex'}
+            self.post_url, {'text': hex_text, 'text_type': 'hex'}
         )
 
         # Check an EDID failed parsed
@@ -202,8 +201,7 @@ class EDIDTextUploadTestCase(TestCase):
 
         # Submit XRandR output
         response = self.client.post(
-            reverse('edid-upload-text'),
-            {'text': xrandr_text, 'text_type': 'xrandr'}
+            self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
         # Check an EDID was parsed and added
@@ -225,8 +223,7 @@ class EDIDTextUploadTestCase(TestCase):
         ## Duplicate test
         # Submit XRandR output again
         response = self.client.post(
-            reverse('edid-upload-text'),
-            {'text': xrandr_text, 'text_type': 'xrandr'}
+            self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
         # Check an EDID was parsed and rejected for duplicate
@@ -240,8 +237,7 @@ class EDIDTextUploadTestCase(TestCase):
 
         # Submit XRandR output again
         response = self.client.post(
-            reverse('edid-upload-text'),
-            {'text': xrandr_text, 'text_type': 'xrandr'}
+            self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
         )
 
         # Check an EDID failed parsed
@@ -374,6 +370,34 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
 
         # Check there is 2 revisions
         self._check_versions_list(2)
+
+    def test_revision_detail(self):
+        # Check there is 1 revision
+        self._check_versions_list(1)
+
+        # Check invalid revision pk
+        response = self.client.get(
+            reverse('edid-revision-detail',
+                    kwargs={'edid_pk': 1, 'revision_pk': 10})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        # Get revision detail page
+        response = self.client.get(
+            reverse('edid-revision-detail',
+                    kwargs={'edid_pk': 1, 'revision_pk': 1})
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        # Get EDID object
+        edid = response.context_data['object']
+        self.assertIsInstance(edid, EDID)
+
+        # Check timings are injected in EDID object
+        self.assertEqual(len(edid.standardtimings), 2)
+        self.assertEqual(len(edid.detailedtimings), 2)
 
     def test_create_timing(self):
         # Check there is 1 revision
@@ -513,6 +537,15 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
         self._check_versions_list(3)
         # Check there is 2 standard timing
         self.assertEqual(EDID.objects.get(pk=1).standardtiming_set.count(), 2)
+
+    def test_revision_in_context(self):
+        self._login('supertester', 'test', True)
+        response = self.client.get(
+            reverse('edid-revision-revert',
+                    kwargs={'edid_pk': 1, 'revision_pk': 1})
+        )
+
+        self.assertIn('revision', response.context_data)
 
     def test_no_revision_found(self):
         self._login('supertester', 'test', True)
@@ -940,3 +973,159 @@ class APIUploadTestCase(TestCase):
         self.assertJSONEqual(
             response.content, json.dumps({'failed': 2, 'succeeded': 0})
         )
+
+
+### API Text Upload Tests
+class APITextUploadTestCase(TestCase):
+    def setUp(self):
+        Manufacturer.objects.bulk_create([
+            Manufacturer(name_id='SEC', name='Seiko Epson Corporation'),
+            Manufacturer(name_id='UNK', name='Unknown'),
+        ])
+
+        self.post_url = reverse('api-upload-text')
+
+    def _read_from_file(self, filename):
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        with open(os.path.join(data_dir, filename), 'r') as text_file:
+            return text_file.read()
+
+    def test_hex(self):
+        hex_text = self._read_from_file('hex.log')
+
+        # Submit Hex
+        response = self.client.post(
+            self.post_url, {'text': hex_text, 'text_type': 'hex'}
+        )
+        data = json.loads(response.content)
+
+        # Check an EDID was parsed and added
+        self.assertEqual(data['succeeded'], 1)
+        self.assertEqual(data['failed'], 0)
+        self.assertEqual(data['duplicate'], 0)
+
+        # Check some of EDID values
+        edid = EDID.objects.get(pk=1)
+        self.assertEqual(
+            len([timing for timing in edid.get_est_timings()
+                 if timing['supported']]),
+            0
+        )
+        self.assertEqual(edid.manufacturer.name_id, 'SEC')
+        self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
+        self.assertEqual(edid.monitor_range_limits, False)
+
+        ## Duplicate test
+        # Submit Hex again
+        response = self.client.post(
+            self.post_url, {'text': hex_text, 'text_type': 'hex'}
+        )
+        data = json.loads(response.content)
+
+        # Check an EDID was parsed and rejected for duplicate
+        self.assertEqual(data['succeeded'], 0)
+        self.assertEqual(data['failed'], 0)
+        self.assertEqual(data['duplicate'], 1)
+
+        ## Failure test
+        # Sabotage Hex, corrupting EDID header
+        hex_text = hex_text[:18] + '00' + hex_text[20:]
+
+        # Submit Hex again
+        response = self.client.post(
+            self.post_url, {'text': hex_text, 'text_type': 'hex'}
+        )
+        data = json.loads(response.content)
+
+        # Check an EDID failed parsed
+        self.assertEqual(data['succeeded'], 0)
+        self.assertEqual(data['failed'], 1)
+        self.assertEqual(data['duplicate'], 0)
+
+    def test_xrandr(self):
+        xrandr_text = self._read_from_file('xrandr.log')
+
+        # Submit XRandR output
+        response = self.client.post(
+            self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
+        )
+        data = json.loads(response.content)
+
+        # Check an EDID was parsed and added
+        self.assertEqual(data['succeeded'], 1)
+        self.assertEqual(data['failed'], 0)
+        self.assertEqual(data['duplicate'], 0)
+
+        # Check some of EDID values
+        edid = EDID.objects.get(pk=1)
+        self.assertEqual(
+            len([timing for timing in edid.get_est_timings()
+                 if timing['supported']]),
+            0
+        )
+        self.assertEqual(edid.manufacturer.name_id, 'SEC')
+        self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
+        self.assertEqual(edid.monitor_range_limits, False)
+
+        ## Duplicate test
+        # Submit XRandR output again
+        response = self.client.post(
+            self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
+        )
+        data = json.loads(response.content)
+
+        # Check an EDID was parsed and rejected for duplicate
+        self.assertEqual(data['succeeded'], 0)
+        self.assertEqual(data['failed'], 0)
+        self.assertEqual(data['duplicate'], 1)
+
+        ## Failure test
+        # Sabotage XRandR output, corrupting EDID header
+        xrandr_text = xrandr_text[:162] + '00' + xrandr_text[164:]
+
+        # Submit XRandR output again
+        response = self.client.post(
+            self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
+        )
+        data = json.loads(response.content)
+
+        # Check an EDID failed parsed
+        self.assertEqual(data['succeeded'], 0)
+        self.assertEqual(data['failed'], 1)
+        self.assertEqual(data['duplicate'], 0)
+
+    def test_invalid(self):
+        response = self.client.post(
+            self.post_url, {'text': 'BAD TEXT', 'text_type': 'None'}
+        )
+
+        self.assertJSONEqual(response.content, {'error': 'Submittion failed!'})
+
+
+### Manufacturer Tests
+class ManufacturerTestCase(EDIDTestMixin, TestCase):
+    def test_list_queryset(self):
+        # Get Manufacturer List
+        response = self.client.get(
+            reverse('manufacturer-list')
+        )
+        manufacturers = response.context_data['manufacturer_list']
+
+        # Check we have 1 manufacturer
+        self.assertEqual(len(manufacturers), 1)
+        # Check first manufacturer have 1 edid
+        self.assertEqual(manufacturers[0].edid__count, 1)
+
+    def test_detail_context(self):
+        # Get Manufacturer Detail
+        response = self.client.get(
+            reverse('manufacturer-detail', kwargs={'pk': 1})
+        )
+
+        # Check for edid_list in context
+        self.assertIn('edid_list', response.context_data)
+        edid = response.context_data['edid_list'][0]
+
+        # Check for timings count in EDID object
+        self.assertEqual(edid.standardtiming__count, 2)
+        self.assertEqual(edid.detailedtiming__count, 2)

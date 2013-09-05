@@ -521,6 +521,7 @@ class EDIDInvalidTest(EDIDTest):
         self.assertRaises(EDIDParsingError, self.parser.parse_header,
                           test_edid)
 
+
 class EDIDParsingErrorTestCase(unittest.TestCase):
     def test_exception(self):
         """
