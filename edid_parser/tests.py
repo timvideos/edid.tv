@@ -1,7 +1,7 @@
 # pylint: disable-msg=C0103
 import unittest
-from edid_parser import EDID_Parser, EDIDParsingError, Display_Type, \
-                        Display_Stereo_Mode, Timing_Sync_Scheme
+from edid_parser import (EDID_Parser, EDIDParsingError, Display_Type,
+                         Display_Stereo_Mode, Timing_Sync_Scheme)
 
 
 class EDIDTest(unittest.TestCase):
@@ -32,7 +32,7 @@ class EDIDValidTest(EDIDTest):
                     "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
                     "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
                     "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
-        self.parser.parse_all(test_edid)
+        EDID_Parser(test_edid)
 
     def test_binary(self):
         test_edid = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01" \
@@ -103,7 +103,7 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(data['Feature_Support']['Display_Type'],
                          Display_Type.RGB)
 
-        test_edid = [0b01011111, 0x78, 0x44, 0x99, 0b11110111]
+        test_edid = [0b01011111, 0x78, 0x44, 0xFF, 0b11110111]
         data = self.parser.parse_basic_display(test_edid)
 
         self.assertFalse(data['Video_Input'])
@@ -117,7 +117,7 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(data['Max_Horizontal_Image_Size'], 120)
         self.assertEqual(data['Max_Vertical_Image_Size'], 68)
 
-        self.assertEqual(data['Display_Gamma'], 2.53)
+        self.assertEqual(data['Display_Gamma'], None)
 
         self.assertTrue(data['Feature_Support']['Standby'])
         self.assertTrue(data['Feature_Support']['Suspend'])
@@ -128,6 +128,31 @@ class EDIDValidTest(EDIDTest):
 
         self.assertEqual(data['Feature_Support']['Display_Type'],
                          Display_Type.Non_RGB)
+
+    def test_basic_display_signal_level_standard(self):
+        test_edid = [0b00011111, 0x78, 0x44, 0xFF, 0b11110111]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertFalse(data['Video_Input'])
+        self.assertEqual(data['Signal_Level_Standard'], (0.700, 0.300))
+
+        test_edid = [0b00111111, 0x78, 0x44, 0xFF, 0b11110111]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertFalse(data['Video_Input'])
+        self.assertEqual(data['Signal_Level_Standard'], (0.714, 0.286))
+
+        test_edid = [0b01011111, 0x78, 0x44, 0xFF, 0b11110111]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertFalse(data['Video_Input'])
+        self.assertEqual(data['Signal_Level_Standard'], (1.000, 0.400))
+
+        test_edid = [0b01111111, 0x78, 0x44, 0xFF, 0b11110111]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertFalse(data['Video_Input'])
+        self.assertEqual(data['Signal_Level_Standard'], (0.700, 0.000))
 
     def test_chromaticity(self):
         test_edid = [0xF0, 0x9D, 0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47,
@@ -223,10 +248,13 @@ class EDIDValidTest(EDIDTest):
     def test_descriptors(self):
         test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
                      0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+
                      0x66, 0x21, 0x50, 0xB0, 0x51, 0x00, 0x1B, 0x30, 0x40,
                      0x70, 0x36, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+
                      0x00, 0x00, 0x00, 0xFC, 0x00, 0x54, 0x4F, 0x53, 0x48,
                      0x49, 0x42, 0x41, 0x2D, 0x54, 0x56, 0x0A, 0x20, 0x20,
+
                      0x00, 0x00, 0x00, 0xFD, 0x00, 0x17, 0x3D, 0x0F, 0x44,
                      0x0F, 0x00, 0x0A, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20]
         data = self.parser.parse_descriptors(test_edid)
@@ -235,6 +263,24 @@ class EDIDValidTest(EDIDTest):
         self.assertIn('Timing_Descriptor_2', data)
         self.assertIn('Monitor_Name', self.parser.data)
         self.assertIn('Monitor_Range_Limits_Descriptor', data)
+
+        test_edid = [0x00, 0x00, 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+
+                     0x00, 0x00, 0x00, 0xFE, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+
+                     0x00, 0x00, 0x00, 0xFB, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+
+                     0x00, 0x00, 0x00, 0xFA, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+        data = self.parser.parse_descriptors(test_edid)
+
+        self.assertIn('Monitor_Serial_Number', self.parser.data)
+        self.assertIn('Monitor_Data_String', self.parser.data)
+        self.assertIn('Additional_Color_Point', data)
+        self.assertIn('Additional_Standard_Timing', data)
 
     def test_timing_descriptor(self):
         test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
@@ -292,6 +338,62 @@ class EDIDValidTest(EDIDTest):
                          Timing_Sync_Scheme.Digital_Separate)
         self.assertTrue(data['Flags']['Vertical_Polarity'])
         self.assertTrue(data['Flags']['Horizontal_Polarity'])
+
+    def test_timing_descriptor_flags_sync_scheme(self):
+        """
+        Test Sync Scheme are parsed correctly including their related flags.
+        """
+        test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
+                     0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00,
+                     0b00000110]
+        data = self.parser.parse_timing_descriptor(test_edid)
+
+        self.assertEqual(data['Flags']['Sync_Scheme'],
+                         Timing_Sync_Scheme.Analog_Composite)
+        self.assertNotIn('Vertical_Polarity', data['Flags'])
+        self.assertNotIn('Horizontal_Polarity', data['Flags'])
+        self.assertTrue(data['Flags']['Serrate'])
+        self.assertNotIn('Composite_Polarity', data['Flags'])
+        self.assertTrue(data['Flags']['Sync_On_RGB'])
+
+        test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
+                     0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00,
+                     0b00001110]
+        data = self.parser.parse_timing_descriptor(test_edid)
+
+        self.assertEqual(data['Flags']['Sync_Scheme'],
+                         Timing_Sync_Scheme.Bipolar_Analog_Composite)
+        self.assertNotIn('Vertical_Polarity', data['Flags'])
+        self.assertNotIn('Horizontal_Polarity', data['Flags'])
+        self.assertTrue(data['Flags']['Serrate'])
+        self.assertNotIn('Composite_Polarity', data['Flags'])
+        self.assertTrue(data['Flags']['Sync_On_RGB'])
+
+        test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
+                     0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00,
+                     0b00010110]
+        data = self.parser.parse_timing_descriptor(test_edid)
+
+        self.assertEqual(data['Flags']['Sync_Scheme'],
+                         Timing_Sync_Scheme.Digital_Composite)
+        self.assertNotIn('Vertical_Polarity', data['Flags'])
+        self.assertNotIn('Horizontal_Polarity', data['Flags'])
+        self.assertTrue(data['Flags']['Serrate'])
+        self.assertTrue(data['Flags']['Composite_Polarity'])
+        self.assertNotIn('Sync_On_RGB', data['Flags'])
+
+        test_edid = [0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
+                     0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00,
+                     0b00011110]
+        data = self.parser.parse_timing_descriptor(test_edid)
+
+        self.assertEqual(data['Flags']['Sync_Scheme'],
+                         Timing_Sync_Scheme.Digital_Separate)
+        self.assertTrue(data['Flags']['Vertical_Polarity'])
+        self.assertTrue(data['Flags']['Horizontal_Polarity'])
+        self.assertNotIn('Serrate', data['Flags'])
+        self.assertNotIn('Composite_Polarity', data['Flags'])
+        self.assertNotIn('Sync_On_RGB', data['Flags'])
 
     def test_stereo_mode(self):
         self.assertEqual(self.parser.decode_stereo_mode(0, 0, 0),
@@ -418,6 +520,16 @@ class EDIDInvalidTest(EDIDTest):
                      0x13, 0x02, 0x03]
         self.assertRaises(EDIDParsingError, self.parser.parse_header,
                           test_edid)
+
+
+class EDIDParsingErrorTestCase(unittest.TestCase):
+    def test_exception(self):
+        """
+        Tests EDIDParsingError string output is equal to value to passed to it.
+        """
+        exception = EDIDParsingError('Exception test.')
+
+        self.assertEqual(str(exception), 'Exception test.')
 
 if __name__ == '__main__':
     unittest.main()
