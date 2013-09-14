@@ -1,5 +1,5 @@
 # Django settings for edid_db_website project.
-# pylint: disable-msg=C0103
+# pylint: disable-msg=C0103,W0401,W0614
 import os
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))

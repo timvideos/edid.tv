@@ -62,15 +62,19 @@ parsertest:
 	$(ACTIVATE) && python edid_parser/tests.py
 
 clitest:
-	$(ACTIVATE) && python manage.py test --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && python manage.py test --settings=test_settings \
+	    frontend.django_tests
 
 firefoxtest:
-	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test --settings=test_settings frontend.selenium_tests
+	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test \
+	    --settings=test_settings frontend.selenium_tests
 
 coverage:
 	$(ACTIVATE) && coverage run --source=edid_parser edid_parser/tests.py
-	$(ACTIVATE) && coverage run -a --source=frontend manage.py test --settings=test_settings frontend.django_tests
-	$(ACTIVATE) && TEST_DISPLAY=1 coverage run -a --source=frontend manage.py test --settings=test_settings frontend.selenium_tests
+	$(ACTIVATE) && coverage run -a --source=frontend manage.py test \
+	    --settings=test_settings frontend.django_tests
+	$(ACTIVATE) && TEST_DISPLAY=1 coverage run -a --source=frontend manage.py \
+	    test --settings=test_settings frontend.selenium_tests
 	$(ACTIVATE) && coverage html -d coverage_report
 	$(ACTIVATE) && coverage erase
 
@@ -80,25 +84,27 @@ pep8:
 	-$(ACTIVATE) && pep8 --statistics frontend/
 
 lint:
-	@# R0904 - Disable "Too many public methods" warning
-	@# W0221 - Disable "Arguments differ from parent", as get and post will.
-	@# E1103 - Disable "Instance of 'x' has no 'y' member (but some types could not be inferred)"
+	@# C0303 - Disable "Trailing whitespace"
+	@# E1103 - Disable "Instance of 'x' has no 'y' member
+	@#         (but some types could not be inferred)"
 	@# I0011 - Disable "Locally disabling 'xxxx'"
-	@# C0111 - Disable "Missing docstring"
-	@$(ACTIVATE) && python \
-		-W "ignore:disable-msg is:DeprecationWarning:pylint.lint" \
-		-c "import sys; from pylint import lint; lint.Run(sys.argv[1:])" \
-		--reports=n \
-		--include-ids=y \
-		--no-docstring-rgx "(__.*__)|(get)|(post)|(main)" \
-		--indent-string='    ' \
-		--disable=W0221 \
-		--disable=R0904 \
+	@# R0801 - Disable "Duplication/Similar lines in %s files"
+	@# R0904 - Disable "Too many public methods"
+	@# W0212 - Disable "Access to a protected member _meta of a client class"
+	@# W0511 - Disable "FIXME/TODO"
+	@# W0613 - Disable "Unused argument 'xxxx'"
+	$(ACTIVATE) && pylint \
+		--disable=C0303 \
 		--disable=E1103 \
 		--disable=I0011 \
-		--disable=C0111 \
-		--const-rgx='[a-z_][a-z0-9_]{2,30}$$' \
-		*.py frontend/*.py edid_parser/*.py 2>&1 | grep -v 'maximum recursion depth exceeded'
+		--disable=R0801 \
+		--disable=R0904 \
+		--disable=W0212 \
+		--disable=W0511 \
+		--disable=W0613 \
+		--reports=n \
+		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+		*.py edid_parser/*.py frontend/*.py
 
 ###############################################################################
 ###############################################################################

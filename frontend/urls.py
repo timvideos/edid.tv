@@ -1,3 +1,5 @@
+# pylint: disable-msg=C0103,E1120
+
 from django.conf.urls import patterns, include, url
 
 from frontend import feeds, views

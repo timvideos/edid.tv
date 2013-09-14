@@ -94,12 +94,12 @@
       {% else %}
           <tr>
             <td>VESA DFP 1.x</td>
-            <td><i class="icon-{{ edid.bdp_video_input_DFP_1|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_video_input_dfp_1|yesno:"ok,remove" }}"></i></td>
           </tr>
       {% endif %}
           <tr>
             <td>Display Type</td>
-            <td>{{ edid.get_bdp_feature_display_type_display }}</td>
+            <td>{{ edid.bdp_feature_display_type }}</td>
           </tr>
         </tbody>
       </table>
@@ -112,15 +112,15 @@
           </tr>
           <tr>
             <td>Default GTF</td>
-            <td><i class="icon-{{ edid.bdp_feature_default_GTF|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_default_gtf|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Preferred Timing Mode</td>
-            <td><i class="icon-{{ edid.bdp_feature_preferred_timing_mode|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_pref_timing_mode|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Standard sRGB</td>
-            <td><i class="icon-{{ edid.bdp_feature_standard_sRGB|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.bdp_feature_standard_srgb|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Standby</td>
@@ -254,28 +254,28 @@
           </tr>
           <tr>
             <td>Secondary GTF curve supported</td>
-            <td><i class="icon-{{ edid.mrl_secondary_GTF_curve_supported|yesno:"ok,remove" }}"></i></td>
+            <td><i class="icon-{{ edid.mrl_secondary_gtf_curve_support|yesno:"ok,remove" }}"></i></td>
           </tr>
-    {% if edid.mrl_secondary_GTF_curve_supported %}
+    {% if edid.mrl_secondary_gtf_curve_support %}
           <tr>
             <td>Start frequency</td>
-            <td>{{ edid.mrl_max_pixel_clock }} kHz</td>
+            <td>{{ edid.mrl_secondary_gtf_start_freq }} kHz</td>
           </tr>
           <tr>
             <td>C</td>
-            <td>{{ edid.mrl_secondary_GTF_C }}</td>
+            <td>{{ edid.mrl_secondary_gtf_c }}</td>
           </tr>
           <tr>
             <td>M</td>
-            <td>{{ edid.mrl_secondary_GTF_M }}</td>
+            <td>{{ edid.mrl_secondary_gtf_m }}</td>
           </tr>
           <tr>
             <td>K</td>
-            <td>{{ edid.mrl_secondary_GTF_K }}</td>
+            <td>{{ edid.mrl_secondary_gtf_k }}</td>
           </tr>
           <tr>
             <td>J</td>
-            <td>{{ edid.mrl_secondary_GTF_J }}</td>
+            <td>{{ edid.mrl_secondary_gtf_j }}</td>
           </tr>
     {% endif %}
         </tbody>

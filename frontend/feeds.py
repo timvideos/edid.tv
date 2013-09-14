@@ -1,3 +1,5 @@
+# pylint: disable-msg=R0201
+
 from django.core.urlresolvers import reverse
 from django.contrib.syndication.views import Feed
 

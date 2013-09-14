@@ -1,3 +1,11 @@
+# E1002: Use of super on an old style class
+# R0201: Method could be a function (no-self-use)
+# R0902: Too many instance attributes
+# R0912: Too many branches
+# R0915: Too many statements
+# W0201: Attribute 'xxxx' defined outside __init__
+# pylint: disable-msg=E1002,R0201,R0902,R0912,R0915,W0201
+
 import re
 
 from django.conf import settings
@@ -5,8 +13,8 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 
-from edid_parser.edid_parser import (Display_Type, Display_Stereo_Mode,
-                                     Timing_Sync_Scheme)
+from edid_parser.edid_parser import (DisplayType, DisplayStereoMode,
+                                     TimingSyncScheme)
 
 
 class Manufacturer(models.Model):
@@ -15,7 +23,7 @@ class Manufacturer(models.Model):
     # ID, 3 characters
     name_id = models.CharField(max_length=3)
 
-    class Meta:
+    class Meta(object):
         ordering = ['name_id']
 
     def __unicode__(self):
@@ -100,27 +108,27 @@ class EDID(models.Model):
     ### bdp=Basic display parameters
     bdp_video_input_analog = 0
     bdp_video_input_digital = 1
-    bdp_video_input_choices = ((bdp_video_input_analog, 'Analog'),
+    BDP_VIDEO_INPUT_CHOICES = ((bdp_video_input_analog, 'Analog'),
                                (bdp_video_input_digital, 'Digital'))
     bdp_video_input = models.PositiveSmallIntegerField(
         'video input',
-        choices=bdp_video_input_choices,
+        choices=BDP_VIDEO_INPUT_CHOICES,
         default=bdp_video_input_analog
     )
 
     # Analog Input
-    bdp_signal_level_standard_0700_0300 = 0
-    bdp_signal_level_standard_0714_0286 = 1
-    bdp_signal_level_standard_1000_0400 = 2
-    bdp_signal_level_standard_0700_0000 = 3
-    bdp_signal_level_standard_choices = (
-        (bdp_signal_level_standard_0700_0300, '(0.700, 0.300)'),
-        (bdp_signal_level_standard_0714_0286, '(0.714, 0.286)'),
-        (bdp_signal_level_standard_1000_0400, '(1.000, 0.400)'),
-        (bdp_signal_level_standard_0700_0000, '(0.700, 0.000)'),
+    bdp_signal_level_std_0700_0300 = 0
+    bdp_signal_level_std_0714_0286 = 1
+    bdp_signal_level_std_1000_0400 = 2
+    bdp_signal_level_std_0700_0000 = 3
+    BDP_SIGNAL_LVL_STD_CHOICE = (
+        (bdp_signal_level_std_0700_0300, '(0.700, 0.300)'),
+        (bdp_signal_level_std_0714_0286, '(0.714, 0.286)'),
+        (bdp_signal_level_std_1000_0400, '(1.000, 0.400)'),
+        (bdp_signal_level_std_0700_0000, '(0.700, 0.000)'),
     )
     bdp_signal_level_standard = models.PositiveSmallIntegerField(
-        'signal level standard', choices=bdp_signal_level_standard_choices,
+        'signal level standard', choices=BDP_SIGNAL_LVL_STD_CHOICE,
         blank=True, null=True)
 
     bdp_blank_to_black_setup = models.NullBooleanField(
@@ -134,7 +142,7 @@ class EDID(models.Model):
         'serration on the vertical sync')
 
     # Digital Input
-    bdp_video_input_DFP_1 = models.NullBooleanField('digital flat panel 1.x')
+    bdp_video_input_dfp_1 = models.NullBooleanField('digital flat panel 1.x')
 
     bdp_max_horizontal_image_size = models.PositiveSmallIntegerField(
         'maximum horizontal image size')
@@ -144,11 +152,11 @@ class EDID(models.Model):
                                             decimal_places=2, blank=True,
                                             null=True)
 
-    bdp_feature_display_type_choices = (
-        (Display_Type.Monochrome, 'Monochrome or grayscale display'),
-        (Display_Type.RGB, 'RGB color display'),
-        (Display_Type.Non_RGB, 'Non-RGB multicolor display'),
-        (Display_Type.Undefined, 'Undefined'),
+    BDP_FEATURE_DISPLY_CHOICE = (
+        (DisplayType.Monochrome, 'Monochrome or grayscale display'),
+        (DisplayType.RGB, 'RGB color display'),
+        (DisplayType.Non_RGB, 'Non-RGB multicolor display'),
+        (DisplayType.Undefined, 'Undefined'),
     )
 
     bdp_feature_standby = models.BooleanField('standby mode')
@@ -156,11 +164,11 @@ class EDID(models.Model):
     bdp_feature_active_off = models.BooleanField(
         'active off/very low power mode')
     bdp_feature_display_type = models.PositiveSmallIntegerField(
-        'display color type', choices=bdp_feature_display_type_choices)
-    bdp_feature_standard_sRGB = models.BooleanField('standard sRGB')
-    bdp_feature_preferred_timing_mode = models.BooleanField(
+        'display color type', choices=BDP_FEATURE_DISPLY_CHOICE)
+    bdp_feature_standard_srgb = models.BooleanField('standard sRGB')
+    bdp_feature_pref_timing_mode = models.BooleanField(
         'preferred timing mode')
-    bdp_feature_default_GTF = models.BooleanField('default GTF')
+    bdp_feature_default_gtf = models.BooleanField('default GTF')
 
     ### chr=Chromaticity
     chr_red_x = models.DecimalField(
@@ -217,19 +225,19 @@ class EDID(models.Model):
     mrl_max_pixel_clock = models.PositiveSmallIntegerField(
         'maximum supported pixel clock', blank=True, null=True)
 
-    mrl_secondary_GTF_curve_supported = models.NullBooleanField(
+    mrl_secondary_gtf_curve_support = models.NullBooleanField(
         'secondary GTF curve')
 
     # in kHz
-    mrl_secondary_GTF_start_frequency = models.PositiveSmallIntegerField(
+    mrl_secondary_gtf_start_freq = models.PositiveSmallIntegerField(
         'start frequency', blank=True, null=True)
-    mrl_secondary_GTF_C = models.PositiveSmallIntegerField(
+    mrl_secondary_gtf_c = models.PositiveSmallIntegerField(
         'C', blank=True, null=True)
-    mrl_secondary_GTF_M = models.PositiveSmallIntegerField(
+    mrl_secondary_gtf_m = models.PositiveSmallIntegerField(
         'M', blank=True, null=True)
-    mrl_secondary_GTF_K = models.PositiveSmallIntegerField(
+    mrl_secondary_gtf_k = models.PositiveSmallIntegerField(
         'K', blank=True, null=True)
-    mrl_secondary_GTF_J = models.PositiveSmallIntegerField(
+    mrl_secondary_gtf_j = models.PositiveSmallIntegerField(
         'J', blank=True, null=True)
 
     @classmethod
@@ -292,16 +300,16 @@ class EDID(models.Model):
             # Analog Input
             if bdp['Signal_Level_Standard'] == (0.700, 0.300):
                 self.bdp_signal_level_standard = \
-                    self.bdp_signal_level_standard_0700_0300
+                    self.bdp_signal_level_std_0700_0300
             elif bdp['Signal_Level_Standard'] == (0.714, 0.286):
                 self.bdp_signal_level_standard = \
-                    self.bdp_signal_level_standard_0714_0286
+                    self.bdp_signal_level_std_0714_0286
             elif bdp['Signal_Level_Standard'] == (1.000, 0.400):
                 self.bdp_signal_level_standard = \
-                    self.bdp_signal_level_standard_1000_0400
+                    self.bdp_signal_level_std_1000_0400
             elif bdp['Signal_Level_Standard'] == (0.700, 0.000):
                 self.bdp_signal_level_standard = \
-                    self.bdp_signal_level_standard_0700_0000
+                    self.bdp_signal_level_std_0700_0000
             else:
                 raise ValidationError(
                     'Invalid signal level standard can not be parsed.'
@@ -314,7 +322,7 @@ class EDID(models.Model):
             self.bdp_vsync_serration = bdp['Vsync_serration']
         else:
             # Digital Input
-            self.bdp_video_input_DFP_1 = bdp['Video_Input_DFP_1']
+            self.bdp_video_input_dfp_1 = bdp['Video_Input_DFP_1']
 
         self.bdp_max_horizontal_image_size = bdp['Max_Horizontal_Image_Size']
         self.bdp_max_vertical_image_size = bdp['Max_Vertical_Image_Size']
@@ -324,11 +332,11 @@ class EDID(models.Model):
         self.bdp_feature_suspend = bdp['Feature_Support']['Suspend']
         self.bdp_feature_active_off = bdp['Feature_Support']['Active-off']
         self.bdp_feature_display_type = bdp['Feature_Support']['Display_Type']
-        self.bdp_feature_standard_sRGB = \
+        self.bdp_feature_standard_srgb = \
             bdp['Feature_Support']['Standard-sRGB']
-        self.bdp_feature_preferred_timing_mode = \
+        self.bdp_feature_pref_timing_mode = \
             bdp['Feature_Support']['Preferred_Timing_Mode']
-        self.bdp_feature_default_GTF = bdp['Feature_Support']['Default_GTF']
+        self.bdp_feature_default_gtf = bdp['Feature_Support']['Default_GTF']
 
         ### Chromaticity
         self.chr_red_x = edid['Chromaticity']['Red_x']
@@ -374,7 +382,7 @@ class EDID(models.Model):
         self.est_timings_1280_1024_75 = \
             edid['Established_Timings']['1280x1024@75Hz']
 
-    def populate_timings_from_edid_parser(self, edid):
+    def populate_timings_from_parser(self, edid):
         for item in edid['Standard_Timings']:
             data = edid['Standard_Timings'][item]
             identification = re.search(r"^Identification_(\d+)$", item,
@@ -451,7 +459,7 @@ class EDID(models.Model):
                     timing.flags_composite_polarity = \
                         data['Flags']['Composite_Polarity']
                 else:
-                    timing.flags_sync_on_RGB = data['Flags']['Sync_On_RGB']
+                    timing.flags_sync_on_rgb = data['Flags']['Sync_On_RGB']
 
             self.detailedtiming_set.add(timing)
 
@@ -464,16 +472,16 @@ class EDID(models.Model):
             self.mrl_min_vertical_rate = data['Min_Vertical_rate']
             self.mrl_max_vertical_rate = data['Max_Vertical_rate']
             self.mrl_max_pixel_clock = data['Max_Supported_Pixel_Clock']
-            self.mrl_secondary_GTF_curve_supported = \
+            self.mrl_secondary_gtf_curve_support = \
                 data['Secondary_GTF_curve_supported']
 
-            if self.mrl_secondary_GTF_curve_supported:
-                self.mrl_secondary_GTF_start_frequency = \
+            if self.mrl_secondary_gtf_curve_support:
+                self.mrl_secondary_gtf_start_freq = \
                     data['Secondary_GTF']['start_frequency']
-                self.mrl_secondary_GTF_C = data['Secondary_GTF']['C']
-                self.mrl_secondary_GTF_M = data['Secondary_GTF']['M']
-                self.mrl_secondary_GTF_K = data['Secondary_GTF']['K']
-                self.mrl_secondary_GTF_J = data['Secondary_GTF']['J']
+                self.mrl_secondary_gtf_c = data['Secondary_GTF']['C']
+                self.mrl_secondary_gtf_m = data['Secondary_GTF']['M']
+                self.mrl_secondary_gtf_k = data['Secondary_GTF']['K']
+                self.mrl_secondary_gtf_j = data['Secondary_GTF']['J']
         else:
             self.monitor_range_limits = False
 
@@ -627,7 +635,7 @@ class Timing(models.Model):
     # Identification
     identification = models.IntegerField()
 
-    class Meta:
+    class Meta(object):
         abstract = True
         ordering = ['identification']
 
@@ -693,7 +701,7 @@ class DetailedTiming(Timing):
 
     flags_interlaced = models.BooleanField('interlaced')
 
-    Stereo_Mode = Display_Stereo_Mode
+    Stereo_Mode = DisplayStereoMode
     STEREO_MODE_CHOICES = (
         (Stereo_Mode.Normal_display, 'Normal display, no stereo.'),
         (Stereo_Mode.Field_sequential_right,
@@ -713,7 +721,7 @@ class DetailedTiming(Timing):
         choices=STEREO_MODE_CHOICES
     )
 
-    Sync_Scheme = Timing_Sync_Scheme
+    Sync_Scheme = TimingSyncScheme
     SYNC_SCHEME_CHOICES = (
         (Sync_Scheme.Analog_Composite, 'Analog Composite'),
         (Sync_Scheme.Bipolar_Analog_Composite, 'Bipolar Analog Composite'),
@@ -737,7 +745,7 @@ class DetailedTiming(Timing):
 
     # If not flags_sync_scheme == Digital_Composite and
     # not flags_sync_scheme == Digital_Separate
-    flags_sync_on_RGB = models.NullBooleanField('sync on RGB')
+    flags_sync_on_rgb = models.NullBooleanField('sync on RGB')
 
     def __unicode__(self):
         return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active,
@@ -763,7 +771,7 @@ class Comment(models.Model):
 
     content = models.TextField()
 
-    class Meta:
+    class Meta(object):
         ordering = ('level', 'submitted',)
 
     def get_max_thread_level(self):

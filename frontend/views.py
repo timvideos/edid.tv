@@ -14,7 +14,7 @@ from braces.views import (CsrfExemptMixin, JSONResponseMixin,
                           StaffuserRequiredMixin)
 import reversion
 
-from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
+from edid_parser.edid_parser import EDIDParser, EDIDParsingError
 
 from frontend.models import (Manufacturer, EDID, StandardTiming,
                              DetailedTiming, Comment)
@@ -112,7 +112,7 @@ class EDIDBinaryUpload(FormView):
         # Save the entry
         edid_object.save()
         # Add timings
-        edid_object.populate_timings_from_edid_parser(form.edid_data)
+        edid_object.populate_timings_from_parser(form.edid_data)
         # Save the updated entry
         edid_object.save()
 
@@ -157,7 +157,7 @@ class EDIDTextUpload(FormView):
         else:
             # Parse EDID file and add it
             try:
-                edid_data = EDID_Parser(edid_bytes).data
+                edid_data = EDIDParser(edid_bytes).data
                 self._create_edid(edid_base64, edid_data)
                 self.succeeded += 1
             except EDIDParsingError:
@@ -175,7 +175,7 @@ class EDIDTextUpload(FormView):
             edid_object.save()
 
             # Add timings
-            edid_object.populate_timings_from_edid_parser(edid_data)
+            edid_object.populate_timings_from_parser(edid_data)
             # Save the updated entry
             edid_object.save()
 
@@ -199,12 +199,12 @@ class EDIDDetailView(PrefetchRelatedMixin, DetailView):
         See EDIDRevisionDetail for details.
         """
 
-        object = super(EDIDDetailView, self).get_object(queryset)
+        obj = super(EDIDDetailView, self).get_object(queryset)
 
-        object.standardtimings = object.standardtiming_set.all()
-        object.detailedtimings = object.detailedtiming_set.all()
+        obj.standardtimings = obj.standardtiming_set.all()
+        obj.detailedtimings = obj.detailedtiming_set.all()
 
-        return object
+        return obj
 
     def get_context_data(self, **kwargs):
         """
@@ -437,7 +437,7 @@ class TimingMixin(object):
 
         # For CreateView, set EDID
         if not form.instance.EDID_id:
-            form.instance.EDID = form.EDID
+            form.instance.EDID = form.edid
             if not form.instance.identification:
                 # Get count of available timings
                 count = self.model.objects.filter(EDID=form.instance.EDID)\
@@ -467,16 +467,16 @@ class TimingMixin(object):
         Used for DeleteView.
         """
 
-        self.object = self.get_object()
-        self.object.delete()
+        obj = self.get_object()
+        obj.delete()
 
         # Did not actually update EDID, just to make sure EDID and all its
         # related objects are included in the revision
-        self.object.EDID.save()
+        obj.EDID.save()
 
         # Set revision comment
         reversion.set_comment('Deleted %s %s.' % (
-            self.object._meta.verbose_name, self.object
+            obj._meta.verbose_name, obj
         ))
 
         return HttpResponseRedirect(self.get_success_url())
@@ -649,7 +649,7 @@ class CommentCreate(LoginRequiredMixin, CreateView):
         """
 
         # Set EDID
-        form.instance.EDID = form.EDID
+        form.instance.EDID = form.edid
 
         # Set user
         form.instance.user = self.request.user
@@ -668,6 +668,13 @@ class CommentCreate(LoginRequiredMixin, CreateView):
 class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
     http_method_names = ['post']
 
+    def __init__(self):
+        super(APIUpload, self).__init__()
+
+        self.succeeded = 0
+        self.failed = 0
+        self.edid_list = []
+
     def post(self, request, *args, **kwargs):
         content = json.loads(request.body)
 
@@ -675,9 +682,6 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             return HttpResponseBadRequest(
                 json.dumps({'error_message': 'List of EDIDs is missing.'})
             )
-
-        self.succeeded = 0
-        self.failed = 0
 
         for edid_base64 in content['edid_list']:
             self._process_edid(edid_base64)
@@ -693,7 +697,7 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
 
             # Parse EDID file
             try:
-                edid_data = EDID_Parser(edid_binary).data
+                edid_data = EDIDParser(edid_binary).data
                 self._create_edid(edid_base64, edid_data)
                 self.succeeded += 1
             except EDIDParsingError:
@@ -711,7 +715,7 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             edid_object.save()
 
             # Add timings
-            edid_object.populate_timings_from_edid_parser(edid_data)
+            edid_object.populate_timings_from_parser(edid_data)
             # Save the updated entry
             edid_object.save()
 
@@ -719,6 +723,8 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             reversion.set_comment('EDID parsed.')
             # Create revision for EDID
             reversion.default_revision_manager.save_revision([edid_object])
+
+            self.edid_list.append(edid_object)
 
 
 class APITextUpload(CsrfExemptMixin, JSONResponseMixin, EDIDTextUpload):
