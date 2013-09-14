@@ -37,7 +37,7 @@ In your `private/settings.py` make sure to set these settings:
 
         import os
         SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
-        STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
+        STATIC_ROOT = os.path.join(SITE_ROOT, '../static')
         STATIC_URL = '/'
 
 * To support additional social sites for accounts:
