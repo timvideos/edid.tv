@@ -46,18 +46,6 @@ In your `private/settings.py` make sure to set these settings:
             'allauth.socialaccount.providers.google',
         )
 
-Running Tests
----
-
-Tests are run automatically through [Travis CI](https://travis-ci.org/timvideos/edid.tv) and coverage report can be found at [Coveralls](https://coveralls.io/r/timvideos/edid.tv).
-
-To run tests manually use the following commands:
-* `make coverage` to run all tests and generate coverage report.
-* `make clitest` to run unittests.
-* `make firefoxtest` to run Selenium integration tests with Firefox.
-* `make pep8` to run [PEP 8](http://www.python.org/dev/peps/pep-0008/) checker.
-
-
 Production Deployment
 ---
 
@@ -72,3 +60,23 @@ When deploying new version:
 1. `git pull`
 1. `make prepare-serve`
 2. `sudo /etc/init.d/uwsgi restart edid.tv`
+
+Running Tests
+---
+
+Tests are run automatically through [Travis CI](https://travis-ci.org/timvideos/edid.tv) and coverage report can be found at [Coveralls](https://coveralls.io/r/timvideos/edid.tv).
+
+To run tests manually use the following commands:
+* `make coverage` to run all tests and generate coverage report.
+* `make clitest` to run unittests.
+* `make firefoxtest` to run Selenium integration tests with Firefox.
+* `make pep8` to run [PEP 8](http://www.python.org/dev/peps/pep-0008/) checker.
+
+Contributing
+---
+
+1. [Fork](https://help.github.com/articles/fork-a-repo) this repo.
+2. Make your changes and commit them in your fork.
+3. Run tests locally as described above if possible.
+4. [Create a pull request](https://help.github.com/articles/using-pull-requests).
+    Travis-CI will run all tests and make a coverage report.
