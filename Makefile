@@ -85,23 +85,8 @@ pep8:
 
 lint:
 	@# C0303 - Disable "Trailing whitespace"
-	@# E1103 - Disable "Instance of 'x' has no 'y' member
-	@#         (but some types could not be inferred)"
-	@# I0011 - Disable "Locally disabling 'xxxx'"
-	@# R0801 - Disable "Duplication/Similar lines in %s files"
-	@# R0904 - Disable "Too many public methods"
-	@# W0212 - Disable "Access to a protected member _meta of a client class"
-	@# W0511 - Disable "FIXME/TODO"
-	@# W0613 - Disable "Unused argument 'xxxx'"
 	$(ACTIVATE) && pylint \
 		--disable=C0303 \
-		--disable=E1103 \
-		--disable=I0011 \
-		--disable=R0801 \
-		--disable=R0904 \
-		--disable=W0212 \
-		--disable=W0511 \
-		--disable=W0613 \
 		--reports=n \
 		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		*.py edid_parser/*.py frontend/*.py
