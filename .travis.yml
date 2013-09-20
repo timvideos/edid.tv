@@ -15,7 +15,9 @@ script:
   - pep8 --statistics *.py
   - pep8 --statistics edid_parser/
   - pep8 --statistics frontend/
-  - pylint --reports=n *.py edid_parser/*.py frontend/*.py
+  - pylint --reports=n \
+    --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+    *.py edid_parser/*.py frontend/*.py
   - coverage run --source=edid_parser edid_parser/tests.py
   - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.django_tests
   - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.selenium_tests
