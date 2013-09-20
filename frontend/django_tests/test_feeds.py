@@ -4,7 +4,7 @@ from xml.etree import ElementTree as ET
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from edid_parser.edid_parser import EDID_Parser
+from edid_parser.edid_parser import EDIDParser
 
 from frontend.django_tests.base import EDIDTestMixin
 from frontend.feeds import UploadedEDIDsFeed, UpdatedEDIDsFeed
@@ -28,7 +28,7 @@ class FeedTestMixin(object):
                       "\x31\x36\x57\x0A\x20\x20\x20\x20\x20\x00\x52"
 
         # Parse EDID file
-        edid_data = EDID_Parser(edid_binary).data
+        edid_data = EDIDParser(edid_binary).data
         # Encode in base64
         edid_base64 = base64.b64encode(edid_binary)
 
@@ -36,7 +36,7 @@ class FeedTestMixin(object):
         edid_object = EDID.create(file_base64=edid_base64,
                                   edid_data=edid_data)
         edid_object.save()
-        edid_object.populate_timings_from_edid_parser(edid_data)
+        edid_object.populate_timings_from_parser(edid_data)
         edid_object.save()
 
         self.edid_2 = edid_object

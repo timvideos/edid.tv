@@ -272,11 +272,11 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
 
         # Fields with null value will fail form validation
         data['bdp_signal_level_standard'] = 0
-        data['mrl_secondary_GTF_start_frequency'] = 0
-        data['mrl_secondary_GTF_C'] = 0
-        data['mrl_secondary_GTF_M'] = 0
-        data['mrl_secondary_GTF_K'] = 0
-        data['mrl_secondary_GTF_J'] = 0
+        data['mrl_secondary_gtf_start_freq'] = 0
+        data['mrl_secondary_gtf_c'] = 0
+        data['mrl_secondary_gtf_m'] = 0
+        data['mrl_secondary_gtf_k'] = 0
+        data['mrl_secondary_gtf_j'] = 0
 
         # Update while not logged in, get redirected to login page
         response = self.client.post(reverse('edid-update', kwargs={'pk': 1}),
@@ -354,11 +354,11 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
 
         # We need to fill these to validate the form
         data['bdp_signal_level_standard'] = 0
-        data['mrl_secondary_GTF_start_frequency'] = 0
-        data['mrl_secondary_GTF_C'] = 0
-        data['mrl_secondary_GTF_M'] = 0
-        data['mrl_secondary_GTF_K'] = 0
-        data['mrl_secondary_GTF_J'] = 0
+        data['mrl_secondary_gtf_start_freq'] = 0
+        data['mrl_secondary_gtf_c'] = 0
+        data['mrl_secondary_gtf_m'] = 0
+        data['mrl_secondary_gtf_k'] = 0
+        data['mrl_secondary_gtf_j'] = 0
 
         response = self.client.post(reverse('edid-update', kwargs={'pk': 1}),
                                     data)

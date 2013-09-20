@@ -1,3 +1,6 @@
+# E1002: Use of super on an old style class
+# pylint: disable-msg=E1002
+
 import base64
 import re
 
@@ -10,9 +13,10 @@ from crispy_forms.layout import Field, Fieldset, HTML, Layout, Submit
 from crispy_forms.bootstrap import (AppendedText, FormActions, InlineRadios,
                                     Tab, TabHolder)
 
-from edid_parser.edid_parser import EDID_Parser, EDIDParsingError
+from edid_parser.edid_parser import EDIDParser, EDIDParsingError
 
 from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
+from frontend.utils import form_nullify_fields
 
 
 class EDIDUploadForm(forms.Form):
@@ -31,7 +35,7 @@ class EDIDUploadForm(forms.Form):
 
         # Parse EDID file
         try:
-            self.edid_data = EDID_Parser(self.edid_binary).data
+            self.edid_data = EDIDParser(self.edid_binary).data
         except EDIDParsingError as msg:
             raise forms.ValidationError(msg)
 
@@ -49,9 +53,9 @@ class EDIDTextUploadForm(forms.Form):
     text = forms.CharField(widget=forms.Textarea)
     text_type = forms.CharField(widget=forms.HiddenInput)
 
-    _hex_addresses = re.compile('0x[0-9A-Fa-f]+')
-    _whitespaces = re.compile('\s')
-    _non_hex = re.compile('[^0-9A-Fa-f]')
+    _hex_addresses = re.compile(r'0x[0-9A-Fa-f]+')
+    _whitespaces = re.compile(r'\s')
+    _non_hex = re.compile(r'[^0-9A-Fa-f]')
 
     def __init__(self, *args, **kwargs):
         super(EDIDTextUploadForm, self).__init__(*args, **kwargs)
@@ -139,20 +143,9 @@ class BaseForm(forms.ModelForm):
 
         return cleaned_data
 
-    def _nullify_fields(self, cleaned_data, fields):
-        """Sets field value to Null.
-
-        To be used for unused fields.
-        """
-
-        for field in fields:
-            cleaned_data[field] = None
-
-        return cleaned_data
-
 
 class EDIDUpdateForm(BaseForm):
-    class Meta:
+    class Meta(object):
         model = EDID
         fields = [
             # Main Fields
@@ -164,12 +157,12 @@ class EDIDUpdateForm(BaseForm):
             'bdp_video_input', 'bdp_signal_level_standard',
             'bdp_blank_to_black_setup', 'bdp_separate_syncs',
             'bdp_composite_sync', 'bdp_sync_on_green_video',
-            'bdp_vsync_serration', 'bdp_video_input_DFP_1',
+            'bdp_vsync_serration', 'bdp_video_input_dfp_1',
             'bdp_max_horizontal_image_size', 'bdp_max_vertical_image_size',
             'bdp_display_gamma', 'bdp_feature_display_type',
             'bdp_feature_standby', 'bdp_feature_suspend',
-            'bdp_feature_active_off', 'bdp_feature_standard_sRGB',
-            'bdp_feature_preferred_timing_mode', 'bdp_feature_default_GTF',
+            'bdp_feature_active_off', 'bdp_feature_standard_srgb',
+            'bdp_feature_pref_timing_mode', 'bdp_feature_default_gtf',
             # Chromaticity
             'chr_red_x', 'chr_red_y', 'chr_green_x', 'chr_green_y',
             'chr_blue_x', 'chr_blue_y', 'chr_white_x', 'chr_white_y',
@@ -186,10 +179,10 @@ class EDIDUpdateForm(BaseForm):
             'monitor_range_limits', 'mrl_min_horizontal_rate',
             'mrl_max_horizontal_rate', 'mrl_min_vertical_rate',
             'mrl_max_vertical_rate', 'mrl_max_pixel_clock',
-            'mrl_secondary_GTF_curve_supported',
-            'mrl_secondary_GTF_start_frequency', 'mrl_secondary_GTF_C',
-            'mrl_secondary_GTF_M', 'mrl_secondary_GTF_K',
-            'mrl_secondary_GTF_J',
+            'mrl_secondary_gtf_curve_support',
+            'mrl_secondary_gtf_start_freq', 'mrl_secondary_gtf_c',
+            'mrl_secondary_gtf_m', 'mrl_secondary_gtf_k',
+            'mrl_secondary_gtf_j',
         ]
 
         # Change widget for NullBooleanField fields to act like regular
@@ -200,8 +193,8 @@ class EDIDUpdateForm(BaseForm):
             'bdp_composite_sync': forms.CheckboxInput,
             'bdp_sync_on_green_video': forms.CheckboxInput,
             'bdp_vsync_serration': forms.CheckboxInput,
-            'bdp_video_input_DFP_1': forms.CheckboxInput,
-            'mrl_secondary_GTF_curve_supported': forms.CheckboxInput,
+            'bdp_video_input_dfp_1': forms.CheckboxInput,
+            'mrl_secondary_gtf_curve_support': forms.CheckboxInput,
         }
 
     def __init__(self, *args, **kwargs):
@@ -230,7 +223,7 @@ class EDIDUpdateForm(BaseForm):
                     'bdp_composite_sync',
                     'bdp_sync_on_green_video',
                     'bdp_vsync_serration',
-                    'bdp_video_input_DFP_1',
+                    'bdp_video_input_dfp_1',
                     AppendedText('bdp_max_horizontal_image_size', 'cm'),
                     AppendedText('bdp_max_vertical_image_size', 'cm'),
                     'bdp_display_gamma',
@@ -238,9 +231,9 @@ class EDIDUpdateForm(BaseForm):
                     'bdp_feature_standby',
                     'bdp_feature_suspend',
                     'bdp_feature_active_off',
-                    'bdp_feature_standard_sRGB',
-                    'bdp_feature_preferred_timing_mode',
-                    'bdp_feature_default_GTF',
+                    'bdp_feature_standard_srgb',
+                    'bdp_feature_pref_timing_mode',
+                    'bdp_feature_default_gtf',
                 ),
                 Tab(
                     'Chromaticity',
@@ -280,12 +273,12 @@ class EDIDUpdateForm(BaseForm):
                     AppendedText('mrl_min_vertical_rate', 'Hz'),
                     AppendedText('mrl_max_vertical_rate', 'Hz'),
                     AppendedText('mrl_max_pixel_clock', 'MHz'),
-                    'mrl_secondary_GTF_curve_supported',
-                    AppendedText('mrl_secondary_GTF_start_frequency', 'kHz'),
-                    'mrl_secondary_GTF_C',
-                    'mrl_secondary_GTF_M',
-                    'mrl_secondary_GTF_K',
-                    'mrl_secondary_GTF_J',
+                    'mrl_secondary_gtf_curve_support',
+                    AppendedText('mrl_secondary_gtf_start_freq', 'kHz'),
+                    'mrl_secondary_gtf_c',
+                    'mrl_secondary_gtf_m',
+                    'mrl_secondary_gtf_k',
+                    'mrl_secondary_gtf_j',
                 )
             ),
             FormActions(
@@ -354,16 +347,16 @@ class EDIDUpdateForm(BaseForm):
         self.fields['mrl_max_pixel_clock'].validators.append(
             MaxValueValidator(255))
 
-        self.fields['mrl_secondary_GTF_start_frequency'].validators.append(
+        self.fields['mrl_secondary_gtf_start_freq'].validators.append(
             MaxValueValidator(510))
 
-        self.fields['mrl_secondary_GTF_C'].validators.append(
+        self.fields['mrl_secondary_gtf_c'].validators.append(
             MaxValueValidator(127))
-        self.fields['mrl_secondary_GTF_M'].validators.append(
+        self.fields['mrl_secondary_gtf_m'].validators.append(
             MaxValueValidator(65535))
-        self.fields['mrl_secondary_GTF_K'].validators.append(
+        self.fields['mrl_secondary_gtf_k'].validators.append(
             MaxValueValidator(255))
-        self.fields['mrl_secondary_GTF_J'].validators.append(
+        self.fields['mrl_secondary_gtf_j'].validators.append(
             MaxValueValidator(127))
 
     def clean_week_of_manufacture(self):
@@ -396,14 +389,14 @@ class EDIDUpdateForm(BaseForm):
         bdp_video_input = cleaned_data.get('bdp_video_input')
         if not bdp_video_input:
             # Analog
-            cleaned_data = self._nullify_fields(
-                cleaned_data, ['bdp_video_input_DFP_1'])
+            cleaned_data = form_nullify_fields(
+                cleaned_data, ['bdp_video_input_dfp_1'])
 
             cleaned_data = self._check_required_field(
                 cleaned_data, ['bdp_signal_level_standard'])
         else:
             # Digital
-            cleaned_data = self._nullify_fields(
+            cleaned_data = form_nullify_fields(
                 cleaned_data, ['bdp_signal_level_standard',
                                'bdp_blank_to_black_setup',
                                'bdp_separate_syncs', 'bdp_composite_sync',
@@ -414,11 +407,11 @@ class EDIDUpdateForm(BaseForm):
         mrl_fields = ['mrl_min_horizontal_rate', 'mrl_max_horizontal_rate',
                       'mrl_min_vertical_rate', 'mrl_max_vertical_rate',
                       'mrl_max_pixel_clock']
-        mrl_secondary_GTF_fields = ['mrl_secondary_GTF_start_frequency',
-                                    'mrl_secondary_GTF_C',
-                                    'mrl_secondary_GTF_M',
-                                    'mrl_secondary_GTF_K',
-                                    'mrl_secondary_GTF_J']
+        mrl_secondary_gtf_fields = ['mrl_secondary_gtf_start_freq',
+                                    'mrl_secondary_gtf_c',
+                                    'mrl_secondary_gtf_m',
+                                    'mrl_secondary_gtf_k',
+                                    'mrl_secondary_gtf_j']
 
         # If monitor range limits is enabled make sure all its fields are
         # required
@@ -428,22 +421,22 @@ class EDIDUpdateForm(BaseForm):
 
             # If Secondary GTF curve is enabled make sure all its fields are
             # required
-            mrl_secondary_GTF_curve_supported = cleaned_data.get(
-                'mrl_secondary_GTF_curve_supported')
-            if mrl_secondary_GTF_curve_supported:
+            mrl_secondary_gtf_curve_support = cleaned_data.get(
+                'mrl_secondary_gtf_curve_support')
+            if mrl_secondary_gtf_curve_support:
                 cleaned_data = self._check_required_field(
-                    cleaned_data, mrl_secondary_GTF_fields)
+                    cleaned_data, mrl_secondary_gtf_fields)
             # If Secondary GTF curve is disabled set all its fields to null
             else:
-                cleaned_data = self._nullify_fields(
-                    cleaned_data, mrl_secondary_GTF_fields)
+                cleaned_data = form_nullify_fields(
+                    cleaned_data, mrl_secondary_gtf_fields)
         # If Monitor Range Limits is disabled set all its fields to null
         else:
-            cleaned_data = self._nullify_fields(cleaned_data, mrl_fields)
-            cleaned_data = self._nullify_fields(
-                cleaned_data, ['mrl_secondary_GTF_curve_supported'])
-            cleaned_data = self._nullify_fields(
-                cleaned_data, mrl_secondary_GTF_fields)
+            cleaned_data = form_nullify_fields(cleaned_data, mrl_fields)
+            cleaned_data = form_nullify_fields(
+                cleaned_data, ['mrl_secondary_gtf_curve_support'])
+            cleaned_data = form_nullify_fields(
+                cleaned_data, mrl_secondary_gtf_fields)
 
         return cleaned_data
 
@@ -459,14 +452,14 @@ class EDIDUpdateForm(BaseForm):
 
 
 class StandardTimingForm(BaseForm):
-    class Meta:
+    class Meta(object):
         model = StandardTiming
         fields = ['horizontal_active', 'vertical_active', 'refresh_rate',
                   'aspect_ratio']
 
     def __init__(self, *args, **kwargs):
         # Store EDID object in the form
-        self.EDID = kwargs['initial'].get('edid')
+        self.edid = kwargs['initial'].get('edid')
 
         self.helper = FormHelper()
         self.helper.form_class = 'form-horizontal'
@@ -478,7 +471,7 @@ class StandardTimingForm(BaseForm):
             FormActions(
                 Submit('submit', 'Submit'),
                 HTML('<a class="btn" href="'
-                     "{% url 'edid-update' form.EDID.pk %}"
+                     "{% url 'edid-update' form.edid.pk %}"
                      '">Cancel</a>'),
             )
         )
@@ -521,11 +514,11 @@ class StandardTimingForm(BaseForm):
         old_versions = [EDID.VERSION_1_0, EDID.VERSION_1_1, EDID.VERSION_1_2]
 
         if aspect_ratio == StandardTiming.ASPECT_RATIO_1_1:
-            if not self.EDID.version in old_versions:
+            if not self.edid.version in old_versions:
                 raise forms.ValidationError('1:1 aspect ratio is not allowed'
                                             ' with EDID 1.3 or newer.')
         elif aspect_ratio == StandardTiming.ASPECT_RATIO_16_10:
-            if self.EDID.version in old_versions:
+            if self.edid.version in old_versions:
                 raise forms.ValidationError('16:10 aspect ratio is not allowed'
                                             ' prior to EDID 1.3.')
 
@@ -533,7 +526,7 @@ class StandardTimingForm(BaseForm):
 
 
 class DetailedTimingForm(BaseForm):
-    class Meta:
+    class Meta(object):
         model = DetailedTiming
         fields = [
             # Horizontal
@@ -548,7 +541,7 @@ class DetailedTimingForm(BaseForm):
             'pixel_clock', 'flags_interlaced', 'flags_stereo_mode',
             'flags_sync_scheme', 'flags_horizontal_polarity',
             'flags_vertical_polarity', 'flags_serrate',
-            'flags_composite_polarity', 'flags_sync_on_RGB',
+            'flags_composite_polarity', 'flags_sync_on_rgb',
         ]
 
         # Change widget for NullBooleanField fields to act like regular
@@ -557,11 +550,11 @@ class DetailedTimingForm(BaseForm):
                    'flags_vertical_polarity': forms.CheckboxInput,
                    'flags_serrate': forms.CheckboxInput,
                    'flags_composite_polarity': forms.CheckboxInput,
-                   'flags_sync_on_RGB': forms.CheckboxInput}
+                   'flags_sync_on_rgb': forms.CheckboxInput}
 
     def __init__(self, *args, **kwargs):
         # Store EDID object in the form
-        self.EDID = kwargs['initial'].get('edid')
+        self.edid = kwargs['initial'].get('edid')
 
         self.helper = FormHelper()
         self.helper.form_class = 'form-horizontal'
@@ -592,12 +585,12 @@ class DetailedTimingForm(BaseForm):
                 'flags_vertical_polarity',
                 'flags_serrate',
                 'flags_composite_polarity',
-                'flags_sync_on_RGB',
+                'flags_sync_on_rgb',
             ),
             FormActions(
                 Submit('submit', 'Submit'),
                 HTML('<a class="btn" href="'
-                     "{% url 'edid-update' form.EDID.pk %}"
+                     "{% url 'edid-update' form.edid.pk %}"
                      '">Cancel</a>'),
             )
         )
@@ -674,15 +667,15 @@ class DetailedTimingForm(BaseForm):
             fields_to_nullify.append('flags_composite_polarity')
 
         if digital_composite or digital_separate:
-            fields_to_nullify.append('flags_sync_on_RGB')
+            fields_to_nullify.append('flags_sync_on_rgb')
 
-        cleaned_data = self._nullify_fields(cleaned_data, fields_to_nullify)
+        cleaned_data = form_nullify_fields(cleaned_data, fields_to_nullify)
 
         return cleaned_data
 
 
 class CommentForm(forms.ModelForm):
-    class Meta:
+    class Meta(object):
         model = Comment
         fields = ['EDID', 'parent', 'content']
         widgets = {'EDID': forms.HiddenInput,
@@ -690,11 +683,11 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         # Store EDID object in the form
-        self.EDID = kwargs['initial'].get('edid')
+        self.edid = kwargs['initial'].get('edid')
 
         self.helper = FormHelper()
         self.helper.form_action = reverse('comment-create',
-                                          kwargs={'edid_pk': self.EDID.pk})
+                                          kwargs={'edid_pk': self.edid.pk})
         self.helper.form_class = 'form-horizontal'
         self.helper.layout = Layout(
             Field('content', rows=3, required=True),
@@ -704,7 +697,7 @@ class CommentForm(forms.ModelForm):
         )
         super(CommentForm, self).__init__(*args, **kwargs)
 
-        self.fields['EDID'].initial = self.EDID.pk
+        self.fields['EDID'].initial = self.edid.pk
         self.fields['parent'].required = False
         self.fields['content'].label = 'Add Comment'
 

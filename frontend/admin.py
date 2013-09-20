@@ -1,3 +1,6 @@
+# W0142: Used * or ** magic
+# pylint: disable-msg=W0142
+
 from django.contrib import admin
 
 import reversion

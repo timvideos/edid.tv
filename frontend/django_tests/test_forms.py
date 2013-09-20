@@ -46,8 +46,8 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
             'mrl_max_pixel_clock'
         ]
         self.mrl_secondary_GTF_fields = [
-            'mrl_secondary_GTF_start_frequency', 'mrl_secondary_GTF_C',
-            'mrl_secondary_GTF_M', 'mrl_secondary_GTF_K', 'mrl_secondary_GTF_J'
+            'mrl_secondary_gtf_start_freq', 'mrl_secondary_gtf_c',
+            'mrl_secondary_gtf_m', 'mrl_secondary_gtf_k', 'mrl_secondary_gtf_j'
         ]
 
     def test_valid(self):
@@ -96,9 +96,9 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         data = self.valid_data
         data['bdp_video_input'] = EDID.bdp_video_input_analog
         data['bdp_signal_level_standard'] = \
-            EDID.bdp_signal_level_standard_0700_0300
+            EDID.bdp_signal_level_std_0700_0300
         self._test_nulled_fields(
-            data, ['bdp_video_input_DFP_1']
+            data, ['bdp_video_input_dfp_1']
         )
 
         # Test bdp_video_input = Digital
@@ -113,14 +113,14 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         # Test monitor_range_limits = True
         data = self.valid_data
         data['monitor_range_limits'] = True
-        data['mrl_secondary_GTF_curve_supported'] = False
+        data['mrl_secondary_gtf_curve_support'] = False
         self._test_nulled_fields(data, self.mrl_secondary_GTF_fields)
 
         # Test monitor_range_limits = False
         data = self.valid_data
         data['monitor_range_limits'] = False
         self._test_nulled_fields(
-            data, self.mrl_fields + ['mrl_secondary_GTF_curve_supported']
+            data, self.mrl_fields + ['mrl_secondary_gtf_curve_support']
             + self.mrl_secondary_GTF_fields
         )
 
@@ -134,19 +134,19 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         )
 
         # Test monitor_range_limits = True and
-        # mrl_secondary_GTF_curve_supported = True
+        # mrl_secondary_gtf_curve_support = True
         data = self.valid_data
         data['monitor_range_limits'] = True
-        data['mrl_secondary_GTF_curve_supported'] = True
+        data['mrl_secondary_gtf_curve_support'] = True
         for field in self.mrl_fields + self.mrl_secondary_GTF_fields:
             data[field] = None
             self._test_field_error(data, field, u'This field is required.')
 
         # Test monitor_range_limits = True and
-        # mrl_secondary_GTF_curve_supported = False
+        # mrl_secondary_gtf_curve_support = False
         data = self.valid_data
         data['monitor_range_limits'] = True
-        data['mrl_secondary_GTF_curve_supported'] = False
+        data['mrl_secondary_gtf_curve_support'] = False
         for field in self.mrl_fields:
             data[field] = None
             self._test_field_error(data, field, u'This field is required.')
@@ -316,7 +316,7 @@ class DetailedTimingFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
                                                   .Digital_Composite
         self._test_nulled_fields(
             data, ['flags_horizontal_polarity', 'flags_vertical_polarity',
-                   'flags_sync_on_RGB']
+                   'flags_sync_on_rgb']
         )
 
         # Test flags_sync_scheme = Digital_Separate
@@ -324,7 +324,7 @@ class DetailedTimingFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         data['flags_sync_scheme'] = DetailedTiming.Sync_Scheme.Digital_Separate
         self._test_nulled_fields(
             data, ['flags_serrate', 'flags_composite_polarity',
-                   'flags_sync_on_RGB']
+                   'flags_sync_on_rgb']
         )
 
 

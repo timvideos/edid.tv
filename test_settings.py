@@ -1,5 +1,7 @@
 # Django settings for testing.
-# pylint: disable-msg=C0103
+# W0401: Wildcard import
+# W0614: Unused import from wildcard import
+# pylint: disable-msg=W0401,W0614
 
 from settings import *
 

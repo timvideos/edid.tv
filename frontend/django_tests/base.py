@@ -2,7 +2,7 @@ import base64
 
 from django.contrib.auth import get_user_model
 
-from edid_parser.edid_parser import EDID_Parser
+from edid_parser.edid_parser import EDIDParser
 
 from frontend.models import Manufacturer, EDID
 
@@ -28,7 +28,7 @@ class EDIDTestMixin(object):
                       "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
 
         # Parse EDID file
-        edid_data = EDID_Parser(edid_binary).data
+        edid_data = EDIDParser(edid_binary).data
         # Encode in base64
         edid_base64 = base64.b64encode(edid_binary)
 
@@ -36,7 +36,7 @@ class EDIDTestMixin(object):
         edid_object = EDID.create(file_base64=edid_base64,
                                   edid_data=edid_data)
         edid_object.save()
-        edid_object.populate_timings_from_edid_parser(edid_data)
+        edid_object.populate_timings_from_parser(edid_data)
         edid_object.save()
 
         self.edid = edid_object

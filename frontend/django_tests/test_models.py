@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from edid_parser.edid_parser import EDID_Parser
+from edid_parser.edid_parser import EDIDParser
 
 from frontend.django_tests.base import EDIDTestMixin
 from frontend.models import EDID, Manufacturer, StandardTiming, Comment
@@ -93,14 +93,14 @@ class EDIDParsingTestCase(TestCase):
                            "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
                            "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
                            "\x20\x20\x20\x20\x20\x20\x01\x24"
-        self.edid_data = EDID_Parser(self.edid_binary).data
+        self.edid_data = EDIDParser(self.edid_binary).data
 
     def _process_edid(self, edid_data):
         edid_object = EDID.create(file_base64='', edid_data=edid_data)
         # Save the entry
         edid_object.save()
         # Add timings
-        edid_object.populate_timings_from_edid_parser(edid_data)
+        edid_object.populate_timings_from_parser(edid_data)
         # Save the updated entry
         edid_object.save()
 
@@ -157,10 +157,10 @@ class EDIDParsingTestCase(TestCase):
         edid_data['Basic_display_parameters']['Vsync_serration'] = False
 
         for standard in [
-            ((0.700, 0.300), EDID.bdp_signal_level_standard_0700_0300),
-            ((0.714, 0.286), EDID.bdp_signal_level_standard_0714_0286),
-            ((1.000, 0.400), EDID.bdp_signal_level_standard_1000_0400),
-            ((0.700, 0.000), EDID.bdp_signal_level_standard_0700_0000)
+            ((0.700, 0.300), EDID.bdp_signal_level_std_0700_0300),
+            ((0.714, 0.286), EDID.bdp_signal_level_std_0714_0286),
+            ((1.000, 0.400), EDID.bdp_signal_level_std_1000_0400),
+            ((0.700, 0.000), EDID.bdp_signal_level_std_0700_0000)
         ]:
             edid_data['Basic_display_parameters']['Signal_Level_Standard'] = \
                 standard[0]
@@ -262,12 +262,12 @@ class EDIDParsingTestCase(TestCase):
 
         # Check stored values
         self.assertTrue(edid.monitor_range_limits)
-        self.assertTrue(edid.mrl_secondary_GTF_curve_supported)
-        self.assertEqual(edid.mrl_secondary_GTF_start_frequency, 64)
-        self.assertEqual(edid.mrl_secondary_GTF_C, 64)
-        self.assertEqual(edid.mrl_secondary_GTF_M, 64)
-        self.assertEqual(edid.mrl_secondary_GTF_K, 64)
-        self.assertEqual(edid.mrl_secondary_GTF_J, 64)
+        self.assertTrue(edid.mrl_secondary_gtf_curve_support)
+        self.assertEqual(edid.mrl_secondary_gtf_start_freq, 64)
+        self.assertEqual(edid.mrl_secondary_gtf_c, 64)
+        self.assertEqual(edid.mrl_secondary_gtf_m, 64)
+        self.assertEqual(edid.mrl_secondary_gtf_k, 64)
+        self.assertEqual(edid.mrl_secondary_gtf_j, 64)
 
 
 class DetailedTimingParsingTestCase(TestCase):
@@ -301,13 +301,13 @@ class DetailedTimingParsingTestCase(TestCase):
         # Convert to string
         edid_binary = ''.join([chr(x) for x in edid_binary])
 
-        edid_data = EDID_Parser(edid_binary).data
+        edid_data = EDIDParser(edid_binary).data
 
         edid_object = EDID.create(file_base64='', edid_data=edid_data)
         # Save the entry
         edid_object.save()
         # Add timings
-        edid_object.populate_timings_from_edid_parser(edid_data)
+        edid_object.populate_timings_from_parser(edid_data)
         # Save the updated entry
         edid_object.save()
 
@@ -328,7 +328,7 @@ class DetailedTimingParsingTestCase(TestCase):
         self.assertEqual(timing.flags_horizontal_polarity, None)
         self.assertEqual(timing.flags_serrate, True)
         self.assertEqual(timing.flags_composite_polarity, None)
-        self.assertEqual(timing.flags_sync_on_RGB, True)
+        self.assertEqual(timing.flags_sync_on_rgb, True)
 
     def test_flags_sync_scheme_bipolar_analog_composite(self):
         """
@@ -345,7 +345,7 @@ class DetailedTimingParsingTestCase(TestCase):
         self.assertEqual(timing.flags_horizontal_polarity, None)
         self.assertEqual(timing.flags_serrate, True)
         self.assertEqual(timing.flags_composite_polarity, None)
-        self.assertEqual(timing.flags_sync_on_RGB, True)
+        self.assertEqual(timing.flags_sync_on_rgb, True)
 
     def test_flags_sync_scheme_digital_composite(self):
         """
@@ -362,7 +362,7 @@ class DetailedTimingParsingTestCase(TestCase):
         self.assertEqual(timing.flags_horizontal_polarity, None)
         self.assertEqual(timing.flags_serrate, True)
         self.assertEqual(timing.flags_composite_polarity, True)
-        self.assertEqual(timing.flags_sync_on_RGB, None)
+        self.assertEqual(timing.flags_sync_on_rgb, None)
 
     def test_flags_sync_scheme_digital_separate(self):
         """
@@ -379,7 +379,7 @@ class DetailedTimingParsingTestCase(TestCase):
         self.assertEqual(timing.flags_horizontal_polarity, True)
         self.assertEqual(timing.flags_serrate, None)
         self.assertEqual(timing.flags_composite_polarity, None)
-        self.assertEqual(timing.flags_sync_on_RGB, None)
+        self.assertEqual(timing.flags_sync_on_rgb, None)
 
 
 ### Timing Tests

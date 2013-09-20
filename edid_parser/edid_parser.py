@@ -5,18 +5,22 @@ EDID Parser for timvideos's HDMI2USB's EDID.tv website!
 http://en.wikipedia.org/wiki/Extended_display_identification_data
 http://read.pudn.com/downloads110/ebook/456020/E-EDID%20Standard.pdf
 """
+# C0103: Invalid name
+# R0201: Method could be a function (no-self-use)
+# R0914: Too many local variables
+# pylint: disable-msg=C0103,R0201,R0914
 
 import struct
 
 
-class Display_Type:
+class DisplayType(object):
     Monochrome = 0b00
     RGB = 0b01
     Non_RGB = 0b10
     Undefined = 0b11
 
 
-class Display_Stereo_Mode:
+class DisplayStereoMode(object):
     Normal_display = 0b000
     Field_sequential_right = 0b010
     Field_sequential_left = 0b100
@@ -26,26 +30,27 @@ class Display_Stereo_Mode:
     Interleaved_side_by_side = 0b111
 
 
-class Timing_Sync_Scheme:
+class TimingSyncScheme(object):
     Analog_Composite = 0b00
     Bipolar_Analog_Composite = 0b01
     Digital_Composite = 0b10
     Digital_Separate = 0b11
 
 
-class EDID_Parser(object):
+class EDIDParser(object):
     def __init__(self, bin_data=None):
         """
         Preparing settings
         """
 
         self.data = {}
+        self.bin_data = bin_data
 
-        if bin_data:
-            self.parse_all(bin_data)
+        if self.bin_data:
+            self.parse_all()
 
-    def parse_all(self, bin_data):
-        edid = self.parse_binary(bin_data)
+    def parse_all(self):
+        edid = self.parse_binary()
 
         self.checksum(edid)
         self.parse_header(edid[8:20])
@@ -58,17 +63,17 @@ class EDID_Parser(object):
             self.parse_standard_timings(edid[38:54])
         self.data['Descriptors'] = self.parse_descriptors(edid[54:126])
 
-    def parse_binary(self, bin_data):
+    def parse_binary(self):
         """
         Converts string to list of bytes, supports first 128 bytes only
 
         bin_data is a string of bytes
         """
 
-        if len(bin_data) < 128:
+        if len(self.bin_data) < 128:
             raise EDIDParsingError("Binary file is smaller than 128 bytes.")
 
-        return struct.unpack("B" * 128, bin_data[:128])
+        return struct.unpack("B" * 128, self.bin_data[:128])
 
     def checksum(self, edid):
         """
@@ -283,30 +288,32 @@ class EDID_Parser(object):
         for i in range(0, 15, 2):
             # Check if the field is not unused (both bytes are 0b01)
             if edid[i] is not 0b01 and edid[i + 1] is not 0b01:
-                id = {}
-                id['Horizontal_active'] = ((edid[i] + 31) * 8)
-                id['Refresh_Rate'] = (edid[i + 1] & 0b00111111) + 60
+                timing = {
+                    'Horizontal_active': ((edid[i] + 31) * 8),
+                    'Refresh_Rate': (edid[i + 1] & 0b00111111) + 60,
+                    'Image_aspect_ratio': (edid[i + 1] & 0b11000000) >> 6
+                }
 
-                id['Image_aspect_ratio'] = (edid[i + 1] & 0b11000000) >> 6
-                if id['Image_aspect_ratio'] == 0b00:
+                if timing['Image_aspect_ratio'] == 0b00:
                     if (self.data['EDID_version'] <= 1) and \
                        (self.data['EDID_revision'] < 3):
-                        id['Image_aspect_ratio'] = (1, 1)
+                        timing['Image_aspect_ratio'] = (1, 1)
                     else:
-                        id['Image_aspect_ratio'] = (16, 10)
-                elif id['Image_aspect_ratio'] == 0b01:
-                    id['Image_aspect_ratio'] = (4, 3)
-                elif id['Image_aspect_ratio'] == 0b10:
-                    id['Image_aspect_ratio'] = (5, 4)
-                elif id['Image_aspect_ratio'] == 0b11:
-                    id['Image_aspect_ratio'] = (16, 9)
+                        timing['Image_aspect_ratio'] = (16, 10)
+                elif timing['Image_aspect_ratio'] == 0b01:
+                    timing['Image_aspect_ratio'] = (4, 3)
+                elif timing['Image_aspect_ratio'] == 0b10:
+                    timing['Image_aspect_ratio'] = (5, 4)
+                elif timing['Image_aspect_ratio'] == 0b11:
+                    timing['Image_aspect_ratio'] = (16, 9)
 
-                id['Vertical_active'] = (
-                    (id['Horizontal_active'] * id['Image_aspect_ratio'][1]) /
-                    id['Image_aspect_ratio'][0]
+                timing['Vertical_active'] = (
+                    (timing['Horizontal_active'] *
+                     timing['Image_aspect_ratio'][1]) /
+                    timing['Image_aspect_ratio'][0]
                 )
 
-                new_data['Identification_%d' % ((i / 2) + 1)] = id
+                new_data['Identification_%d' % ((i / 2) + 1)] = timing
 
         return new_data
 
@@ -414,13 +421,13 @@ class EDID_Parser(object):
         bit_2 = (edid[17] & 0b00000100) >> 2
         bit_1 = (edid[17] & 0b00000010) >> 1
 
-        if flags['Sync_Scheme'] == Timing_Sync_Scheme.Digital_Separate:
+        if flags['Sync_Scheme'] == TimingSyncScheme.Digital_Separate:
             flags['Vertical_Polarity'] = bit_2
             flags['Horizontal_Polarity'] = bit_1
         else:
             flags['Serrate'] = bit_2
 
-            if flags['Sync_Scheme'] == Timing_Sync_Scheme.Digital_Composite:
+            if flags['Sync_Scheme'] == TimingSyncScheme.Digital_Composite:
                 flags['Composite_Polarity'] = bit_1
             else:
                 flags['Sync_On_RGB'] = bit_1
@@ -429,29 +436,25 @@ class EDID_Parser(object):
 
         return new_data
 
-    def decode_stereo_mode(self, x, y, z):
+    def decode_stereo_mode(self, bit_6, bit_5, bit_0):
         """
-        Decodes stereo mode bits
-
-        x is bit 6
-        y is bit 5
-        z is bit 0
+        Decodes stereo mode bits.
         """
 
-        if x == 0 and y == 0:
-            stereo_mode = Display_Stereo_Mode.Normal_display
-        elif x == 0 and y == 1 and z == 0:
-            stereo_mode = Display_Stereo_Mode.Field_sequential_right
-        elif x == 1 and y == 0 and z == 0:
-            stereo_mode = Display_Stereo_Mode.Field_sequential_left
-        elif x == 0 and y == 1 and z == 1:
-            stereo_mode = Display_Stereo_Mode.Interleaved_2_way_right
-        elif x == 1 and y == 0 and z == 1:
-            stereo_mode = Display_Stereo_Mode.Interleaved_2_way_left
-        elif x == 1 and y == 1 and z == 0:
-            stereo_mode = Display_Stereo_Mode.Interleaved_4_way
-        elif x == 1 and y == 1 and z == 1:
-            stereo_mode = Display_Stereo_Mode.Interleaved_side_by_side
+        if bit_6 == 0 and bit_5 == 0:
+            stereo_mode = DisplayStereoMode.Normal_display
+        elif bit_6 == 0 and bit_5 == 1 and bit_0 == 0:
+            stereo_mode = DisplayStereoMode.Field_sequential_right
+        elif bit_6 == 1 and bit_5 == 0 and bit_0 == 0:
+            stereo_mode = DisplayStereoMode.Field_sequential_left
+        elif bit_6 == 0 and bit_5 == 1 and bit_0 == 1:
+            stereo_mode = DisplayStereoMode.Interleaved_2_way_right
+        elif bit_6 == 1 and bit_5 == 0 and bit_0 == 1:
+            stereo_mode = DisplayStereoMode.Interleaved_2_way_left
+        elif bit_6 == 1 and bit_5 == 1 and bit_0 == 0:
+            stereo_mode = DisplayStereoMode.Interleaved_4_way
+        elif bit_6 == 1 and bit_5 == 1 and bit_0 == 1:
+            stereo_mode = DisplayStereoMode.Interleaved_side_by_side
 
         return stereo_mode
 
@@ -464,11 +467,11 @@ class EDID_Parser(object):
 
         output = ""
 
-        for x in range(0, 13):
-            if edid[x] == 0x0a:
+        for index in range(0, 13):
+            if edid[index] == 0x0a:
                 break
 
-            output += chr(edid[x])
+            output += chr(edid[index])
 
         self.data[name] = output
 
@@ -508,6 +511,8 @@ class EDID_Parser(object):
 
 class EDIDParsingError(Exception):
     def __init__(self, value):
+        super(EDIDParsingError, self).__init__()
+
         self.value = value
 
     def __str__(self):
@@ -519,7 +524,6 @@ if __name__ == "__main__":
     import pprint
 
     with open(sys.argv[1], 'rb') as edid_file:
-        bin_data = edid_file.read()
+        TEMP_EDID = EDIDParser(edid_file.read())
 
-    my_edid = EDID_Parser(bin_data)
-    print pprint.pprint(my_edid.data)
+    print pprint.pprint(TEMP_EDID.data)
