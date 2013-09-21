@@ -42,7 +42,7 @@ install-ez_setup: lib
 
 install-packages: requirements.txt
 	$(ACTIVATE) && pip install -r requirements.txt
-	-$(ACTIVATE) && pip install -r private/requirements.txt
+	$(ACTIVATE) && [ ! -f private/requirements.txt ] || pip install -r private/requirements.txt
 
 install: install-ez_setup install-distribute install-packages
 
