@@ -71,6 +71,7 @@ To run tests manually use the following commands:
 * `make clitest` to run unittests.
 * `make firefoxtest` to run Selenium integration tests with Firefox.
 * `make pep8` to run [PEP 8](http://www.python.org/dev/peps/pep-0008/) checker.
+* `make lint` to run [Pylint](http://www.pylint.org) checker.
 
 Contributing
 ---
