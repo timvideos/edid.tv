@@ -1,8 +1,13 @@
+import os
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from frontend.django_tests.base import EDIDTestMixin
 from frontend.forms import (EDIDTextUploadForm, EDIDUpdateForm, CommentForm,
-                            StandardTimingForm, DetailedTimingForm)
+                            StandardTimingForm, DetailedTimingForm,
+                            GrabberReleaseUploadForm)
 from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
 
 
@@ -363,3 +368,105 @@ class CommentFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
             data, 'parent',
             u'Comment nesting limit exceeded.'
         )
+
+
+@override_settings(EDID_GRABBER_RELEASE_UPLOAD_API_KEY='VALID_KEY')
+class GrabberReleaseUploadFormTestCase(TestCase):
+    def setUp(self):
+        super(GrabberReleaseUploadFormTestCase, self).setUp()
+
+        self.valid_data = {
+            'platform': 'linux',
+            'commit': 'da39a3ee5e6b4b0d3255bfef95601890afd80709',
+            'api_key': 'VALID_KEY'
+        }
+
+        self._update_files('edid-grabber-linux-da39a3e.tar.gz')
+
+    def _update_files(self, filename):
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        filepath = os.path.join(data_dir, filename)
+
+        self.valid_files = {
+            'release_file': InMemoryUploadedFile(
+                open(filepath, 'r'), 'release_file',
+                filename, 'application/octet-stream',
+                os.path.getsize(filepath), None
+            )
+        }
+
+    def _test_field_error(self, data, files, field, error_message):
+        form = GrabberReleaseUploadForm(data, files)
+        self.assertEqual(form.errors[field], [error_message])
+
+    def test_valid(self):
+        # Test valid data
+        form = GrabberReleaseUploadForm(self.valid_data, self.valid_files)
+        self.assertEqual(len(form.errors), 0)
+
+    @override_settings(EDID_GRABBER_RELEASE_UPLOAD_API_KEY=None)
+    def test_no_api_key(self):
+        # from django.conf import settings
+        # print(settings.EDID_GRABBER_RELEASE_UPLOAD_API_KEY)
+        # Test no API key in settings
+        self._test_field_error(
+            self.valid_data, self.valid_files, 'api_key',
+            u'This feature is disabled.'
+        )
+
+    def test_invalid_api_key(self):
+        # Test invalid API key
+        data = self.valid_data
+        data['api_key'] = 'INVALID_KEY'
+        self._test_field_error(
+            data, self.valid_files, 'api_key',
+            u'API key is incorrect.'
+        )
+
+    @override_settings(EDID_GRABBER_RELEASE_UPLOAD_API_KEY=12345)
+    def test_integer_api_key(self):
+        # Test an integer API key in settings
+        data = self.valid_data
+        data['api_key'] = 12345
+        form = GrabberReleaseUploadForm(data, self.valid_files)
+        self.assertEqual(len(form.errors), 0)
+
+    @override_settings(EDID_GRABBER_RELEASE_UPLOAD_API_KEY='ASCII')
+    def test_ascii_api_key(self):
+        # Test an ASCII API key in settings
+        data = self.valid_data
+        data['api_key'] = 'ASCII'
+        form = GrabberReleaseUploadForm(data, self.valid_files)
+        self.assertEqual(len(form.errors), 0)
+
+    @override_settings(EDID_GRABBER_RELEASE_UPLOAD_API_KEY=u'Unicode')
+    def test_unicode_api_key(self):
+        # Test an unicode API key in settings
+        data = self.valid_data
+        data['api_key'] = 'Unicode'
+        form = GrabberReleaseUploadForm(data, self.valid_files)
+        self.assertEqual(len(form.errors), 0)
+
+    def test_no_release_file(self):
+        # Test no release_file included
+        self._test_field_error(
+            self.valid_data, None, 'release_file',
+            u'This field is required.'
+        )
+
+    def test_platform(self):
+        # Test valid platforms
+        for platform in ['linux', 'macosx', 'windows']:
+            data = self.valid_data
+            data['platform'] = platform
+            form = GrabberReleaseUploadForm(data, self.valid_files)
+            self.assertEqual(len(form.errors), 0)
+
+        # Test invalid platforms
+        for platform in ['android', 'ps3', 'hdmi2usb']:
+            data = self.valid_data
+            data['platform'] = platform
+            self._test_field_error(
+                data, self.valid_files, 'platform',
+                u'Platform is incorrect.'
+            )

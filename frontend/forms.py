@@ -5,6 +5,7 @@ import base64
 import re
 
 from django import forms
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -15,7 +16,8 @@ from crispy_forms.bootstrap import (AppendedText, FormActions, InlineRadios,
 
 from edid_parser.edid_parser import EDIDParser, EDIDParsingError
 
-from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
+from frontend.models import (EDID, StandardTiming, DetailedTiming, Comment,
+                             GrabberRelease)
 from frontend.utils import form_nullify_fields
 
 
@@ -709,3 +711,52 @@ class CommentForm(forms.ModelForm):
                 raise forms.ValidationError('Comment nesting limit exceeded.')
 
         return parent
+
+
+class GrabberReleaseUploadForm(BaseForm):
+    platforms = {'linux': GrabberRelease.PLATFORM_LINUX,
+                 'macosx': GrabberRelease.PLATFORM_MACOSX,
+                 'windows': GrabberRelease.PLATFORM_WINDOWS}
+
+    api_key = forms.CharField(widget=forms.PasswordInput)
+    platform = forms.CharField()
+
+    class Meta(object):
+        model = GrabberRelease
+        fields = ['release_file', 'commit']
+
+    def __init__(self, *args, **kwargs):
+        super(GrabberReleaseUploadForm, self).__init__(*args, **kwargs)
+        self.file_data = None
+
+    def clean_api_key(self):
+        api_key = self.cleaned_data['api_key']
+
+        if not hasattr(settings, 'EDID_GRABBER_RELEASE_UPLOAD_API_KEY') \
+                or settings.EDID_GRABBER_RELEASE_UPLOAD_API_KEY is None:
+            raise forms.ValidationError('This feature is disabled.')
+
+        if not api_key == str(settings.EDID_GRABBER_RELEASE_UPLOAD_API_KEY) \
+                .encode('utf-8'):
+            raise forms.ValidationError('API key is incorrect.')
+
+        return api_key
+
+    def clean_release_file(self):
+        release_file = self.cleaned_data['release_file']
+
+        # TODO: Validate file content based on file name extension
+
+        self.file_data = release_file.read()
+
+        return release_file
+
+    def clean_platform(self):
+        platform = self.cleaned_data['platform']
+
+        if not platform in self.platforms.iterkeys():
+            raise forms.ValidationError('Platform is incorrect.')
+
+        platform = self.platforms[platform]
+
+        return platform

@@ -68,6 +68,8 @@ urlpatterns = patterns(
     url(r'^api/upload/$', views.APIUpload.as_view(), name='api-upload'),
     url(r'^api/upload/text$', views.APITextUpload.as_view(),
         name='api-upload-text'),
+    url(r'^api/grabber/upload/$', views.GrabberReleaseUpload.as_view(),
+        name='api-grabber-upload'),
 
     # django-allauth
     (r'^accounts/', include('allauth.urls')),

@@ -782,3 +782,32 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return "%s: %s" % (self.pk, self.content[:100])
+
+
+class GrabberRelease(models.Model):
+    # Release platform
+    PLATFORM_LINUX = 0
+    PLATFORM_MACOSX = 1
+    PLATFORM_WINDOWS = 2
+    PLATFORM_CHOICES = ((PLATFORM_LINUX, 'Linux'),
+                        (PLATFORM_MACOSX, 'Mac OS X'),
+                        (PLATFORM_WINDOWS, 'Windows'))
+    platform = models.PositiveSmallIntegerField(choices=PLATFORM_CHOICES)
+
+    # Release commit hash
+    commit = models.CharField(max_length=40)
+
+    release_file = models.FileField(upload_to='edid-grabber/%Y/%m')
+
+    # Release file checksum
+    checksum_md5 = models.CharField(max_length=32)
+    checksum_sha1 = models.CharField(max_length=40)
+
+    # Uploaded date
+    uploaded = models.DateTimeField(auto_now_add=True)
+
+    # Non-sticky releases will be listed in archive only
+    sticky = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return "%s" % (self.commit)
