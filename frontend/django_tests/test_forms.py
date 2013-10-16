@@ -381,7 +381,7 @@ class GrabberReleaseUploadFormTestCase(TestCase):
             'api_key': 'VALID_KEY'
         }
 
-        self._update_files('test.zip')
+        self._update_files('edid-grabber-linux-da39a3e.tar.gz')
 
     def _update_files(self, filename):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
