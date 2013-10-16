@@ -718,7 +718,7 @@ class GrabberReleaseUploadForm(BaseForm):
                  'macosx': GrabberRelease.PLATFORM_MACOSX,
                  'windows': GrabberRelease.PLATFORM_WINDOWS}
 
-    api_key = forms.CharField()
+    api_key = forms.CharField(widget=forms.PasswordInput)
     platform = forms.CharField()
 
     class Meta(object):

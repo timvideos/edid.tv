@@ -33,6 +33,7 @@ In your `private/settings.py` make sure to set these settings:
 * `ADMINS` and `MANAGERS` for receiving emails for errors.
 * `ALLOWED_HOSTS` to to a list of served domains, like `['.edid.co', '.edid.tv']`.
 * `DATABASES` to your production database settings.
+* `EDID_GRABBER_RELEASE_UPLOAD_API_KEY` to API key to be used by [edid_grabber_c](http://github.com/sewar/edid_grabber_c) to publish new releases. Leaving it empty will keep this feature disabled.
 * For static files:
 
         import os

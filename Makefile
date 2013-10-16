@@ -25,7 +25,7 @@ virtualenv-clean:
 
 clean:
 	find . \( -name \*\.pyc \) -delete
-	git clean -f -d
+#	git clean -f -d
 
 bin/activate:
 	virtualenv --no-site-packages .
