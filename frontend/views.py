@@ -1,9 +1,11 @@
 import base64
+import hashlib
 import json
 
 from django.db.models import Count
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseRedirect, Http404)
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import (FormView, CreateView, UpdateView,
@@ -17,10 +19,10 @@ import reversion
 from edid_parser.edid_parser import EDIDParser, EDIDParsingError
 
 from frontend.models import (Manufacturer, EDID, StandardTiming,
-                             DetailedTiming, Comment)
+                             DetailedTiming, Comment, GrabberRelease)
 from frontend.forms import (EDIDTextUploadForm, EDIDUpdateForm, EDIDUploadForm,
                             StandardTimingForm, DetailedTimingForm,
-                            CommentForm)
+                            CommentForm, GrabberReleaseUploadForm)
 
 
 ### Manufacturer
@@ -744,6 +746,28 @@ class APITextUpload(CsrfExemptMixin, JSONResponseMixin, EDIDTextUpload):
 
     def form_invalid(self, form):
         return self.render_json_response({'error': 'Submittion failed!'})
+
+
+### Grabber Release
+class GrabberReleaseUpload(CsrfExemptMixin, CreateView):
+    model = GrabberRelease
+    form_class = GrabberReleaseUploadForm
+    http_method_names = [u'post']
+
+    def form_invalid(self, form):
+        return HttpResponse("%d\nRelease posting failed.\n%s" % (False, form),
+                            content_type='text/plain', status=400)
+
+    def form_valid(self, form):
+        form.instance.platform = form.cleaned_data['platform']
+
+        # Calculate MD5 and SHA1 checksum
+        form.instance.checksum_md5 = hashlib.md5(form.file_data).hexdigest()
+        form.instance.checksum_sha1 = hashlib.sha1(form.file_data).hexdigest()
+
+        self.object = form.save()
+        return HttpResponse("%d\nRelease posted successfully." % True,
+                            content_type='text/plain')
 
 
 ### User Profile
