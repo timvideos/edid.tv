@@ -6,3 +6,10 @@ local_settings.py
 !.travis.yml
 private/
 !private/__init__.py
+bin/
+include/
+lib/
+local/
+pip-selfcheck.json
+selenium/
+*.iml
