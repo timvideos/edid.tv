@@ -41,6 +41,7 @@
       <a class="btn disabled" href="#" data-toggle="tooltip" title="Registration is required to make changes."><i class="icon-edit"></i> Update</a>
     {% endif %}
       <a class="btn" href="{% url 'edid-revision-list' edid.pk %}">Revisions</a>
+      <a class="btn btn-primary" href="{% url 'edid-download' edid.pk %}">Download binary</a>
     </p>
   {% endif %}
 

@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseRedirect, Http404)
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import smart_str
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import (FormView, CreateView, UpdateView,
                                        DeleteView)
@@ -218,6 +219,23 @@ class EDIDDetailView(PrefetchRelatedMixin, DetailView):
         context['comment_form'] = CommentForm(initial={'edid': self.object})
 
         return context
+
+
+class EDIDDownloadView(DetailView):
+    model = EDID
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        response = HttpResponse(mimetype='application/octet-stream')
+        response.content = base64.b64decode(obj.file_base64)
+
+        if obj.monitor_name:
+            name = "%s_%s" % (smart_str(obj.monitor_name), smart_str(obj.manufacturer_serial_number))
+        else:
+            name = smart_str(obj.manufacturer_serial_number)
+
+        response['Content-Disposition'] = 'attachment; filename=%s.edid' % name
+        return response
 
 
 class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):

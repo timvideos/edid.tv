@@ -15,6 +15,8 @@ urlpatterns = patterns(
     # EDID
     url(r'^edid/(?P<pk>\d+)/$', views.EDIDDetailView.as_view(),
         name='edid-detail'),
+    url(r'^edid/(?P<pk>\d+)/download/$', views.EDIDDownloadView.as_view(),
+        name='edid-download'),
     url(r'^edid/(?P<pk>\d+)/update/$', views.EDIDUpdate.as_view(),
         name='edid-update'),
     url(r'^edid/upload/binary/$', views.EDIDBinaryUpload.as_view(),
