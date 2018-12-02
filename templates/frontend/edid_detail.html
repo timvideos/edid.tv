@@ -26,7 +26,8 @@
   </div>
 
   <div class="span9">
-    <h2><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a> {{ edid.manufacturer_serial_number }}</h2>
+    <h2><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a></h2>
+    <h3>S/N: {{ edid.manufacturer_serial_number }}</h3>
 
   {% if edid.is_revision %}
     <div class="alert alert-block alert-info">
