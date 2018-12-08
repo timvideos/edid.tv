@@ -26,7 +26,12 @@
   </div>
 
   <div class="span9">
-    <h2><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a> {{ edid.manufacturer_serial_number }}</h2>
+    <h2><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a></h2>
+  {% if edid.monitor_name %}
+    <h3>{{ edid.monitor_name }} (S/N: {{ edid.manufacturer_serial_number }})</h3>
+  {% else %}
+    <h3>S/N: {{ edid.manufacturer_serial_number }}</h3>
+  {% endif %}
 
   {% if edid.is_revision %}
     <div class="alert alert-block alert-info">

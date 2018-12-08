@@ -6,6 +6,7 @@
     {% if not manufacturer %}
       <td>Manufacturer</td>
     {% endif %}
+      <td>Name</td>
       <td>Serial Number</td>
       <td>Manufacturing</td>
       <td>Video Input</td>
@@ -22,6 +23,7 @@
     {% if not manufacturer %}
       <td><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a></td>
     {% endif %}
+      <td>{{ edid.monitor_name }}</td>
       <td>{{ edid.manufacturer_serial_number }}</td>
       <td>
     {% if edid.week_of_manufacture and edid.week_of_manufacture != 255 %}
