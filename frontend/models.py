@@ -5,6 +5,7 @@
 # R0915: Too many statements
 # W0201: Attribute 'xxxx' defined outside __init__
 # pylint: disable-msg=E1002,R0201,R0902,R0912,R0915,W0201
+from __future__ import division
 
 import re
 
@@ -595,7 +596,7 @@ class EDID(models.Model):
                 maximum_resolution,
                 timing.horizontal_active,
                 timing.vertical_active,
-                timing.pixel_clock / 1000
+                timing.get_refresh_rate()
             )
 
         return maximum_resolution
@@ -747,9 +748,14 @@ class DetailedTiming(Timing):
     # not flags_sync_scheme == Digital_Separate
     flags_sync_on_rgb = models.NullBooleanField('sync on RGB')
 
+    def get_refresh_rate(self):
+        return round((self.pixel_clock * 1000) /
+                     ((self.horizontal_active + self.horizontal_blanking)
+                      * (self.vertical_active + self.vertical_blanking)), 2)
+
     def __unicode__(self):
-        return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active,
-                               self.pixel_clock / 1000)
+        return "%dx%d@%fHz" % (self.horizontal_active, self.vertical_active,
+                               self.get_refresh_rate())
 
 
 # Default settings for Comment model
