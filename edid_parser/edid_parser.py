@@ -37,6 +37,14 @@ class TimingSyncScheme(object):
     Digital_Separate = 0b11
 
 
+class CVTSupportDefinitionPreferredAspectRatio(object):
+    AR_4_3 = 0b000
+    AR_16_9 = 0b001
+    AR_16_10 = 0b010
+    AR_5_4 = 0b011
+    AR_15_9 = 0b100
+
+
 class EDIDParser(object):
     def __init__(self, bin_data=None):
         """
@@ -492,6 +500,9 @@ class EDIDParser(object):
 
         new_data['Max_Supported_Pixel_Clock'] = edid[4] * 10
 
+        new_data['Coordinated_Video_Timings_supported'] = False
+        new_data['Secondary_GTF_curve_supported'] = False
+
         if edid[5] == 0x02:
             new_data['Secondary_GTF_curve_supported'] = True
             gtf = {}
@@ -503,8 +514,34 @@ class EDIDParser(object):
             gtf['J'] = float(edid[12]) / 2
 
             new_data['Secondary_GTF'] = gtf
-        else:
-            new_data['Secondary_GTF_curve_supported'] = False
+        elif edid[5] == 0x04:
+            new_data['Coordinated_Video_Timings_supported'] = True
+            new_data['Max_Supported_Pixel_Clock'] -= (edid[7] >> 2) * 0.25
+            new_data['Max_Active_Pixels_per_Line'] = (((edid[7] & 0b11) << 8) + edid[8]) * 8
+            new_data['Aspect_Ratio_4:3_supported'] = \
+                (edid[9] & 0b10000000) != 0
+            new_data['Aspect_Ratio_16:9_supported'] = \
+                (edid[9] & 0b01000000) != 0
+            new_data['Aspect_Ratio_16:10_supported'] = \
+                (edid[9] & 0b00100000) != 0
+            new_data['Aspect_Ratio_5:4_supported'] = \
+                (edid[9] & 0b00010000) != 0
+            new_data['Aspect_Ratio_15:9_supported'] = \
+                (edid[9] & 0b00001000) != 0
+            new_data['Preferred_Aspect_Ratio'] = edid[10] >> 5
+            new_data['CVT_Standard_Blanking_supported'] = \
+                (edid[10] & 0b01000) != 0
+            new_data['CVT_Reduced_Blanking_supported'] = \
+                (edid[10] & 0b10000) != 0
+            new_data['Horizontal_Shrink_supported'] = \
+                (edid[11] & 0b10000000) != 0
+            new_data['Horizontal_Stretch_supported'] = \
+                (edid[11] & 0b01000000) != 0
+            new_data['Vertical_Shrink_supported'] = \
+                (edid[11] & 0b00100000) != 0
+            new_data['Vertical_Stretch_supported'] = \
+                (edid[11] & 0b00010000) != 0
+            new_data['Preferred_Vertical_Refresh_Rate'] = edid[12]
 
         return new_data
 

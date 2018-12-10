@@ -4,7 +4,7 @@
 
 import unittest
 from edid_parser import (EDIDParser, EDIDParsingError, DisplayType,
-                         DisplayStereoMode, TimingSyncScheme)
+                         DisplayStereoMode, TimingSyncScheme, CVTSupportDefinitionPreferredAspectRatio)
 
 
 class EDIDTest(unittest.TestCase):
@@ -458,6 +458,39 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(data['Secondary_GTF']['M'], 32971)
         self.assertEqual(data['Secondary_GTF']['K'], 188)
         self.assertEqual(data['Secondary_GTF']['J'], 86.5)
+
+        test_edid = [0x30, 0x55, 0x1E, 0x5D, 0x11, 0x04, 0x11, 0x50, 0xD2,
+                     0xF8, 0x58, 0xF0, 0x00]
+        data = self.parser.parse_monitor_descriptor_range_limits(test_edid)
+
+        self.assertEqual(data['Min_Vertical_rate'], 48)
+        self.assertEqual(data['Max_Vertical_rate'], 85)
+
+        self.assertEqual(data['Min_Horizontal_rate'], 30)
+        self.assertEqual(data['Max_Horizontal_rate'], 93)
+
+        self.assertEqual(data['Max_Supported_Pixel_Clock'], 165)
+
+        self.assertEqual(data['Coordinated_Video_Timings_supported'], True)
+
+        self.assertEqual(data['Max_Active_Pixels_per_Line'], 1680)
+
+        self.assertEqual(data['Aspect_Ratio_4:3_supported'], True)
+        self.assertEqual(data['Aspect_Ratio_16:9_supported'], True)
+        self.assertEqual(data['Aspect_Ratio_16:10_supported'], True)
+        self.assertEqual(data['Aspect_Ratio_5:4_supported'], True)
+        self.assertEqual(data['Aspect_Ratio_15:9_supported'], True)
+        self.assertEqual(data['Preferred_Aspect_Ratio'], CVTSupportDefinitionPreferredAspectRatio.AR_16_10)
+
+        self.assertEqual(data['CVT_Standard_Blanking_supported'], True)
+        self.assertEqual(data['CVT_Reduced_Blanking_supported'], True)
+
+        self.assertEqual(data['Horizontal_Shrink_supported'], True)
+        self.assertEqual(data['Horizontal_Stretch_supported'], True)
+        self.assertEqual(data['Vertical_Shrink_supported'], True)
+        self.assertEqual(data['Vertical_Stretch_supported'], True)
+
+        self.assertEqual(data['Preferred_Vertical_Refresh_Rate'], 0)
 
 
 class EDIDInvalidTest(EDIDTest):

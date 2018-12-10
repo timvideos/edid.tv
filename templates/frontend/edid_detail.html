@@ -284,6 +284,95 @@
             <td>{{ edid.mrl_secondary_gtf_j }}</td>
           </tr>
     {% endif %}
+          <tr>
+            <td>Coordinated Video Timings supported</td>
+            <td><i class="icon-{{ edid.mrl_coordinated_video_timing_support|yesno:"ok,remove" }}"></i></td>
+          </tr>
+    {% if edid.mrl_coordinated_video_timing_support %}
+          <tr>
+            <td>Maximum active pixels per line</td>
+            <td>{{ edid.mrl_cvt_max_active_pixels_per_line }}</td>
+          </tr>
+          <tr>
+            <td>Preferred aspect ratio</td>
+            <td>{{ edid.get_mrl_cvt_preferred_aspect_ratio_display }}</td>
+          </tr>
+          <tr>
+            <td>Preferred vertical refresh rate</td>
+            <td>{{ edid.mrl_cvt_preferred_vertical_refresh_rate }} Hz</td>
+          </tr>
+          <tr>
+            <td>Supported aspect ratios</td>
+            <td class="nested-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>4:3</th>
+                    <th>16:9</th>
+                    <th>16:10</th>
+                    <th>5:4</th>
+                    <th>15:9</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><i class="icon-{{ edid.mrl_cvt_aspect_ratio_4_3_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_aspect_ratio_16_9_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_aspect_ratio_16_10_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_aspect_ratio_5_4_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_aspect_ratio_15_9_supported|yesno:"ok,remove" }}"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td>Supported blanking modes</td>
+            <td class="nested-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Standard</th>
+                    <th>Reduced</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><i class="icon-{{ edid.mrl_cvt_standard_blanking_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_reduced_blanking_supported|yesno:"ok,remove" }}"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td>Supported scaling modes</td>
+            <td class="nested-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th colspan="2">Horizontal</th>
+                    <th colspan="2">Vertical</th>
+                  </tr>
+                  <tr>
+                    <th>Shrink</th>
+                    <th>Stretch</th>
+                    <th>Shrink</th>
+                    <th>Stretch</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><i class="icon-{{ edid.mrl_cvt_horizontal_shrink_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_horizontal_stretch_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_vertical_shrink_supported|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.mrl_cvt_vertical_stretch_supported|yesno:"ok,remove" }}"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+    {% endif %}
         </tbody>
       </table>
     </section>
