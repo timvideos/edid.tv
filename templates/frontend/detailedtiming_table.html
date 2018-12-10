@@ -5,6 +5,10 @@
       <td>{{ timing.pixel_clock }} kHz</td>
     </tr>
     <tr>
+      <td>Refresh rate</td>
+      <td>{{ timing.get_refresh_rate|floatformat:2 }} Hz</td>
+    </tr>
+    <tr>
       <td>Horizontal Active</td>
       <td>{{ timing.horizontal_active }} pixels</td>
     </tr>
