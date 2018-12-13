@@ -74,6 +74,30 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
             ]
         )
 
+    def test_get_maximum_resolution(self):
+        max_res = EDID(est_timings_640_480_60=True,
+                       est_timings_800_600_56=True).get_maximum_resolution()
+
+        self.assertEqual(max_res['horizontal_active'], 800)
+        self.assertEqual(max_res['vertical_active'], 600)
+        self.assertEqual(max_res['refresh_rate'], 56)
+
+        max_res = EDID(est_timings_800_600_56=True,
+                       est_timings_800_600_72=True,
+                       est_timings_800_600_75=True).get_maximum_resolution()
+
+        self.assertEqual(max_res['horizontal_active'], 800)
+        self.assertEqual(max_res['vertical_active'], 600)
+        self.assertEqual(max_res['refresh_rate'], 75)
+
+        max_res = EDID(est_timings_640_480_72=True,
+                       est_timings_640_480_75=True,
+                       est_timings_800_600_60=True).get_maximum_resolution()
+
+        self.assertEqual(max_res['horizontal_active'], 800)
+        self.assertEqual(max_res['vertical_active'], 600)
+        self.assertEqual(max_res['refresh_rate'], 60)
+
 
 class EDIDParsingTestCase(TestCase):
     def setUp(self):
