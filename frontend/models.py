@@ -611,7 +611,11 @@ class EDID(models.Model):
         maximum_resolution_pixels = maximum_resolution['horizontal_active'] \
             * maximum_resolution['vertical_active']
 
-        if (horizontal_active * vertical_active) > maximum_resolution_pixels:
+        resolution_pixels = horizontal_active * vertical_active
+
+        if resolution_pixels > maximum_resolution_pixels \
+            or (resolution_pixels == maximum_resolution_pixels
+                and refresh_rate > maximum_resolution['refresh_rate']):
             maximum_resolution = {
                 'horizontal_active': horizontal_active,
                 'vertical_active': vertical_active,
