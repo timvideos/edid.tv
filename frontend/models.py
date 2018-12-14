@@ -14,7 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 
 from edid_parser.edid_parser import (DisplayType, DisplayStereoMode,
-                                     TimingSyncScheme)
+                                     TimingSyncScheme, CVTSupportDefinitionPreferredAspectRatio)
 
 
 class Manufacturer(models.Model):
@@ -221,9 +221,9 @@ class EDID(models.Model):
     mrl_max_vertical_rate = models.PositiveSmallIntegerField(
         'maximum vertical rate', blank=True, null=True)
 
-    # in MHz
-    mrl_max_pixel_clock = models.PositiveSmallIntegerField(
-        'maximum supported pixel clock', blank=True, null=True)
+    # in MHz (0.25 MHz steps, max 256 MHz)
+    mrl_max_pixel_clock = models.DecimalField(
+        'maximum supported pixel clock', max_digits=5, decimal_places=2, blank=True, null=True)
 
     mrl_secondary_gtf_curve_support = models.NullBooleanField(
         'secondary GTF curve')
@@ -239,6 +239,42 @@ class EDID(models.Model):
         'K', blank=True, null=True)
     mrl_secondary_gtf_j = models.PositiveSmallIntegerField(
         'J', blank=True, null=True)
+
+    mrl_coordinated_video_timing_support = models.NullBooleanField(
+        'coordinated video timing support')
+    mrl_cvt_max_active_pixels_per_line = models.PositiveIntegerField(
+        'maximum active pixels per line', blank=True, null=True)
+    mrl_cvt_aspect_ratio_4_3_supported = models.NullBooleanField('4:3')
+    mrl_cvt_aspect_ratio_16_9_supported = models.NullBooleanField('16:9')
+    mrl_cvt_aspect_ratio_16_10_supported = models.NullBooleanField('16:10')
+    mrl_cvt_aspect_ratio_5_4_supported = models.NullBooleanField('5:4')
+    mrl_cvt_aspect_ratio_15_9_supported = models.NullBooleanField('15:9')
+
+    Preferred_Aspect_Ratio = CVTSupportDefinitionPreferredAspectRatio
+    PREFERRED_ASPECT_RATIO_CHOICES = (
+        (Preferred_Aspect_Ratio.AR_4_3, '4:3'),
+        (Preferred_Aspect_Ratio.AR_16_9, '16:9'),
+        (Preferred_Aspect_Ratio.AR_16_10, '16:10'),
+        (Preferred_Aspect_Ratio.AR_5_4, '5:4'),
+        (Preferred_Aspect_Ratio.AR_15_9, '15:9'),
+    )
+    mrl_cvt_preferred_aspect_ratio = models.PositiveSmallIntegerField(
+        'preferred aspect ratio',
+        choices=PREFERRED_ASPECT_RATIO_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    mrl_cvt_standard_blanking_supported = models.NullBooleanField('CVT standard blanking supported')
+    mrl_cvt_reduced_blanking_supported = models.NullBooleanField('CVT reduced blanking supported')
+    mrl_cvt_horizontal_shrink_supported = models.NullBooleanField('horizontal shrink supported')
+    mrl_cvt_horizontal_stretch_supported = models.NullBooleanField('horizontal stretch supported')
+    mrl_cvt_vertical_shrink_supported = models.NullBooleanField('vertical shrink supported')
+    mrl_cvt_vertical_stretch_supported = models.NullBooleanField('vertical stretch supported')
+
+    # in Hz
+    mrl_cvt_preferred_vertical_refresh_rate = models.PositiveSmallIntegerField(
+        'preferred vertical refresh rate', blank=True, null=True)
 
     @classmethod
     def create(cls, file_base64, edid_data):
@@ -474,6 +510,8 @@ class EDID(models.Model):
             self.mrl_max_pixel_clock = data['Max_Supported_Pixel_Clock']
             self.mrl_secondary_gtf_curve_support = \
                 data['Secondary_GTF_curve_supported']
+            self.mrl_coordinated_video_timing_support = \
+                data['Coordinated_Video_Timings_supported']
 
             if self.mrl_secondary_gtf_curve_support:
                 self.mrl_secondary_gtf_start_freq = \
@@ -482,6 +520,36 @@ class EDID(models.Model):
                 self.mrl_secondary_gtf_m = data['Secondary_GTF']['M']
                 self.mrl_secondary_gtf_k = data['Secondary_GTF']['K']
                 self.mrl_secondary_gtf_j = data['Secondary_GTF']['J']
+
+            if self.mrl_coordinated_video_timing_support:
+                self.mrl_cvt_max_active_pixels_per_line = \
+                    data['Max_Active_Pixels_per_Line']
+                self.mrl_cvt_aspect_ratio_4_3_supported = \
+                    data['Aspect_Ratio_4:3_supported']
+                self.mrl_cvt_aspect_ratio_16_9_supported = \
+                    data['Aspect_Ratio_16:9_supported']
+                self.mrl_cvt_aspect_ratio_16_10_supported = \
+                    data['Aspect_Ratio_16:10_supported']
+                self.mrl_cvt_aspect_ratio_5_4_supported = \
+                    data['Aspect_Ratio_5:4_supported']
+                self.mrl_cvt_aspect_ratio_15_9_supported = \
+                    data['Aspect_Ratio_15:9_supported']
+                self.mrl_cvt_preferred_aspect_ratio = \
+                    data['Preferred_Aspect_Ratio']
+                self.mrl_cvt_standard_blanking_supported = \
+                    data['CVT_Standard_Blanking_supported']
+                self.mrl_cvt_reduced_blanking_supported = \
+                    data['CVT_Reduced_Blanking_supported']
+                self.mrl_cvt_horizontal_shrink_supported = \
+                    data['Horizontal_Shrink_supported']
+                self.mrl_cvt_horizontal_stretch_supported = \
+                    data['Horizontal_Stretch_supported']
+                self.mrl_cvt_vertical_shrink_supported = \
+                    data['Vertical_Shrink_supported']
+                self.mrl_cvt_vertical_stretch_supported = \
+                    data['Vertical_Stretch_supported']
+                self.mrl_cvt_preferred_vertical_refresh_rate = \
+                    data['Preferred_Vertical_Refresh_Rate']
         else:
             self.monitor_range_limits = False
 
