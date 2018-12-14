@@ -335,9 +335,8 @@ class EDIDParser(object):
         new_data = {}
 
         for i in range(0, 71, 18):
-            if (not ((edid[i] << 8) + edid[i + 1]) == 0x0000 and
-                    not edid[i + 2] == 0x00 and
-                    not edid[i + 4] == 0x00):
+            if not (((edid[i] << 8) + edid[i + 1]) == 0x0000 and
+                    edid[i + 2] == 0x00):
                 new_data['Timing_Descriptor_%d' % ((i / 18) + 1)] = \
                     self.parse_timing_descriptor(edid[i:i + 18])
             else:
