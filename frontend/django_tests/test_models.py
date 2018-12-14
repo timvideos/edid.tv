@@ -4,7 +4,7 @@ from django.test import TestCase
 from edid_parser.edid_parser import EDIDParser
 
 from frontend.django_tests.base import EDIDTestMixin
-from frontend.models import EDID, Manufacturer, StandardTiming, Comment
+from frontend.models import EDID, Manufacturer, StandardTiming, Comment, DetailedTiming
 
 
 ### EDID Tests
@@ -438,6 +438,13 @@ class StandardTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
 class DetailedTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
     def _get_timings_set(self):
         return self.edid.detailedtiming_set
+
+    def test_get_refresh_rate(self):
+        detailed_timing = DetailedTiming(horizontal_active=1920, horizontal_blanking=280,
+                                         vertical_active=1080, vertical_blanking=45,
+                                         pixel_clock=148500)
+
+        self.assertEqual(detailed_timing.get_refresh_rate(), 60.00)
 
 
 ### Comment Tests
