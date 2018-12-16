@@ -153,7 +153,7 @@ class EDID(models.Model):
                                             decimal_places=2, blank=True,
                                             null=True)
 
-    BDP_FEATURE_DISPLY_CHOICE = (
+    BDP_FEATURE_DISPLAY_TYPE_CHOICE = (
         (DisplayType.Monochrome, 'Monochrome or grayscale display'),
         (DisplayType.RGB, 'RGB color display'),
         (DisplayType.Non_RGB, 'Non-RGB multicolor display'),
@@ -165,7 +165,7 @@ class EDID(models.Model):
     bdp_feature_active_off = models.BooleanField(
         'active off/very low power mode')
     bdp_feature_display_type = models.PositiveSmallIntegerField(
-        'display color type', choices=BDP_FEATURE_DISPLY_CHOICE)
+        'display color type', choices=BDP_FEATURE_DISPLAY_TYPE_CHOICE)
     bdp_feature_standard_srgb = models.BooleanField('standard sRGB')
     bdp_feature_pref_timing_mode = models.BooleanField(
         'preferred timing mode')
