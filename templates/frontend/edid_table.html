@@ -8,7 +8,6 @@
     {% endif %}
       <td>Name</td>
       <td>Serial Number</td>
-      <td>Manufacturing</td>
       <td>Video Input</td>
       <td>Monitor Range Limits</td>
       <td>Standard Timings</td>
@@ -25,12 +24,6 @@
     {% endif %}
       <td>{{ edid.monitor_name }}</td>
       <td>{{ edid.manufacturer_serial_number }}</td>
-      <td>
-    {% if edid.week_of_manufacture and edid.week_of_manufacture != 255 %}
-        Week {{ edid.week_of_manufacture }} of
-    {% endif %}
-        {{ edid.year_of_manufacture }}
-      </td>
       <td>{{ edid.get_bdp_video_input_display }}</td>
       <td><i class="icon-{{ edid.monitor_range_limits|yesno:"ok,remove" }}"></i></td>
       <td>{{ edid.standardtiming__count }}</td>
