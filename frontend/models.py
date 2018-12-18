@@ -79,10 +79,12 @@ class EDID(models.Model):
     # ID Serial Number, 32-bit
     manufacturer_serial_number = models.PositiveIntegerField(blank=True,
                                                              null=True)
-    # Week of manufacture, 1-54, 0==Unknown, 255==the year model
-    week_of_manufacture = models.PositiveSmallIntegerField()
+    # Week of manufacture, 1-54, 0==Unknown
+    week_of_manufacture = models.PositiveSmallIntegerField(blank=True, null=True)
     # Year of manufacture, 1990-2245
-    year_of_manufacture = models.PositiveSmallIntegerField()
+    year_of_manufacture = models.PositiveSmallIntegerField(blank=True, null=True)
+    # Model year, 1990-2245
+    model_year = models.PositiveSmallIntegerField(blank=True, null=True)
 
     # EDID version and revision
     VERSION_1_0 = 0
@@ -350,8 +352,11 @@ class EDID(models.Model):
         self.manufacturer_product_code = edid['ID_Product_Code']
         self.manufacturer_serial_number = edid['ID_Serial_Number']
 
-        self.week_of_manufacture = edid['Week_of_manufacture']
-        self.year_of_manufacture = edid['Year_of_manufacture']
+        if 'Model_Year' in edid:
+            self.model_year = edid['Model_Year']
+        else:
+            self.week_of_manufacture = edid['Week_of_manufacture']
+            self.year_of_manufacture = edid['Year_of_manufacture']
 
         if edid['EDID_version'] == 1:
             if edid['EDID_revision'] == 0:

@@ -96,13 +96,13 @@ class EDID13ValidTest(EDID13Test):
         self.assertEqual(self.parser.data['Extension_Flag'], 1)
 
     def test_header(self):
-        test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF,
+        test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0x10,
                      0x13, 0x01, 0x03]
         self.parser.parse_header(test_edid)
 
         self.assertEqual(self.parser.data['ID_Manufacturer_Name'], 'TSB')
         self.assertEqual(self.parser.data['ID_Product_Code'], '0206')
-        self.assertEqual(self.parser.data['Week_of_manufacture'], 255)
+        self.assertEqual(self.parser.data['Week_of_manufacture'], 16)
         self.assertEqual(self.parser.data['Year_of_manufacture'], 2009)
         self.assertEqual(self.parser.data['ID_Serial_Number'], 16843009)
         self.assertEqual(self.parser.data['EDID_version'], 1)
@@ -539,6 +539,21 @@ class EDID14ValidTest(EDID14Test):
     """
     EDID 1.4 Parser tests with valid input.
     """
+
+    def test_header(self):
+        test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xff,
+                     0x13, 0x01, 0x04]
+        self.parser.parse_header(test_edid)
+
+        self.assertNotIn('Week_of_manufacture', self.parser.data)
+        self.assertNotIn('Year_of_manufacture', self.parser.data)
+
+        self.assertEqual(self.parser.data['ID_Manufacturer_Name'], 'TSB')
+        self.assertEqual(self.parser.data['ID_Product_Code'], '0206')
+        self.assertEqual(self.parser.data['Model_Year'], 2009)
+        self.assertEqual(self.parser.data['ID_Serial_Number'], 16843009)
+        self.assertEqual(self.parser.data['EDID_version'], 1)
+        self.assertEqual(self.parser.data['EDID_revision'], 4)
 
     def test_basic_display(self):
         test_edid = [0xb5, 0x3c, 0x22, 0x78, 0x3a]
