@@ -7,6 +7,7 @@
 <div class="row">
   <div class="span3 sidenav">
     <ul class="nav nav-list sidenav" data-spy="affix">
+      <li><a href="#general_information"><i class="icon-chevron-right"></i> General Information</a> </li>
       <li><a href="#basic_display_parameters"><i class="icon-chevron-right"></i> Basic Display Parameters</a></li>
       <li><a href="#chromaticity"><i class="icon-chevron-right"></i> Chromaticity</a></li>
       <li><a href="#established_timings"><i class="icon-chevron-right"></i> Established Timings</a></li>
@@ -49,6 +50,44 @@
       <a class="btn btn-primary" href="{% url 'edid-download' edid.pk %}">Download binary</a>
     </p>
   {% endif %}
+
+    <section id="general_information">
+      <h3>General Information</h3>
+      <table class="table table-striped table-bordered">
+        <tbody>
+        <tr>
+          <td>EDID version</td>
+          <td>{{ edid.get_version_display }}</td>
+        </tr>
+        <tr>
+          <td>Maximum resolution</td>
+          {% with timing=edid.get_maximum_resolution %}
+            <td>{{ timing.horizontal_active }}x{{ timing.vertical_active }}@{{ timing.refresh_rate }}Hz</td>
+          {% endwith %}
+        </tr>
+        <tr>
+          <td>Video input</td>
+          <td>{{ edid.get_bdp_video_input_display }}</td>
+        </tr>
+        {% if edid.model_year %}
+        <tr>
+          <td>Model year</td>
+          <td>{{ edid.model_year }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td>Manufacturing</td>
+          <td>
+      {% if edid.week_of_manufacture and edid.week_of_manufacture != 255 %}
+            Week {{ edid.week_of_manufacture }} of
+      {% endif %}
+            {{ edid.year_of_manufacture }}
+          </td>
+        </tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </section>
 
     <section id="basic_display_parameters">
       <h3>Basic Display Parameters</h3>
