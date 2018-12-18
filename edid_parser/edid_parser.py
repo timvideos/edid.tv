@@ -20,6 +20,25 @@ class DisplayType(object):
     Undefined = 0b11
 
 
+class ColorBitDepth(object):
+    Undefined = 0b000
+    Depth_6_bit = 0b001
+    Depth_8_bit = 0b010
+    Depth_10_bit = 0b011
+    Depth_12_bit = 0b100
+    Depth_14_bit = 0b101
+    Depth_16_bit = 0b110
+
+
+class DigitalVideoInterface(object):
+    Undefined = 0b0000
+    DVI = 0b0001
+    HDMI_A = 0b0010
+    HDMI_B = 0b0011
+    MDDI = 0b0100
+    DisplayPort = 0b0101
+
+
 class DisplayStereoMode(object):
     Normal_display = 0b000
     Field_sequential_right = 0b010
@@ -158,6 +177,14 @@ class EDIDParser(object):
 
         new_data = {}
 
+        new_data['Feature_Support'] = {
+            'Standby': (edid[4] & 0b10000000) >> 7,
+            'Suspend': (edid[4] & 0b01000000) >> 6,
+            'Active-off': (edid[4] & 0b00100000) >> 5,
+            'Standard-sRGB': (edid[4] & 0b00000100) >> 2,
+            'Preferred_Timing_Mode': (edid[4] & 0b00000010) >> 1,
+        }
+
         new_data['Video_Input'] = edid[0] >> 7
         if new_data['Video_Input'] == 0:
             # Analog Input
@@ -178,28 +205,50 @@ class EDIDParser(object):
             new_data['Vsync_serration'] = edid[0] & 0b00000001
         else:
             # Digital Input
-            new_data['Video_Input_DFP_1'] = edid[0] & 0b00000001
+            if self.data['EDID_version'] == 1 \
+                    and self.data['EDID_revision'] == 4:
+                new_data['Color_Bit_Depth'] = (edid[0] & 0b01110000) >> 4
+                new_data['Digital_Video_Interface'] = edid[0] & 0b00001111
 
-        # If either or both bytes are set to zero, then the system shall make
-        # no assumptions regarding the display size.
-        # e.g. A projection display may be of indeterminate size.
-        new_data['Max_Horizontal_Image_Size'] = edid[1]
-        new_data['Max_Vertical_Image_Size'] = edid[2]
+                new_data['Feature_Support']['Color_Encoding_RGB444_Supported'] \
+                    = True
+                new_data['Feature_Support']['Color_Encoding_YCrCb444_Supported'] \
+                    = (edid[4] & 0b00001000) != 0
+                new_data['Feature_Support']['Color_Encoding_YCrCb422_Supported'] \
+                    = (edid[4] & 0b00010000) != 0
+            else:
+                new_data['Video_Input_DFP_1'] = edid[0] & 0b00000001
+
+        if self.data['EDID_version'] == 1 and self.data['EDID_revision'] == 4:
+            if not (edid[1] == 0 and edid[2] == 0):
+                if edid[1] == 0:
+                    new_data['Aspect_Ratio'] = round(100.0 / (edid[2] + 99), 2)
+                elif edid[2] == 0:
+                    new_data['Aspect_Ratio'] = round((edid[1] + 99) / 100.0, 2)
+                else:
+                    new_data['Horizontal_Screen_Size'] = edid[1]
+                    new_data['Vertical_Screen_Size'] = edid[2]
+
+            new_data['Feature_Support']['Continuous_Frequency'] = \
+                edid[4] & 0b00000001
+        else:
+            # If either or both bytes are set to zero, then the system shall
+            # make no assumptions regarding the display size. e.g. A
+            # projection display may be of indeterminate size.
+            new_data['Max_Horizontal_Image_Size'] = edid[1]
+            new_data['Max_Vertical_Image_Size'] = edid[2]
+
+            new_data['Feature_Support']['Default_GTF'] = edid[4] & 0b00000001
+
+        if (self.data['EDID_version'] == 1 and self.data['EDID_revision'] < 4) \
+                or new_data['Video_Input'] == 0:
+            new_data['Feature_Support']['Display_Type'] = \
+                (edid[4] & 0b00011000) >> 3
 
         if edid[3] == 0xFF:
             new_data['Display_Gamma'] = None
         else:
             new_data['Display_Gamma'] = float(edid[3] + 100) / 100
-
-        new_data['Feature_Support'] = {
-            'Standby': (edid[4] & 0b10000000) >> 7,
-            'Suspend': (edid[4] & 0b01000000) >> 6,
-            'Active-off': (edid[4] & 0b00100000) >> 5,
-            'Display_Type': (edid[4] & 0b00011000) >> 3,
-            'Standard-sRGB': (edid[4] & 0b00000100) >> 2,
-            'Preferred_Timing_Mode': (edid[4] & 0b00000010) >> 1,
-            'Default_GTF': edid[4] & 0b00000001,
-        }
 
 #        if not new_data['Feature_Support']['Preferred_Timing_Mode']:
 #            if (self.data['EDID_version'] == 1 and

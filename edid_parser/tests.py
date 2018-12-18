@@ -4,7 +4,9 @@
 
 import unittest
 from edid_parser import (EDIDParser, EDIDParsingError, DisplayType,
-                         DisplayStereoMode, TimingSyncScheme, CVTSupportDefinitionPreferredAspectRatio)
+                         DisplayStereoMode, TimingSyncScheme,
+                         CVTSupportDefinitionPreferredAspectRatio,
+                         ColorBitDepth, DigitalVideoInterface)
 
 
 class EDIDTest(unittest.TestCase):
@@ -14,14 +16,35 @@ class EDIDTest(unittest.TestCase):
 
     def setUp(self):
         self.parser = EDIDParser()
-        # Assuming version 1.3 by default
+
+
+class EDID13Test(EDIDTest):
+    """
+    Base class for EDID 1.3 parsing tests.
+    """
+
+    def setUp(self):
+        super(EDID13Test, self).setUp()
+
         self.parser.data['EDID_version'] = 1
         self.parser.data['EDID_revision'] = 3
 
 
-class EDIDValidTest(EDIDTest):
+class EDID14Test(EDIDTest):
     """
-    EDID Parser tests with valid input.
+    Base class for EDID 1.3 parsing tests.
+    """
+
+    def setUp(self):
+        super(EDID14Test, self).setUp()
+
+        self.parser.data['EDID_version'] = 1
+        self.parser.data['EDID_revision'] = 4
+
+
+class EDID13ValidTest(EDID13Test):
+    """
+    EDID 1.3 Parser tests with valid input.
     """
 
     def test_all(self):
@@ -512,8 +535,76 @@ class EDIDValidTest(EDIDTest):
         self.assertEqual(data['Preferred_Vertical_Refresh_Rate'], 0)
 
 
-class EDIDInvalidTest(EDIDTest):
-    """EDID Parser tests with invalid input."""
+class EDID14ValidTest(EDID14Test):
+    """
+    EDID 1.4 Parser tests with valid input.
+    """
+
+    def test_basic_display(self):
+        test_edid = [0xb5, 0x3c, 0x22, 0x78, 0x3a]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertTrue(data['Video_Input'])
+
+        self.assertNotIn('Video_Input_DFP_1', data)
+        self.assertNotIn('Default_GTF', data['Feature_Support'])
+        self.assertNotIn('Aspect_Ratio', data)
+
+        self.assertEqual(data['Horizontal_Screen_Size'], 60)
+        self.assertEqual(data['Vertical_Screen_Size'], 34)
+
+        self.assertEqual(data['Display_Gamma'], 2.2)
+
+        self.assertEqual(data['Color_Bit_Depth'], ColorBitDepth.Depth_10_bit)
+        self.assertEqual(data['Digital_Video_Interface'],
+                         DigitalVideoInterface.DisplayPort)
+
+        self.assertFalse(data['Feature_Support']['Standby'])
+        self.assertFalse(data['Feature_Support']['Suspend'])
+        self.assertTrue(data['Feature_Support']['Active-off'])
+        self.assertFalse(data['Feature_Support']['Standard-sRGB'])
+        self.assertTrue(data['Feature_Support']['Preferred_Timing_Mode'])
+        self.assertFalse(data['Feature_Support']['Continuous_Frequency'])
+        self.assertTrue(data['Feature_Support']
+                        ['Color_Encoding_RGB444_Supported'])
+        self.assertTrue(data['Feature_Support']
+                        ['Color_Encoding_YCrCb444_Supported'])
+        self.assertTrue(data['Feature_Support']
+                        ['Color_Encoding_YCrCb422_Supported'])
+
+        test_edid = [0xa5, 0x4f, 0x00, 0x78, 0xea]
+        data = self.parser.parse_basic_display(test_edid)
+
+        self.assertTrue(data['Video_Input'])
+
+        self.assertNotIn('Video_Input_DFP_1', data)
+        self.assertNotIn('Default_GTF', data['Feature_Support'])
+        self.assertNotIn('Horizontal_Screen_Size', data)
+        self.assertNotIn('Vertical_Screen_Size', data)
+
+        self.assertEqual(data['Aspect_Ratio'], 1.78)
+
+        self.assertEqual(data['Display_Gamma'], 2.2)
+
+        self.assertEqual(data['Color_Bit_Depth'], ColorBitDepth.Depth_8_bit)
+        self.assertEqual(data['Digital_Video_Interface'],
+                         DigitalVideoInterface.DisplayPort)
+
+        self.assertTrue(data['Feature_Support']['Standby'])
+        self.assertTrue(data['Feature_Support']['Suspend'])
+        self.assertTrue(data['Feature_Support']['Active-off'])
+        self.assertFalse(data['Feature_Support']['Standard-sRGB'])
+        self.assertTrue(data['Feature_Support']['Preferred_Timing_Mode'])
+        self.assertFalse(data['Feature_Support']['Continuous_Frequency'])
+        self.assertTrue(data['Feature_Support']
+                        ['Color_Encoding_RGB444_Supported'])
+        self.assertTrue(data['Feature_Support']
+                        ['Color_Encoding_YCrCb444_Supported'])
+        self.assertFalse(data['Feature_Support']
+                        ['Color_Encoding_YCrCb422_Supported'])
+
+class EDID13InvalidTest(EDID13Test):
+    """EDID 1.3 Parser tests with invalid input."""
 
     def test_binary(self):
         #Invalid length of edid bytes list

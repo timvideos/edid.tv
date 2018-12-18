@@ -60,6 +60,23 @@
             <td>{{ edid.bdp_display_gamma|floatformat:2 }}</td>
           </tr>
       {% endif %}
+      {% if edid.version == edid.VERSION_1_4 %}
+          {% if edid.bdp_aspect_ratio %}
+          <tr>
+            <td>Aspect ratio</td>
+            <td>{{ edid.get_bdp_aspect_ratio_display }}</td>
+          </tr>
+          {% elif edid.bdp_horizontal_screen_size %}
+          <tr>
+            <td>Horizontal screen size</td>
+            <td>{{ edid.bdp_horizontal_screen_size }} cm</td>
+          </tr>
+          <tr>
+            <td>Vertical screen size</td>
+            <td>{{ edid.bdp_vertical_screen_size }} cm</td>
+          </tr>
+          {% endif %}
+      {% else %}
           <tr>
             <td>Maximum horizontal image size</td>
             <td>{{ edid.bdp_max_horizontal_image_size }} cm</td>
@@ -72,6 +89,7 @@
             <td>Signal level input</td>
             <td>{{ edid.get_bdp_video_input_display }}</td>
           </tr>
+      {% endif %}
       {% if edid.bdp_video_input == edid.bdp_video_input_analog %}
           <tr>
             <td>Blank-to-black setup</td>
@@ -97,17 +115,28 @@
             <td>Signal Level Standard</td>
             <td>{{ edid.get_bdp_signal_level_standard_display }}</td>
           </tr>
+      {% elif edid.version == edid.VERSION_1_4 %}
+          <tr>
+            <td>Color depth</td>
+            <td>{{ edid.get_bdp_color_bit_depth_display }}</td>
+          </tr>
+          <tr>
+            <td>Digital video interface</td>
+            <td>{{ edid.get_bdp_digital_video_interface_display }}</td>
+          </tr>
       {% else %}
           <tr>
             <td>VESA DFP 1.x</td>
             <td><i class="icon-{{ edid.bdp_video_input_dfp_1|yesno:"ok,remove" }}"></i></td>
           </tr>
       {% endif %}
+      {% if edid.version != edid.VERSION_1_4 or edid.bdp_video_input == edid.bdp_video_input_analog %}
           <tr>
             <td>Display Type</td>
             <td>{{ edid.get_bdp_feature_display_type_display }}</td>
           </tr>
         </tbody>
+      {% endif %}
       </table>
       <h4>Feature Support</h4>
       <table class="table table-striped table-bordered">
@@ -115,10 +144,6 @@
           <tr>
             <td>Active-off</td>
             <td><i class="icon-{{ edid.bdp_feature_active_off|yesno:"ok,remove" }}"></i></td>
-          </tr>
-          <tr>
-            <td>Default GTF</td>
-            <td><i class="icon-{{ edid.bdp_feature_default_gtf|yesno:"ok,remove" }}"></i></td>
           </tr>
           <tr>
             <td>Preferred Timing Mode</td>
@@ -136,6 +161,40 @@
             <td>Suspend</td>
             <td><i class="icon-{{ edid.bdp_feature_suspend|yesno:"ok,remove" }}"></i></td>
           </tr>
+        {% if edid.version == edid.VERSION_1_4 %}
+          <tr>
+            <td>Continuous Frequency Display</td>
+            <td><i class="icon-{{ edid.bdp_feature_continuous_frequency|yesno:"ok,remove" }}"></i></td>
+          </tr>
+            {% if edid.bdp_video_input == edid.bdp_video_input_digital %}
+          <tr>
+            <td>Color Encodings</td>
+            <td class="nested-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>RGB 4:4:4</th>
+                    <th>YCrCb 4:4:4</th>
+                    <th>YCrCb 4:2:2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><i class="icon-{{ edid.bdp_feature_rgb444|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.bdp_feature_ycrcb444|yesno:"ok,remove" }}"></i></td>
+                    <td><i class="icon-{{ edid.bdp_feature_ycrcb422|yesno:"ok,remove" }}"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+            {% endif %}
+        {% else %}
+          <tr>
+            <td>Default GTF</td>
+            <td><i class="icon-{{ edid.bdp_feature_default_gtf|yesno:"ok,remove" }}"></i></td>
+          </tr>
+        {% endif %}
         </tbody>
       </table>
     </section>
