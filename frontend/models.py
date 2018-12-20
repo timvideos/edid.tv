@@ -8,6 +8,7 @@
 from __future__ import division
 
 import re
+from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
@@ -15,7 +16,9 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 
 from edid_parser.edid_parser import (DisplayType, DisplayStereoMode,
-                                     TimingSyncScheme, CVTSupportDefinitionPreferredAspectRatio)
+                                     TimingSyncScheme,
+                                     CVTSupportDefinitionPreferredAspectRatio,
+                                     ColorBitDepth, DigitalVideoInterface)
 
 
 class Manufacturer(models.Model):
@@ -76,10 +79,12 @@ class EDID(models.Model):
     # ID Serial Number, 32-bit
     manufacturer_serial_number = models.PositiveIntegerField(blank=True,
                                                              null=True)
-    # Week of manufacture, 1-54, 0==Unknown, 255==the year model
-    week_of_manufacture = models.PositiveSmallIntegerField()
+    # Week of manufacture, 1-54, 0==Unknown
+    week_of_manufacture = models.PositiveSmallIntegerField(blank=True, null=True)
     # Year of manufacture, 1990-2245
-    year_of_manufacture = models.PositiveSmallIntegerField()
+    year_of_manufacture = models.PositiveSmallIntegerField(blank=True, null=True)
+    # Model year, 1990-2245
+    model_year = models.PositiveSmallIntegerField(blank=True, null=True)
 
     # EDID version and revision
     VERSION_1_0 = 0
@@ -143,17 +148,59 @@ class EDID(models.Model):
         'serration on the vertical sync')
 
     # Digital Input
+    BDP_COLOR_BIT_DEPTH_CHOICE = (
+        (ColorBitDepth.Undefined, 'Undefined'),
+        (ColorBitDepth.Depth_6_bit, '6 bit'),
+        (ColorBitDepth.Depth_8_bit, '8 bit'),
+        (ColorBitDepth.Depth_10_bit, '10 bit'),
+        (ColorBitDepth.Depth_12_bit, '12 bit'),
+        (ColorBitDepth.Depth_14_bit, '14 bit'),
+        (ColorBitDepth.Depth_16_bit, '16 bit'),
+    )
+    bdp_color_bit_depth = models.PositiveSmallIntegerField(
+        'color bit depth', choices=BDP_COLOR_BIT_DEPTH_CHOICE, blank=True,
+        null=True)
+
+    BDP_DIGITAL_VIDEO_INTERFACE_CHOICE = (
+        (DigitalVideoInterface.Undefined, 'Undefined'),
+        (DigitalVideoInterface.DVI, 'DVI'),
+        (DigitalVideoInterface.HDMI_A, 'HDMI-A'),
+        (DigitalVideoInterface.HDMI_B, 'HDMI-B'),
+        (DigitalVideoInterface.MDDI, 'MDDI'),
+        (DigitalVideoInterface.DisplayPort, 'DisplayPort'),
+    )
+    bdp_digital_video_interface = models.PositiveSmallIntegerField(
+        'digital video interface', choices=BDP_DIGITAL_VIDEO_INTERFACE_CHOICE,
+        blank=True, null=True)
+
     bdp_video_input_dfp_1 = models.NullBooleanField('digital flat panel 1.x')
 
+    BDP_ASPECT_RATIO_CHOICE = (
+        (Decimal('1.78'), '16:9'),
+        (Decimal('0.56'), '9:16'),
+        (Decimal('1.60'), '16:10'),
+        (Decimal('0.62'), '10:16'),
+        (Decimal('1.33'), '4:3'),
+        (Decimal('0.75'), '3:4'),
+        (Decimal('1.25'), '5:4'),
+        (Decimal('0.80'), '4:5'),
+    )
+    bdp_aspect_ratio = models.DecimalField('aspect ratio', max_digits=3,
+       decimal_places=2, blank=True, null=True, choices=BDP_ASPECT_RATIO_CHOICE)
+    bdp_horizontal_screen_size = models.PositiveSmallIntegerField(
+        'horizontal screen size', blank=True, null=True)
+    bdp_vertical_screen_size = models.PositiveSmallIntegerField(
+        'vertical screen size', blank=True, null=True)
+
     bdp_max_horizontal_image_size = models.PositiveSmallIntegerField(
-        'maximum horizontal image size')
+        'maximum horizontal image size', blank=True, null=True)
     bdp_max_vertical_image_size = models.PositiveSmallIntegerField(
-        'maximum vertical image size')
+        'maximum vertical image size', blank=True, null=True)
     bdp_display_gamma = models.DecimalField('display gamma', max_digits=3,
                                             decimal_places=2, blank=True,
                                             null=True)
 
-    BDP_FEATURE_DISPLY_CHOICE = (
+    BDP_FEATURE_DISPLAY_TYPE_CHOICE = (
         (DisplayType.Monochrome, 'Monochrome or grayscale display'),
         (DisplayType.RGB, 'RGB color display'),
         (DisplayType.Non_RGB, 'Non-RGB multicolor display'),
@@ -165,11 +212,18 @@ class EDID(models.Model):
     bdp_feature_active_off = models.BooleanField(
         'active off/very low power mode')
     bdp_feature_display_type = models.PositiveSmallIntegerField(
-        'display color type', choices=BDP_FEATURE_DISPLY_CHOICE)
+        'display color type', choices=BDP_FEATURE_DISPLAY_TYPE_CHOICE,
+        blank=True, null=True)
     bdp_feature_standard_srgb = models.BooleanField('standard sRGB')
     bdp_feature_pref_timing_mode = models.BooleanField(
         'preferred timing mode')
-    bdp_feature_default_gtf = models.BooleanField('default GTF')
+    bdp_feature_default_gtf = models.NullBooleanField('default GTF')
+
+    bdp_feature_rgb444 = models.NullBooleanField('RGB 4:4:4 supported')
+    bdp_feature_ycrcb444 = models.NullBooleanField('YCrCb 4:4:4 supported')
+    bdp_feature_ycrcb422 = models.NullBooleanField('YCrCb 4:2:2 supported')
+    bdp_feature_continuous_frequency = models.NullBooleanField(
+        'continuous frequency')
 
     ### chr=Chromaticity
     chr_red_x = models.DecimalField(
@@ -298,8 +352,11 @@ class EDID(models.Model):
         self.manufacturer_product_code = edid['ID_Product_Code']
         self.manufacturer_serial_number = edid['ID_Serial_Number']
 
-        self.week_of_manufacture = edid['Week_of_manufacture']
-        self.year_of_manufacture = edid['Year_of_manufacture']
+        if 'Model_Year' in edid:
+            self.model_year = edid['Model_Year']
+        else:
+            self.week_of_manufacture = edid['Week_of_manufacture']
+            self.year_of_manufacture = edid['Year_of_manufacture']
 
         if edid['EDID_version'] == 1:
             if edid['EDID_revision'] == 0:
@@ -359,21 +416,50 @@ class EDID(models.Model):
             self.bdp_vsync_serration = bdp['Vsync_serration']
         else:
             # Digital Input
-            self.bdp_video_input_dfp_1 = bdp['Video_Input_DFP_1']
+            if self.version == self.VERSION_1_4:
+                self.bdp_color_bit_depth = bdp['Color_Bit_Depth']
+                self.bdp_digital_video_interface = \
+                    bdp['Digital_Video_Interface']
+                self.bdp_feature_rgb444 = \
+                    bdp['Feature_Support']['Color_Encoding_RGB444_Supported']
+                self.bdp_feature_ycrcb444 = \
+                    bdp['Feature_Support']['Color_Encoding_YCrCb444_Supported']
+                self.bdp_feature_ycrcb422 = \
+                    bdp['Feature_Support']['Color_Encoding_YCrCb422_Supported']
+            else:
+                self.bdp_video_input_dfp_1 = bdp['Video_Input_DFP_1']
 
-        self.bdp_max_horizontal_image_size = bdp['Max_Horizontal_Image_Size']
-        self.bdp_max_vertical_image_size = bdp['Max_Vertical_Image_Size']
+        if self.version == self.VERSION_1_4:
+            if 'Aspect_Ratio' in bdp:
+                self.bdp_aspect_ratio = bdp['Aspect_Ratio']
+
+            if 'Horizontal_Screen_Size' in bdp:
+                self.bdp_horizontal_screen_size = \
+                    bdp['Horizontal_Screen_Size']
+                self.bdp_vertical_screen_size = bdp['Vertical_Screen_Size']
+
+            self.bdp_feature_continuous_frequency = \
+                bdp['Feature_Support']['Continuous_Frequency']
+        else:
+            self.bdp_max_horizontal_image_size = bdp[
+                'Max_Horizontal_Image_Size']
+            self.bdp_max_vertical_image_size = bdp['Max_Vertical_Image_Size']
+
+            self.bdp_feature_default_gtf = bdp['Feature_Support']['Default_GTF']
+
         self.bdp_display_gamma = bdp['Display_Gamma']
 
         self.bdp_feature_standby = bdp['Feature_Support']['Standby']
         self.bdp_feature_suspend = bdp['Feature_Support']['Suspend']
         self.bdp_feature_active_off = bdp['Feature_Support']['Active-off']
-        self.bdp_feature_display_type = bdp['Feature_Support']['Display_Type']
         self.bdp_feature_standard_srgb = \
             bdp['Feature_Support']['Standard-sRGB']
         self.bdp_feature_pref_timing_mode = \
             bdp['Feature_Support']['Preferred_Timing_Mode']
-        self.bdp_feature_default_gtf = bdp['Feature_Support']['Default_GTF']
+
+        if 'Display_Type' in bdp['Feature_Support']:
+            self.bdp_feature_display_type = \
+                bdp['Feature_Support']['Display_Type']
 
         ### Chromaticity
         self.chr_red_x = edid['Chromaticity']['Red_x']

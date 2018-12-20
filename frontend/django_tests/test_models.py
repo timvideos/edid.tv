@@ -100,24 +100,25 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
 
 
 class EDIDParsingTestCase(TestCase):
+    EDID_BINARY = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
+                   "\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78" \
+                   "\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21" \
+                   "\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01" \
+                   "\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38" \
+                   "\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E" \
+                   "\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00" \
+                   "\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54" \
+                   "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
+                   "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
+                   "\x20\x20\x20\x20\x20\x20\x01\x24"
+
     def setUp(self):
         Manufacturer.objects.bulk_create([
             Manufacturer(name_id='TSB', name='Toshiba'),
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
-        self.edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
-                           "\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78" \
-                           "\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21" \
-                           "\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01" \
-                           "\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38" \
-                           "\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E" \
-                           "\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00" \
-                           "\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54" \
-                           "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
-                           "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
-                           "\x20\x20\x20\x20\x20\x20\x01\x24"
-        self.edid_data = EDIDParser(self.edid_binary).data
+        self.edid_data = EDIDParser(self.EDID_BINARY).data
 
     def _process_edid(self, edid_data):
         edid_object = EDID.create(file_base64='', edid_data=edid_data)
@@ -139,7 +140,7 @@ class EDIDParsingTestCase(TestCase):
 
         for version in [(1, 0, EDID.VERSION_1_0), (1, 1, EDID.VERSION_1_1),
                         (1, 2, EDID.VERSION_1_2), (1, 3, EDID.VERSION_1_3),
-                        (1, 4, EDID.VERSION_1_4), (2, 0, EDID.VERSION_2_0)]:
+                        (2, 0, EDID.VERSION_2_0)]:
             edid_data['EDID_version'] = version[0]
             edid_data['EDID_revision'] = version[1]
 
@@ -292,6 +293,35 @@ class EDIDParsingTestCase(TestCase):
         self.assertEqual(edid.mrl_secondary_gtf_m, 64)
         self.assertEqual(edid.mrl_secondary_gtf_k, 64)
         self.assertEqual(edid.mrl_secondary_gtf_j, 64)
+
+
+class EDID14ParsingTestCase(EDIDParsingTestCase):
+    EDID_BINARY = "\x00\xff\xff\xff\xff\xff\xff\x00\x22\xf0\x08\x28" \
+                   "\x01\x01\x01\x01\x19\x12\x01\x04\xa5\x2f\x1e\x78" \
+                   "\xee\xce\x50\xa3\x54\x4c\x99\x26\x0f\x50\x54\xa5" \
+                   "\x6b\x80\x81\x40\x81\x80\x95\x00\xb3\x00\xa9\x00" \
+                   "\x01\x01\x01\x01\x01\x01\x21\x39\x90\x30\x62\x1a" \
+                   "\x27\x40\x68\xb0\x36\x00\xd6\x2c\x11\x00\x00\x1c" \
+                   "\x00\x00\x00\xfd\x00\x30\x55\x1e\x5d\x11\x04\x11" \
+                   "\x50\xd2\xf8\x58\xf0\x00\x00\x00\x00\xfc\x00\x48" \
+                   "\x50\x20\x4c\x50\x32\x32\x37\x35\x77\x0a\x20\x20" \
+                   "\x00\x00\x00\xff\x00\x43\x4e\x43\x38\x32\x35\x30" \
+                   "\x47\x53\x53\x0a\x20\x20\x00\x63"
+
+    def test_version_revision_valid(self):
+        """
+        Test EDID 1.4 revision number.
+        """
+
+        edid_data = self.edid_data
+
+        edid_data['EDID_version'] = 1
+        edid_data['EDID_revision'] = 4
+
+        edid = self._process_edid(edid_data)
+
+        # Check for correct version
+        self.assertEqual(edid.version, EDID.VERSION_1_4)
 
 
 class DetailedTimingParsingTestCase(TestCase):

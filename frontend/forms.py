@@ -366,6 +366,7 @@ class EDIDUpdateForm(BaseForm):
 
         weeks_range = range(0, 55)
         weeks_range.append(255)
+        weeks_range.append(None)
 
         if week_of_manufacture not in weeks_range:
             raise forms.ValidationError('This field allowed range is'

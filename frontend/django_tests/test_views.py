@@ -271,6 +271,8 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         data['monitor_range_limits'] = False
 
         # Fields with null value will fail form validation
+        data['week_of_manufacture'] = ''
+        data['year_of_manufacture'] = ''
         data['bdp_signal_level_standard'] = 0
         data['mrl_secondary_gtf_start_freq'] = 0
         data['mrl_secondary_gtf_c'] = 0
@@ -353,6 +355,8 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
         data['monitor_range_limits'] = False
 
         # We need to fill these to validate the form
+        data['week_of_manufacture'] = ''
+        data['year_of_manufacture'] = ''
         data['bdp_signal_level_standard'] = 0
         data['mrl_secondary_gtf_start_freq'] = 0
         data['mrl_secondary_gtf_c'] = 0
