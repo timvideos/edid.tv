@@ -23,7 +23,7 @@
       <td><a href="{% url 'manufacturer-detail' edid.manufacturer.pk %}">{{ edid.manufacturer.name }}</a></td>
     {% endif %}
       <td>{{ edid.monitor_name }}</td>
-      <td>{{ edid.manufacturer_serial_number }}</td>
+      <td>{{ edid.get_preferred_serial_number }}</td>
       <td>{{ edid.get_bdp_video_input_display }}</td>
       <td><i class="icon-{{ edid.monitor_range_limits|yesno:"ok,remove" }}"></i></td>
       <td>{{ edid.standardtiming__count }}</td>

@@ -779,6 +779,10 @@ class EDID(models.Model):
 
         return maximum_resolution
 
+    def get_preferred_serial_number(self):
+        return self.monitor_serial_number if self.monitor_serial_number else \
+            self.manufacturer_serial_number
+
     def __unicode__(self):
         return "%s %s" % (self.manufacturer.name, self.monitor_name)
 
