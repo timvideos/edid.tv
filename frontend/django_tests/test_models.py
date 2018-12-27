@@ -98,6 +98,18 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(max_res['vertical_active'], 600)
         self.assertEqual(max_res['refresh_rate'], 60)
 
+    def test_get_preferred_serial_number(self):
+        sn = EDID(monitor_serial_number="ABCXYZ").get_preferred_serial_number()
+        self.assertEqual(sn, "ABCXYZ")
+
+        sn = EDID(manufacturer_serial_number=123456)\
+            .get_preferred_serial_number()
+        self.assertEqual(sn, 123456)
+
+        sn = EDID(manufacturer_serial_number=123456,
+                  monitor_serial_number="ABCXYZ").get_preferred_serial_number()
+        self.assertEqual(sn, "ABCXYZ")
+
 
 class EDIDParsingTestCase(TestCase):
     EDID_BINARY = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
