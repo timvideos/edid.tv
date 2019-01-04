@@ -1,7 +1,7 @@
 import base64
 from xml.etree import ElementTree as ET
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from edid_parser.edid_parser import EDIDParser

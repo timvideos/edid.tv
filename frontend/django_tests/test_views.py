@@ -3,7 +3,7 @@ from tempfile import TemporaryFile
 import json
 import os
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from frontend.django_tests.base import EDIDTestMixin

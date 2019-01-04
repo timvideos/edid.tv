@@ -1,9 +1,10 @@
+from __future__ import print_function
 import base64
 import hashlib
 import json
 
 from django.db.models import Count
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseRedirect, Http404)
 from django.shortcuts import get_object_or_404
@@ -15,7 +16,8 @@ from django.views.generic.edit import (FormView, CreateView, UpdateView,
 from braces.views import (CsrfExemptMixin, JSONResponseMixin,
                           LoginRequiredMixin, PrefetchRelatedMixin,
                           StaffuserRequiredMixin)
-import reversion
+from reversion import revisions as reversion
+from reversion.models import Version
 
 from edid_parser.edid_parser import EDIDParser, EDIDParsingError
 
@@ -54,7 +56,6 @@ class ManufacturerDetail(DetailView):
         Adds `edid_list` to template context to be used in place of
         `manufacturer.edid_set` RelatedManager.
         """
-
         context = super(ManufacturerDetail, self).get_context_data(**kwargs)
 
         queryset = EDID.objects.filter(manufacturer=context['manufacturer'].pk)
@@ -109,7 +110,7 @@ class EDIDBinaryUpload(FormView):
                                   edid_data=form.edid_data)
 
         # Set the user
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             edid_object.user = self.request.user
 
         # Save the entry
@@ -185,7 +186,7 @@ class EDIDTextUpload(FormView):
             # Set revision comment
             reversion.set_comment('EDID parsed.')
             # Create revision for EDID
-            reversion.default_revision_manager.save_revision([edid_object])
+            reversion.add_to_revision(edid_object)
 
             self.edid_list.append(edid_object)
 
@@ -270,7 +271,7 @@ class EDIDRevisionList(ListView):
         edid_pk = self.kwargs.get('edid_pk', None)
 
         edid = get_object_or_404(EDID, pk=edid_pk)
-        versions_list = reversion.get_for_object(edid)
+        versions_list = Version.objects.get_for_object(edid)
 
         return versions_list
 
@@ -301,7 +302,7 @@ class EDIDRevisionDetail(DetailView):
         revision_pk = self.kwargs.get('revision_pk', None)
 
         # Get version based on edid_pk and revision_pk or return 404.
-        version = reversion.get_for_object_reference(EDID, edid_pk) \
+        version = Version.objects.get_for_object_reference(EDID, edid_pk) \
                            .filter(revision__pk=revision_pk)
 
         try:
@@ -310,7 +311,8 @@ class EDIDRevisionDetail(DetailView):
             raise Http404()
 
         # Assign EDID instance to edid
-        edid = version.object_version.object
+        # TODO accessing protected properties is evil
+        edid = version._object_version.object
 
         # Flag EDID instance as revision
         edid.is_revision = True
@@ -323,7 +325,8 @@ class EDIDRevisionDetail(DetailView):
         detailedtimings = []
 
         for related_version in revision_versions:
-            timing = related_version.object_version.object
+            # TODO moar evil
+            timing = related_version._object_version.object
             if isinstance(timing, StandardTiming):
                 standardtimings.append(timing)
             elif isinstance(timing, DetailedTiming):
@@ -366,7 +369,7 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
         revision_pk = self.kwargs.get('revision_pk', None)
 
         # Get version based on edid_pk and revision_pk or return 404.
-        version = reversion.get_for_object_reference(EDID, edid_pk) \
+        version = Version.objects.get_for_object_reference(EDID, edid_pk) \
                            .filter(revision__pk=revision_pk)
 
         try:
@@ -536,6 +539,7 @@ class DetailedTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
 class TimingReorderMixin(object):
     http_method_names = [u'get']
 
+    @reversion.create_revision()
     def get(self, request, *args, **kwargs):
         edid_pk = kwargs.get('edid_pk', None)
         identification = int(kwargs.get('identification', None))
@@ -742,7 +746,7 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             # Set revision comment
             reversion.set_comment('EDID parsed.')
             # Create revision for EDID
-            reversion.default_revision_manager.save_revision([edid_object])
+            reversion.add_to_revision(edid_object)
 
             self.edid_list.append(edid_object)
 

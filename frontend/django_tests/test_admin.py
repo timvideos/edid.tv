@@ -13,4 +13,5 @@ class EDIDUpdateFormTestCase(EDIDTestMixin, TestCase):
         response = self.client.get('/admin/frontend/edid/')
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<a href="/admin/frontend/edid/1/">')
+        self.assertContains(response,
+                            '<a href="/admin/frontend/edid/1/change/">')

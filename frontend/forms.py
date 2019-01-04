@@ -6,7 +6,7 @@ import re
 
 from django import forms
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from crispy_forms.helper import FormHelper

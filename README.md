@@ -22,7 +22,6 @@ Installation Instructions
 3. Create `private/settings.py`, see `Settings` section below for details, most of the settings are needed only for production deployment only (DEBUG=False).
 4. `make install`
 5. `make serve`
-  * You may need to import `frontend/sql/manufacturer.sql` manually if it failed.
 
 Settings
 ---

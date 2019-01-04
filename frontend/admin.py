@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-import reversion
+from reversion.admin import VersionAdmin
 
 from frontend.models import (Manufacturer, EDID, StandardTiming,
                              DetailedTiming, Comment)
@@ -25,14 +25,14 @@ class DetailedTimingInline(admin.TabularInline):
     fields = ['identification']
 
 
-class EDIDAdmin(reversion.VersionAdmin):
+class EDIDAdmin(VersionAdmin):
     fields = ['manufacturer', 'status']
     inlines = [
         StandardTimingInline,
         DetailedTimingInline,
     ]
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Override default manager to list all EDID objects.
         """

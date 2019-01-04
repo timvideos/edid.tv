@@ -1,11 +1,10 @@
 # pylint: disable-msg=C0103,E1120
 
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 
 from frontend import feeds, views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     # Manufacturer
     url(r'^manufacturer/$', views.ManufacturerList.as_view(),
         name='manufacturer-list'),
@@ -74,11 +73,11 @@ urlpatterns = patterns(
         name='api-grabber-upload'),
 
     # django-allauth
-    (r'^accounts/', include('allauth.urls')),
+    url(r'^accounts/', include('allauth.urls')),
 
     # User Profile
     url(r'^accounts/profile/$', views.ProfileView.as_view(), name='profile'),
 
     # Index
     url(r'^$', views.EDIDList.as_view(), name='index'),
-)
+]
