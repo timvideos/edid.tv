@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.expected_conditions import url_to_be, \
+    url_contains
+from selenium.webdriver.support.wait import WebDriverWait
 
 from base import EDIDReadySeleniumTestCase
 
@@ -9,8 +12,11 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_valid(self):
         get_user_model().objects.create_superuser('tester', '', 'test')
         self.doLogin(username='tester', password='test')
-        self.assertEqual(self.browser.current_url,
-                         "%s/accounts/profile/" % self.live_server_url)
+
+        WebDriverWait(self.browser, 30).until(
+            url_to_be("%s/accounts/profile/" % self.live_server_url),
+            'Should redirect to profile page'
+        )
 
         edid_detail_url = "%s/edid/1/" % self.live_server_url
         edid_update_url = "%s/edid/1/update/" % self.live_server_url
@@ -25,18 +31,22 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         # Update timing and submit form
         self.browser.find_element_by_id('id_refresh_rate').clear()
         self.browser.find_element_by_id('id_refresh_rate').send_keys('120')
-        self.browser.find_element_by_id('submit-id-submit').submit()
+        self.browser.find_element_by_id('submit-id-submit').click()
 
-        # Check we got redirected to EDID update page
-        self.assertEqual(self.browser.current_url, edid_update_url)
+        WebDriverWait(self.browser, 30).until(
+            url_to_be(edid_update_url),
+            'Should redirect to EDID update page'
+        )
 
         # Update EDID and submit form
         self.browser.find_element_by_link_text('Monitor Range Limits').click()
         self.browser.find_element_by_id('id_monitor_range_limits').click()
-        self.browser.find_element_by_id('submit-id-submit').submit()
+        self.browser.find_element_by_id('submit-id-submit').click()
 
-        # Check we got redirected to EDID detail page
-        self.assertEqual(self.browser.current_url, edid_detail_url)
+        WebDriverWait(self.browser, 30).until(
+            url_contains(edid_detail_url),
+            'Should redirect to EDID detail page'
+        )
 
         # Check 'Monitor Range Limits' is disabled
         self.assertRaises(
@@ -54,8 +64,10 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
         # Confirm revert action
         self.browser.find_element_by_id('revert-id-revert').submit()
 
-        # Check we got redirected to EDID detail page
-        self.assertEqual(self.browser.current_url, edid_detail_url)
+        WebDriverWait(self.browser, 30).until(
+            url_contains(edid_detail_url),
+            'Should redirect to EDID detail page'
+        )
 
         # Check 'Monitor Range Limits' is enabled
         self.browser.find_element_by_id('monitor_range_limits')
