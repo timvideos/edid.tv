@@ -113,15 +113,15 @@ class EDIDBinaryUpload(FormView):
         if self.request.user.is_authenticated:
             edid_object.user = self.request.user
 
+        # Set revision comment
+        reversion.set_comment('EDID parsed.')
+
         # Save the entry
         edid_object.save()
         # Add timings
         edid_object.populate_timings_from_parser(form.edid_data)
         # Save the updated entry
         edid_object.save()
-
-        # Set revision comment
-        reversion.set_comment('EDID parsed.')
 
         return HttpResponseRedirect(reverse('edid-detail',
                                             kwargs={'pk': edid_object.pk}))
@@ -172,6 +172,9 @@ class EDIDTextUpload(FormView):
         # RevisionMiddleware creates a revision per request,
         # we want a revision per EDID object created
         with reversion.create_revision(manage_manually=True):
+            # Set revision comment
+            reversion.set_comment('EDID parsed.')
+
             # Create EDID entry
             edid_object = EDID.create(file_base64=edid_base64,
                                       edid_data=edid_data)
@@ -183,8 +186,6 @@ class EDIDTextUpload(FormView):
             # Save the updated entry
             edid_object.save()
 
-            # Set revision comment
-            reversion.set_comment('EDID parsed.')
             # Create revision for EDID
             reversion.add_to_revision(edid_object)
 
@@ -481,6 +482,8 @@ class TimingMixin(object):
             form.instance._meta.verbose_name, form.instance
         ))
 
+        reversion.add_to_revision(form.instance.EDID)
+
         return super(TimingMixin, self).form_valid(form)
 
     def delete(self, request, *args, **kwargs):
@@ -491,16 +494,17 @@ class TimingMixin(object):
         """
 
         obj = self.get_object()
-        obj.delete()
-
-        # Did not actually update EDID, just to make sure EDID and all its
-        # related objects are included in the revision
-        obj.EDID.save()
 
         # Set revision comment
         reversion.set_comment('Deleted %s %s.' % (
             obj._meta.verbose_name, obj
         ))
+
+        obj.delete()
+
+        # Did not actually update EDID, just to make sure EDID and all its
+        # related objects are included in the revision
+        obj.EDID.save()
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -571,6 +575,8 @@ class TimingReorderMixin(object):
                 current_timing._meta.verbose_name, current_timing
             ))
 
+            reversion.add_to_revision(current_timing.EDID)
+
             return HttpResponseRedirect(self.get_success_url())
         elif direction == 'down':
             count = self.model.objects.filter(EDID_id=edid_pk).count()
@@ -599,6 +605,8 @@ class TimingReorderMixin(object):
             reversion.set_comment('Moved %s %s down.' % (
                 current_timing._meta.verbose_name, current_timing
             ))
+
+            reversion.add_to_revision(current_timing.EDID)
 
             return HttpResponseRedirect(self.get_success_url())
 
@@ -732,6 +740,9 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
         # RevisionMiddleware creates a revision per request,
         # we want a revision per EDID object created
         with reversion.create_revision(manage_manually=True):
+            # Set revision comment
+            reversion.set_comment('EDID parsed.')
+
             # Create EDID entry
             edid_object = EDID.create(file_base64=edid_base64,
                                       edid_data=edid_data)
@@ -743,8 +754,6 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             # Save the updated entry
             edid_object.save()
 
-            # Set revision comment
-            reversion.set_comment('EDID parsed.')
             # Create revision for EDID
             reversion.add_to_revision(edid_object)
 

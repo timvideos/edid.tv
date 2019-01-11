@@ -4,7 +4,7 @@ setuptools~=40.6.0
 django-allauth~=0.34.0
 django-braces~=1.13.0
 django-crispy-forms~=1.7.0
-django-reversion~=2.0.0
+django-reversion~=3.0.0
 ez-setup==0.9
 pep8==1.4.6
 pylint==1.0.0
