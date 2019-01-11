@@ -312,8 +312,7 @@ class EDIDRevisionDetail(DetailView):
             raise Http404()
 
         # Assign EDID instance to edid
-        # TODO accessing protected properties is evil
-        edid = version._object_version.object
+        edid = EDID(**version.field_dict)
 
         # Flag EDID instance as revision
         edid.is_revision = True
@@ -326,12 +325,12 @@ class EDIDRevisionDetail(DetailView):
         detailedtimings = []
 
         for related_version in revision_versions:
-            # TODO moar evil
-            timing = related_version._object_version.object
-            if isinstance(timing, StandardTiming):
-                standardtimings.append(timing)
-            elif isinstance(timing, DetailedTiming):
-                detailedtimings.append(timing)
+            if related_version.content_type.model_class() == StandardTiming:
+                standardtimings.append(StandardTiming(**related_version.
+                                                      field_dict))
+            elif related_version.content_type.model_class() == DetailedTiming:
+                detailedtimings.append(DetailedTiming(**related_version.
+                                                      field_dict))
 
         edid.standardtimings = standardtimings
         edid.detailedtimings = detailedtimings
