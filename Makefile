@@ -8,6 +8,10 @@ endef
 
 ACTIVATE = . bin/activate
 
+ifndef PYTHON
+PYTHON = "python"
+endif
+
 ###############################################################################
 # Export the configuration to sub-makes
 ###############################################################################
@@ -28,7 +32,7 @@ clean:
 #	git clean -f -d
 
 bin/activate:
-	virtualenv --no-site-packages .
+	virtualenv -p $(PYTHON) .
 	-rm distribute*.tar.gz
 
 freeze:
