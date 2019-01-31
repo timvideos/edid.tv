@@ -2,14 +2,12 @@ language: python
 python:
   - "2.7"
 env:
-  - DISPLAY=":99"
-# command to install dependencies
-before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  - MOZ_HEADLESS=1
+addons:
+  firefox: latest
 install:
-  - pip install -r requirements.txt --use-mirrors
-  - pip install coveralls --use-mirrors
+  - pip install -r requirements.txt
+  - pip install coveralls
 # command to run tests
 script:
   - pep8 --statistics *.py
@@ -17,7 +15,7 @@ script:
   - pep8 --statistics frontend/
   - pylint --reports=n *.py edid_parser/*.py frontend/*.py
   - coverage run --source=edid_parser edid_parser/tests.py
-  - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.django_tests
-  - coverage run -a --source=frontend manage.py test --settings=test_settings frontend.selenium_tests
+  - coverage run -a --source=frontend manage.py test frontend.django_tests
+  - coverage run -a --source=frontend manage.py test frontend.selenium_tests
 after_success:
   - coveralls

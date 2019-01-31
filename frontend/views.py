@@ -1,9 +1,10 @@
+from __future__ import print_function
 import base64
 import hashlib
 import json
 
 from django.db.models import Count
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseRedirect, Http404)
 from django.shortcuts import get_object_or_404
@@ -15,7 +16,8 @@ from django.views.generic.edit import (FormView, CreateView, UpdateView,
 from braces.views import (CsrfExemptMixin, JSONResponseMixin,
                           LoginRequiredMixin, PrefetchRelatedMixin,
                           StaffuserRequiredMixin)
-import reversion
+from reversion import revisions as reversion
+from reversion.models import Version
 
 from edid_parser.edid_parser import EDIDParser, EDIDParsingError
 
@@ -54,7 +56,6 @@ class ManufacturerDetail(DetailView):
         Adds `edid_list` to template context to be used in place of
         `manufacturer.edid_set` RelatedManager.
         """
-
         context = super(ManufacturerDetail, self).get_context_data(**kwargs)
 
         queryset = EDID.objects.filter(manufacturer=context['manufacturer'].pk)
@@ -109,8 +110,11 @@ class EDIDBinaryUpload(FormView):
                                   edid_data=form.edid_data)
 
         # Set the user
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             edid_object.user = self.request.user
+
+        # Set revision comment
+        reversion.set_comment('EDID parsed.')
 
         # Save the entry
         edid_object.save()
@@ -118,9 +122,6 @@ class EDIDBinaryUpload(FormView):
         edid_object.populate_timings_from_parser(form.edid_data)
         # Save the updated entry
         edid_object.save()
-
-        # Set revision comment
-        reversion.set_comment('EDID parsed.')
 
         return HttpResponseRedirect(reverse('edid-detail',
                                             kwargs={'pk': edid_object.pk}))
@@ -171,6 +172,9 @@ class EDIDTextUpload(FormView):
         # RevisionMiddleware creates a revision per request,
         # we want a revision per EDID object created
         with reversion.create_revision(manage_manually=True):
+            # Set revision comment
+            reversion.set_comment('EDID parsed.')
+
             # Create EDID entry
             edid_object = EDID.create(file_base64=edid_base64,
                                       edid_data=edid_data)
@@ -182,10 +186,8 @@ class EDIDTextUpload(FormView):
             # Save the updated entry
             edid_object.save()
 
-            # Set revision comment
-            reversion.set_comment('EDID parsed.')
             # Create revision for EDID
-            reversion.default_revision_manager.save_revision([edid_object])
+            reversion.add_to_revision(edid_object)
 
             self.edid_list.append(edid_object)
 
@@ -270,7 +272,7 @@ class EDIDRevisionList(ListView):
         edid_pk = self.kwargs.get('edid_pk', None)
 
         edid = get_object_or_404(EDID, pk=edid_pk)
-        versions_list = reversion.get_for_object(edid)
+        versions_list = Version.objects.get_for_object(edid)
 
         return versions_list
 
@@ -301,7 +303,7 @@ class EDIDRevisionDetail(DetailView):
         revision_pk = self.kwargs.get('revision_pk', None)
 
         # Get version based on edid_pk and revision_pk or return 404.
-        version = reversion.get_for_object_reference(EDID, edid_pk) \
+        version = Version.objects.get_for_object_reference(EDID, edid_pk) \
                            .filter(revision__pk=revision_pk)
 
         try:
@@ -310,7 +312,7 @@ class EDIDRevisionDetail(DetailView):
             raise Http404()
 
         # Assign EDID instance to edid
-        edid = version.object_version.object
+        edid = EDID(**version.field_dict)
 
         # Flag EDID instance as revision
         edid.is_revision = True
@@ -323,11 +325,12 @@ class EDIDRevisionDetail(DetailView):
         detailedtimings = []
 
         for related_version in revision_versions:
-            timing = related_version.object_version.object
-            if isinstance(timing, StandardTiming):
-                standardtimings.append(timing)
-            elif isinstance(timing, DetailedTiming):
-                detailedtimings.append(timing)
+            if related_version.content_type.model_class() == StandardTiming:
+                standardtimings.append(StandardTiming(**related_version.
+                                                      field_dict))
+            elif related_version.content_type.model_class() == DetailedTiming:
+                detailedtimings.append(DetailedTiming(**related_version.
+                                                      field_dict))
 
         edid.standardtimings = standardtimings
         edid.detailedtimings = detailedtimings
@@ -366,7 +369,7 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
         revision_pk = self.kwargs.get('revision_pk', None)
 
         # Get version based on edid_pk and revision_pk or return 404.
-        version = reversion.get_for_object_reference(EDID, edid_pk) \
+        version = Version.objects.get_for_object_reference(EDID, edid_pk) \
                            .filter(revision__pk=revision_pk)
 
         try:
@@ -478,6 +481,8 @@ class TimingMixin(object):
             form.instance._meta.verbose_name, form.instance
         ))
 
+        reversion.add_to_revision(form.instance.EDID)
+
         return super(TimingMixin, self).form_valid(form)
 
     def delete(self, request, *args, **kwargs):
@@ -488,16 +493,17 @@ class TimingMixin(object):
         """
 
         obj = self.get_object()
-        obj.delete()
-
-        # Did not actually update EDID, just to make sure EDID and all its
-        # related objects are included in the revision
-        obj.EDID.save()
 
         # Set revision comment
         reversion.set_comment('Deleted %s %s.' % (
             obj._meta.verbose_name, obj
         ))
+
+        obj.delete()
+
+        # Did not actually update EDID, just to make sure EDID and all its
+        # related objects are included in the revision
+        obj.EDID.save()
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -536,6 +542,7 @@ class DetailedTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
 class TimingReorderMixin(object):
     http_method_names = [u'get']
 
+    @reversion.create_revision()
     def get(self, request, *args, **kwargs):
         edid_pk = kwargs.get('edid_pk', None)
         identification = int(kwargs.get('identification', None))
@@ -567,6 +574,8 @@ class TimingReorderMixin(object):
                 current_timing._meta.verbose_name, current_timing
             ))
 
+            reversion.add_to_revision(current_timing.EDID)
+
             return HttpResponseRedirect(self.get_success_url())
         elif direction == 'down':
             count = self.model.objects.filter(EDID_id=edid_pk).count()
@@ -595,6 +604,8 @@ class TimingReorderMixin(object):
             reversion.set_comment('Moved %s %s down.' % (
                 current_timing._meta.verbose_name, current_timing
             ))
+
+            reversion.add_to_revision(current_timing.EDID)
 
             return HttpResponseRedirect(self.get_success_url())
 
@@ -728,6 +739,9 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
         # RevisionMiddleware creates a revision per request,
         # we want a revision per EDID object created
         with reversion.create_revision(manage_manually=True):
+            # Set revision comment
+            reversion.set_comment('EDID parsed.')
+
             # Create EDID entry
             edid_object = EDID.create(file_base64=edid_base64,
                                       edid_data=edid_data)
@@ -739,10 +753,8 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             # Save the updated entry
             edid_object.save()
 
-            # Set revision comment
-            reversion.set_comment('EDID parsed.')
             # Create revision for EDID
-            reversion.default_revision_manager.save_revision([edid_object])
+            reversion.add_to_revision(edid_object)
 
             self.edid_list.append(edid_object)
 

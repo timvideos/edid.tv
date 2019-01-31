@@ -8,6 +8,10 @@ endef
 
 ACTIVATE = . bin/activate
 
+ifndef PYTHON
+PYTHON = "python"
+endif
+
 ###############################################################################
 # Export the configuration to sub-makes
 ###############################################################################
@@ -28,7 +32,7 @@ clean:
 #	git clean -f -d
 
 bin/activate:
-	virtualenv --no-site-packages .
+	virtualenv -p $(PYTHON) .
 	-rm distribute*.tar.gz
 
 freeze:
@@ -51,7 +55,8 @@ createinitialrevisions:
 
 prepare-serve:
 	$(ACTIVATE) && python manage.py collectstatic --noinput
-	$(ACTIVATE) && python manage.py syncdb
+	$(ACTIVATE) && python manage.py migrate
+	$(ACTIVATE) && python manage.py loaddata manufacturer.json
 
 
 #### Tests
@@ -62,19 +67,19 @@ parsertest:
 	$(ACTIVATE) && python edid_parser/tests.py
 
 clitest:
-	$(ACTIVATE) && python manage.py test --settings=test_settings \
+	$(ACTIVATE) && python manage.py test \
 	    frontend.django_tests
 
 firefoxtest:
 	$(ACTIVATE) && TEST_DISPLAY=1 python manage.py test \
-	    --settings=test_settings frontend.selenium_tests
+	    frontend.selenium_tests
 
 coverage:
 	$(ACTIVATE) && coverage run --source=edid_parser edid_parser/tests.py
 	$(ACTIVATE) && coverage run -a --source=frontend manage.py test \
-	    --settings=test_settings frontend.django_tests
+	    frontend.django_tests
 	$(ACTIVATE) && TEST_DISPLAY=1 coverage run -a --source=frontend manage.py \
-	    test --settings=test_settings frontend.selenium_tests
+	    test frontend.selenium_tests
 	$(ACTIVATE) && coverage html -d coverage_report
 	$(ACTIVATE) && coverage erase
 

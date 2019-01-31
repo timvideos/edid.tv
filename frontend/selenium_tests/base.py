@@ -1,13 +1,10 @@
 import base64
-import os
-import warnings
 
-from django.db import transaction
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, TestCase
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from webdrivermanager import GeckoDriverManager
 
 from edid_parser.edid_parser import EDIDParser
 
@@ -28,36 +25,23 @@ class BrowserQuitter(object):
             pass
 
 
-class SeleniumTestCase(LiveServerTestCase):
+class SeleniumTestCase(TestCase, LiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(SeleniumTestCase, cls).setUpClass()
+        gdd = GeckoDriverManager()
+        gdd.download_and_install()
+
     def setUp(self):
         super(SeleniumTestCase, self).setUp()
 
-        profile = webdriver.FirefoxProfile()
-        profile.set_preference('plugins.hide_infobar_for_missing_plugin', True)
-
-        firefox_bin = os.path.join(os.getcwd(), 'firefox', 'firefox')
-        if os.path.exists(firefox_bin):
-            self.browser = webdriver.Firefox(
-                firefox_profile=profile,
-                firefox_binary=FirefoxBinary(firefox_bin)
-            )
-        else:
-            warnings.warn(
-                "Using your default Firefox, this can be unreliable."
-            )
-            self.browser = webdriver.Firefox(firefox_profile=profile)
-
-        self.browser_quitter = BrowserQuitter(self.browser)
+        self.browser = webdriver.Firefox()
+        self.addCleanup(self.browser.quit)
 
         self.browser.implicitly_wait(30)
 
         self.browser.get(self.live_server_url)
         self.assertIn('EDID.tv', self.browser.title)
-        self.main_window_handle = self.browser.window_handles[0]
-
-    def tearDown(self):
-        del self.browser_quitter
-        super(SeleniumTestCase, self).tearDown()
 
     def doLogin(self, username='admin', password='admin'):
         self.browser.find_element_by_id('account_menu').click()
@@ -69,8 +53,6 @@ class SeleniumTestCase(LiveServerTestCase):
         self.browser.find_element_by_id('submit_login').click()
 
     def doLogout(self):
-        self.browser.switch_to_window(self.main_window_handle)
-
         self.browser.find_element_by_id('account_menu').click()
         self.browser.find_element_by_id('logout_link').click()
 

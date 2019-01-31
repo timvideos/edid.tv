@@ -13,7 +13,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from edid_parser.edid_parser import (DisplayType, DisplayStereoMode,
                                      TimingSyncScheme,
@@ -39,8 +39,8 @@ class EDIDPublicManager(models.Manager):
     A manager to filter private EDIDs from public interface.
     """
 
-    def get_query_set(self):
-        return super(EDIDPublicManager, self).get_query_set() \
+    def get_queryset(self):
+        return super(EDIDPublicManager, self).get_queryset() \
             .exclude(status=EDID.STATUS_PRIVATE)
 
 
@@ -48,7 +48,7 @@ class EDID(models.Model):
     objects = EDIDPublicManager()
     all_objects = models.Manager()
 
-    manufacturer = models.ForeignKey(Manufacturer)
+    manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
 
     # Initialized and basic data auto-added
     STATUS_INITIALIZED = 0
@@ -68,7 +68,8 @@ class EDID(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
+                             on_delete=models.SET_NULL)
 
     # Binary file encoded in base64
     file_base64 = models.TextField(editable=False)
@@ -207,16 +208,17 @@ class EDID(models.Model):
         (DisplayType.Undefined, 'Undefined'),
     )
 
-    bdp_feature_standby = models.BooleanField('standby mode')
-    bdp_feature_suspend = models.BooleanField('suspend mode')
+    bdp_feature_standby = models.BooleanField('standby mode', default=False)
+    bdp_feature_suspend = models.BooleanField('suspend mode', default=False)
     bdp_feature_active_off = models.BooleanField(
-        'active off/very low power mode')
+        'active off/very low power mode', default=False)
     bdp_feature_display_type = models.PositiveSmallIntegerField(
         'display color type', choices=BDP_FEATURE_DISPLAY_TYPE_CHOICE,
         blank=True, null=True)
-    bdp_feature_standard_srgb = models.BooleanField('standard sRGB')
+    bdp_feature_standard_srgb = models.BooleanField('standard sRGB',
+                                                    default=False)
     bdp_feature_pref_timing_mode = models.BooleanField(
-        'preferred timing mode')
+        'preferred timing mode', default=False)
     bdp_feature_default_gtf = models.NullBooleanField('default GTF')
 
     bdp_feature_rgb444 = models.NullBooleanField('RGB 4:4:4 supported')
@@ -244,25 +246,31 @@ class EDID(models.Model):
         'white y', max_digits=4, decimal_places=3)
 
     ### est_timings=Established Timings
-    est_timings_720_400_70 = models.BooleanField('720x400@70Hz')
-    est_timings_720_400_88 = models.BooleanField('720x400@88Hz')
-    est_timings_640_480_60 = models.BooleanField('640x480@60Hz')
-    est_timings_640_480_67 = models.BooleanField('640x480@67Hz')
-    est_timings_640_480_72 = models.BooleanField('640x480@72Hz')
-    est_timings_640_480_75 = models.BooleanField('640x480@75Hz')
-    est_timings_800_600_56 = models.BooleanField('800x600@56Hz')
-    est_timings_800_600_60 = models.BooleanField('800x600@60Hz')
-    est_timings_800_600_72 = models.BooleanField('800x600@72Hz')
-    est_timings_800_600_75 = models.BooleanField('800x600@75Hz')
-    est_timings_832_624_75 = models.BooleanField('832x624@75Hz')
-    est_timings_1024_768_87 = models.BooleanField('1024x768@87Hz')
-    est_timings_1024_768_60 = models.BooleanField('1024x768@60Hz')
-    est_timings_1024_768_70 = models.BooleanField('1024x768@70Hz')
-    est_timings_1024_768_75 = models.BooleanField('1024x768@75Hz')
-    est_timings_1280_1024_75 = models.BooleanField('1280x1024@75Hz')
+    est_timings_720_400_70 = models.BooleanField('720x400@70Hz', default=False)
+    est_timings_720_400_88 = models.BooleanField('720x400@88Hz', default=False)
+    est_timings_640_480_60 = models.BooleanField('640x480@60Hz', default=False)
+    est_timings_640_480_67 = models.BooleanField('640x480@67Hz', default=False)
+    est_timings_640_480_72 = models.BooleanField('640x480@72Hz', default=False)
+    est_timings_640_480_75 = models.BooleanField('640x480@75Hz', default=False)
+    est_timings_800_600_56 = models.BooleanField('800x600@56Hz', default=False)
+    est_timings_800_600_60 = models.BooleanField('800x600@60Hz', default=False)
+    est_timings_800_600_72 = models.BooleanField('800x600@72Hz', default=False)
+    est_timings_800_600_75 = models.BooleanField('800x600@75Hz', default=False)
+    est_timings_832_624_75 = models.BooleanField('832x624@75Hz', default=False)
+    est_timings_1024_768_87 = models.BooleanField('1024x768@87Hz',
+                                                  default=False)
+    est_timings_1024_768_60 = models.BooleanField('1024x768@60Hz',
+                                                  default=False)
+    est_timings_1024_768_70 = models.BooleanField('1024x768@70Hz',
+                                                  default=False)
+    est_timings_1024_768_75 = models.BooleanField('1024x768@75Hz',
+                                                  default=False)
+    est_timings_1280_1024_75 = models.BooleanField('1280x1024@75Hz',
+                                                   default=False)
 
     ### mrl=Monitor range limits, optional starting from v1.1
-    monitor_range_limits = models.BooleanField('monitor range limits')
+    monitor_range_limits = models.BooleanField('monitor range limits',
+                                               default=False)
 
     # in kHz
     mrl_min_horizontal_rate = models.PositiveSmallIntegerField(
@@ -532,9 +540,11 @@ class EDID(models.Model):
                 horizontal_active=data['Horizontal_active'],
                 vertical_active=data['Vertical_active'],
                 refresh_rate=data['Refresh_Rate'],
-                aspect_ratio=aspect_ratio
+                aspect_ratio=aspect_ratio,
+                EDID=self,
             )
 
+            timing.save()
             self.standardtiming_set.add(timing)
 
         for item in edid['Descriptors']:
@@ -565,7 +575,8 @@ class EDID(models.Model):
                 vertical_border=data['Vertical_Border'],
                 flags_interlaced=data['Flags']['Interlaced'],
                 flags_stereo_mode=data['Flags']['Stereo_Mode'],
-                flags_sync_scheme=data['Flags']['Sync_Scheme']
+                flags_sync_scheme=data['Flags']['Sync_Scheme'],
+                EDID=self,
             )
 
             if (timing.flags_sync_scheme ==
@@ -584,6 +595,7 @@ class EDID(models.Model):
                 else:
                     timing.flags_sync_on_rgb = data['Flags']['Sync_On_RGB']
 
+            timing.save()
             self.detailedtiming_set.add(timing)
 
         if 'Monitor_Range_Limits_Descriptor' in edid['Descriptors']:
@@ -788,12 +800,13 @@ class EDID(models.Model):
 
 
 class Timing(models.Model):
-    EDID = models.ForeignKey(EDID)
+    EDID = models.ForeignKey(EDID, on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
+                             on_delete=models.SET_NULL)
 
     # Identification
     identification = models.IntegerField()
@@ -862,7 +875,7 @@ class DetailedTiming(Timing):
     vertical_image_size = models.PositiveSmallIntegerField()
     vertical_border = models.PositiveSmallIntegerField()
 
-    flags_interlaced = models.BooleanField('interlaced')
+    flags_interlaced = models.BooleanField('interlaced', default=False)
 
     Stereo_Mode = DisplayStereoMode
     STEREO_MODE_CHOICES = (
@@ -925,15 +938,16 @@ EDID_COMMENT_MAX_THREAD_LEVEL = 2
 
 
 class Comment(models.Model):
-    EDID = models.ForeignKey(EDID)
+    EDID = models.ForeignKey(EDID, on_delete=models.CASCADE)
 
     # Parent comment
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
 
     # Nested level
     level = models.PositiveSmallIntegerField()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
     submitted = models.DateTimeField(auto_now_add=True)
 

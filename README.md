@@ -20,9 +20,8 @@ Installation Instructions
 1. Clone this repository.
 2. Create `private/requirements.txt` if needed, you can use it to install additional packages, like database interfaces.
 3. Create `private/settings.py`, see `Settings` section below for details, most of the settings are needed only for production deployment only (DEBUG=False).
-4. `make install`
+4. `make install` (for systems where Python 3 is default: use `PYTHON=/path/to/python2 make install`)
 5. `make serve`
-  * You may need to import `frontend/sql/manufacturer.sql` manually if it failed.
 
 Settings
 ---

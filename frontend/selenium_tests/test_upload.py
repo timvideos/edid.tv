@@ -1,6 +1,7 @@
 from tempfile import NamedTemporaryFile
 
-from django.db import transaction
+from selenium.webdriver.support.expected_conditions import url_to_be
+from selenium.webdriver.support.wait import WebDriverWait
 
 from frontend.models import Manufacturer
 
@@ -9,11 +10,10 @@ from base import SeleniumTestCase
 
 class UploadSeleniumTestCase(SeleniumTestCase):
     def setUp(self):
-        with transaction.commit_on_success():
-            Manufacturer.objects.bulk_create([
-                Manufacturer(name_id='TSB', name='Toshiba'),
-                Manufacturer(name_id='UNK', name='Unknown'),
-            ])
+        Manufacturer.objects.bulk_create([
+            Manufacturer(name_id='TSB', name='Toshiba'),
+            Manufacturer(name_id='UNK', name='Unknown'),
+        ])
 
         super(UploadSeleniumTestCase, self).setUp()
 
@@ -47,6 +47,7 @@ class UploadSeleniumTestCase(SeleniumTestCase):
         # Submit upload form
         self.browser.find_element_by_id('upload-id-upload').submit()
 
-        # Check we got redirected to EDID detail page
-        self.assertEqual(self.browser.current_url,
-                         "%s/edid/1/" % self.live_server_url)
+        WebDriverWait(self.browser, 30).until(
+            url_to_be("%s/edid/1/" % self.live_server_url),
+            'Should redirect to EDID detail page'
+        )
