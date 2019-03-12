@@ -1,0 +1,15 @@
+upstream edidtv {
+    server site:8000;
+}
+
+server {
+    listen 80 default;
+    listen [::]:80 default;
+
+    client_max_body_size 1M;
+
+    location / {
+        uwsgi_pass edidtv;
+        include /etc/nginx/uwsgi_params;
+    }
+}

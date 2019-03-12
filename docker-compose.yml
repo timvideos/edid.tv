@@ -1,0 +1,62 @@
+version: '3.1'
+services:
+  database:
+    image: mariadb:latest
+    volumes:
+      - database:/var/lib/mysql
+      - ./docker/my.cnf:/etc/mysql/conf.d/my.cnf:z
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      edidtv:
+        aliases:
+          - database
+    environment:
+      - MYSQL_DATABASE=edidtv
+      - MYSQL_USER=edidtv
+      - MYSQL_PASSWORD=edidtv
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+  httpd:
+    image: nginx:alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/edidtv.nginx:/etc/nginx/conf.d/default.conf:z
+    networks:
+      edidtv:
+        aliases:
+          - httpd
+    depends_on:
+      - site
+  site:
+    build: .
+    volumes:
+      - ./docker/settings.py:/opt/edidtv/private/settings.py:z
+    networks:
+      edidtv:
+        aliases:
+          - site
+    depends_on:
+      - database
+      - smtpd
+    entrypoint:
+      - wait-for
+      - database:3306
+      - -t
+      - "180"
+      - --
+      - /bin/sh
+      - entrypoint.sh
+  smtpd:
+    build: ./docker/exim
+    hostname: mail.edid.tv
+    networks:
+      edidtv:
+        aliases:
+          - smtpd
+networks:
+  edidtv:
+    driver: bridge
+volumes:
+  database:
