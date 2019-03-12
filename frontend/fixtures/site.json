@@ -1,0 +1,10 @@
+[
+    {
+        "fields": {
+            "domain": "edid.tv",
+            "name": "edid.tv"
+        },
+        "model": "sites.Site",
+        "pk": 1
+    }
+]
