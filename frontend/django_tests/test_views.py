@@ -298,6 +298,10 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         # Check the field have been updated
         self.assertEqual(EDID.objects.get(pk=1).monitor_range_limits, False)
 
+    def test_download(self):
+        response = self.client.get(reverse('edid-download', kwargs={'pk': 1}))
+        self.assertEqual(response.content, self._edid_binary)
+
 
 ### EDID Revisions Tests
 class RevisionsTestCase(EDIDTestMixin, TestCase):

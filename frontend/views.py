@@ -228,7 +228,7 @@ class EDIDDownloadView(DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        response = HttpResponse(mimetype='application/octet-stream')
+        response = HttpResponse(content_type='application/octet-stream')
         response.content = base64.b64decode(obj.file_base64)
 
         if obj.monitor_name:
