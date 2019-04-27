@@ -1,0 +1,7 @@
+exim4-config	exim4/dc_local_interfaces	string	0.0.0.0
+exim4-config	exim4/mailname	string	edid.tv
+exim4-config	exim4/dc_postmaster	string	root
+exim4-config	exim4/use_split_config	boolean	false
+exim4-config	exim4/dc_eximconfig_configtype	select	internet site; mail is sent and received directly using SMTP
+exim4-config	exim4/dc_other_hostnames	string	edid.tv
+exim4-config    exim4/dc_relay_domains string  *

@@ -425,7 +425,7 @@
     },
     {
         "fields": {
-            "name_id": "AVN ",
+            "name_id": "AVN",
             "name": "Advance Computer Corporation"
         },
         "model": "frontend.manufacturer",
@@ -489,7 +489,7 @@
     },
     {
         "fields": {
-            "name_id": "EVE ",
+            "name_id": "EVE",
             "name": "Advanced Micro Peripherals Ltd"
         },
         "model": "frontend.manufacturer",
@@ -1369,7 +1369,7 @@
     },
     {
         "fields": {
-            "name_id": "AMS ",
+            "name_id": "AMS",
             "name": "ARMSTEL, Inc."
         },
         "model": "frontend.manufacturer",
@@ -5345,7 +5345,7 @@
     },
     {
         "fields": {
-            "name_id": "EPH ",
+            "name_id": "EPH",
             "name": "Epiphan Systems Inc. "
         },
         "model": "frontend.manufacturer",
@@ -8705,7 +8705,7 @@
     },
     {
         "fields": {
-            "name_id": "KFE ",
+            "name_id": "KFE",
             "name": "Komatsu Forest "
         },
         "model": "frontend.manufacturer",
@@ -15313,7 +15313,7 @@
     },
     {
         "fields": {
-            "name_id": "TUA ",
+            "name_id": "TUA",
             "name": "T+A elektroakustik GmbH"
         },
         "model": "frontend.manufacturer",
@@ -17265,7 +17265,7 @@
     },
     {
         "fields": {
-            "name_id": "WEL ",
+            "name_id": "WEL",
             "name": "W-DEV"
         },
         "model": "frontend.manufacturer",

@@ -56,6 +56,7 @@ createinitialrevisions:
 prepare-serve:
 	$(ACTIVATE) && python manage.py collectstatic --noinput
 	$(ACTIVATE) && python manage.py migrate
+	$(ACTIVATE) && python manage.py loaddata site.json
 	$(ACTIVATE) && python manage.py loaddata manufacturer.json
 
 
