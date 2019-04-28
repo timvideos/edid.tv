@@ -10,7 +10,7 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  - pycodestyle --statistics *.py
+  - pycodestyle --statistics --exclude=wsgi.py *.py
   - pycodestyle --statistics edid_parser/
   - pycodestyle --statistics frontend/
   - pylint --reports=n *.py edid_parser/ frontend/
