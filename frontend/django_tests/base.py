@@ -1,5 +1,7 @@
 import base64
 
+from tempfile import TemporaryFile
+
 from django.contrib.auth import get_user_model
 
 from edid_parser.edid_parser import EDIDParser
@@ -56,3 +58,12 @@ class EDIDTestMixin(object):
         self.client.login(username=username, password=password)
 
         return user
+
+    @staticmethod
+    def _create_temp_file(edid_binary):
+        edid_file = TemporaryFile()
+        edid_file.write(edid_binary)
+        edid_file.flush()
+        edid_file.seek(0)
+
+        return edid_file

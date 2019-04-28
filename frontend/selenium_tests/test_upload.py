@@ -17,7 +17,8 @@ class UploadSeleniumTestCase(SeleniumTestCase):
 
         super(UploadSeleniumTestCase, self).setUp()
 
-    def create_temp_file(self, edid_binary):
+    @staticmethod
+    def _create_temp_file(edid_binary):
         edid_file = NamedTemporaryFile(delete=False)
         edid_file.write(edid_binary)
         edid_file.flush()
@@ -36,7 +37,7 @@ class UploadSeleniumTestCase(SeleniumTestCase):
                       "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
                       "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
                       "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
-        edid_file = self.create_temp_file(edid_binary)
+        edid_file = self._create_temp_file(edid_binary)
         edid_file.close()
 
         self.browser.get("%s/edid/upload/binary" % self.live_server_url)

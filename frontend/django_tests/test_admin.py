@@ -1,7 +1,6 @@
 from django.test import TestCase
 
 from frontend.django_tests.base import EDIDTestMixin
-from frontend.models import EDID
 
 
 class EDIDUpdateFormTestCase(EDIDTestMixin, TestCase):

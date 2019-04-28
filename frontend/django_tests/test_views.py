@@ -1,5 +1,6 @@
+# pylint: disable-msg=C0302
+# C0302: Too many lines in module
 from copy import copy
-from tempfile import TemporaryFile
 import json
 import os
 
@@ -13,7 +14,7 @@ from frontend.models import (EDID, Manufacturer, StandardTiming,
                              DetailedTiming, Comment)
 
 
-### EDID Tests
+# EDID Tests
 class EDIDUploadTestCase(EDIDTestMixin, TestCase):
     def setUp(self):
         Manufacturer.objects.bulk_create([
@@ -33,16 +34,8 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
                            "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
                            "\x20\x20\x20\x20\x20\x20\x01\x24"
 
-    def create_temp_file(self, edid_binary):
-        edid_file = TemporaryFile()
-        edid_file.write(edid_binary)
-        edid_file.flush()
-        edid_file.seek(0)
-
-        return edid_file
-
     def test_valid(self):
-        edid_file = self.create_temp_file(self.edid_binary)
+        edid_file = self._create_temp_file(self.edid_binary)
 
         # Upload the file and check for redirection to EDID detail view
         response = self.client.post(reverse('edid-upload-binary'), {
@@ -80,7 +73,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x24"
 
         # Save EDID to temporary file
-        edid_file = self.create_temp_file(edid_binary)
+        edid_file = self._create_temp_file(edid_binary)
 
         # Upload EDID file
         response = self.client.post(reverse('edid-upload-binary'), {
@@ -99,7 +92,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_binary = self.edid_binary[:3] + '\x00\x00' + self.edid_binary[5:]
 
         # Save EDID to temporary file
-        edid_file = self.create_temp_file(edid_binary)
+        edid_file = self._create_temp_file(edid_binary)
 
         # Upload EDID file
         response = self.client.post(reverse('edid-upload-binary'), {
@@ -118,7 +111,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
         edid_binary = self.edid_binary[:127] + '\xFF'
 
         # Save EDID to temporary file
-        edid_file = self.create_temp_file(edid_binary)
+        edid_file = self._create_temp_file(edid_binary)
 
         # Upload EDID file
         response = self.client.post(reverse('edid-upload-binary'), {
@@ -142,7 +135,8 @@ class EDIDTextUploadTestCase(TestCase):
 
         self.post_url = reverse('edid-upload-text')
 
-    def _read_from_file(self, filename):
+    @staticmethod
+    def _read_from_file(filename):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         with open(os.path.join(data_dir, filename), 'r') as text_file:
             return text_file.read()
@@ -171,7 +165,7 @@ class EDIDTextUploadTestCase(TestCase):
         self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
         self.assertEqual(edid.monitor_range_limits, False)
 
-        ## Duplicate test
+        # Duplicate test
         # Submit Hex again
         response = self.client.post(
             self.post_url, {'text': hex_text, 'text_type': 'hex'}
@@ -182,7 +176,7 @@ class EDIDTextUploadTestCase(TestCase):
         self.assertEqual(response.context_data['failed'], 0)
         self.assertEqual(response.context_data['duplicate'], 1)
 
-        ## Failure test
+        # Failure test
         # Sabotage Hex, corrupting EDID header
         hex_text = hex_text[:18] + '00' + hex_text[20:]
 
@@ -220,7 +214,7 @@ class EDIDTextUploadTestCase(TestCase):
         self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
         self.assertEqual(edid.monitor_range_limits, False)
 
-        ## Duplicate test
+        # Duplicate test
         # Submit XRandR output again
         response = self.client.post(
             self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
@@ -231,7 +225,7 @@ class EDIDTextUploadTestCase(TestCase):
         self.assertEqual(response.context_data['failed'], 0)
         self.assertEqual(response.context_data['duplicate'], 1)
 
-        ## Failure test
+        # Failure test
         # Sabotage XRandR output, corrupting EDID header
         xrandr_text = xrandr_text[:162] + '00' + xrandr_text[164:]
 
@@ -303,7 +297,7 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(response.content, self._edid_binary)
 
 
-### EDID Revisions Tests
+# EDID Revisions Tests
 class RevisionsTestCase(EDIDTestMixin, TestCase):
     def setUp(self):
         Manufacturer.objects.bulk_create([
@@ -321,7 +315,7 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
                       "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
                       "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
                       "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
-        edid_file = self.create_temp_file(edid_binary)
+        edid_file = self._create_temp_file(edid_binary)
 
         # Upload the file and check for redirection to EDID detail view
         response = self.client.post(reverse('edid-upload-binary'), {
@@ -332,14 +326,6 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
                                                kwargs={'pk': 1}))
 
         edid_file.close()
-
-    def create_temp_file(self, edid_binary):
-        edid_file = TemporaryFile()
-        edid_file.write(edid_binary)
-        edid_file.flush()
-        edid_file.seek(0)
-
-        return edid_file
 
     def _check_versions_list(self, count):
         response = self.client.get(reverse(
@@ -577,7 +563,7 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
     #     )
 
 
-### Timing Tests
+# Timing Tests
 class TimingTestMixin(object):
     def setUp(self):
         super(TimingTestMixin, self).setUp()
@@ -693,7 +679,7 @@ class DetailedTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
         return self.edid.detailedtiming_set
 
 
-### Timing Reorder Tests
+# Timing Reorder Tests
 class TimingReorderMixin(object):
     def setUp(self):
         super(TimingReorderMixin, self).setUp()
@@ -794,7 +780,7 @@ class DetailedTimingReorderTestCase(TimingReorderMixin, EDIDTestMixin,
     urlconf_name = 'detailed-timing-reorder'
 
 
-### Comment Tests
+# Comment Tests
 class CommentTestCase(EDIDTestMixin, TestCase):
     def setUp(self):
         super(CommentTestCase, self).setUp()
@@ -830,7 +816,7 @@ class CommentTestCase(EDIDTestMixin, TestCase):
 
     def test_empty_content(self):
         # Post comment with no content
-        user = self._login()
+        self._login()
 
         data = self.valid_data
         data['content'] = ''
@@ -872,8 +858,8 @@ class CommentTestCase(EDIDTestMixin, TestCase):
                             content='').save()
         comment_2 = Comment(EDID=self.edid, user=user, level=1,
                             parent=comment_1, content='').save()
-        comment_3 = Comment(EDID=self.edid, user=user, level=2,
-                            parent=comment_2, content='').save()
+        Comment(EDID=self.edid, user=user, level=2,
+                parent=comment_2, content='').save()
 
         # Post comment with over-limit nesting
         data = self.valid_data
@@ -885,7 +871,7 @@ class CommentTestCase(EDIDTestMixin, TestCase):
                              'Comment nesting limit exceeded.')
 
 
-### API Upload Tests
+# API Upload Tests
 class APIUploadTestCase(TestCase):
     def setUp(self):
         Manufacturer.objects.bulk_create([
@@ -983,7 +969,7 @@ class APIUploadTestCase(TestCase):
         )
 
 
-### API Text Upload Tests
+# API Text Upload Tests
 class APITextUploadTestCase(TestCase):
     def setUp(self):
         Manufacturer.objects.bulk_create([
@@ -993,7 +979,8 @@ class APITextUploadTestCase(TestCase):
 
         self.post_url = reverse('api-upload-text')
 
-    def _read_from_file(self, filename):
+    @staticmethod
+    def _read_from_file(filename):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         with open(os.path.join(data_dir, filename), 'r') as text_file:
             return text_file.read()
@@ -1023,7 +1010,7 @@ class APITextUploadTestCase(TestCase):
         self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
         self.assertEqual(edid.monitor_range_limits, False)
 
-        ## Duplicate test
+        # Duplicate test
         # Submit Hex again
         response = self.client.post(
             self.post_url, {'text': hex_text, 'text_type': 'hex'}
@@ -1035,7 +1022,7 @@ class APITextUploadTestCase(TestCase):
         self.assertEqual(data['failed'], 0)
         self.assertEqual(data['duplicate'], 1)
 
-        ## Failure test
+        # Failure test
         # Sabotage Hex, corrupting EDID header
         hex_text = hex_text[:18] + '00' + hex_text[20:]
 
@@ -1075,7 +1062,7 @@ class APITextUploadTestCase(TestCase):
         self.assertEqual(edid.bdp_video_input, EDID.bdp_video_input_digital)
         self.assertEqual(edid.monitor_range_limits, False)
 
-        ## Duplicate test
+        # Duplicate test
         # Submit XRandR output again
         response = self.client.post(
             self.post_url, {'text': xrandr_text, 'text_type': 'xrandr'}
@@ -1087,7 +1074,7 @@ class APITextUploadTestCase(TestCase):
         self.assertEqual(data['failed'], 0)
         self.assertEqual(data['duplicate'], 1)
 
-        ## Failure test
+        # Failure test
         # Sabotage XRandR output, corrupting EDID header
         xrandr_text = xrandr_text[:162] + '00' + xrandr_text[164:]
 
@@ -1110,7 +1097,7 @@ class APITextUploadTestCase(TestCase):
         self.assertJSONEqual(response.content, {'error': 'Submittion failed!'})
 
 
-### Manufacturer Tests
+# Manufacturer Tests
 class ManufacturerTestCase(EDIDTestMixin, TestCase):
     def test_list_queryset(self):
         # Get Manufacturer List

@@ -1,6 +1,3 @@
-# W0142: Used * or ** magic
-# pylint: disable-msg=W0142
-
 from django.contrib import admin
 
 from reversion.admin import VersionAdmin
@@ -11,6 +8,7 @@ from frontend.models import (Manufacturer, EDID, StandardTiming,
 
 class ManufacturerAdmin(admin.ModelAdmin):
     pass
+
 
 admin.site.register(Manufacturer, ManufacturerAdmin)
 
@@ -42,6 +40,7 @@ class EDIDAdmin(VersionAdmin):
         if ordering:
             qs = qs.order_by(*ordering)
         return qs
+
 
 admin.site.register(EDID, EDIDAdmin)
 

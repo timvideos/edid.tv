@@ -28,7 +28,7 @@ from frontend.forms import (EDIDTextUploadForm, EDIDUpdateForm, EDIDUploadForm,
                             CommentForm, GrabberReleaseUploadForm)
 
 
-### Manufacturer
+# Manufacturer
 class ManufacturerList(ListView):
     model = Manufacturer
     context_object_name = 'manufacturer_list'
@@ -69,7 +69,7 @@ class ManufacturerDetail(DetailView):
         return context
 
 
-### EDID
+# EDID
 class EDIDList(ListView):
     model = EDID
 
@@ -232,7 +232,8 @@ class EDIDDownloadView(DetailView):
         response.content = base64.b64decode(obj.file_base64)
 
         if obj.monitor_name:
-            name = "%s_%s" % (smart_str(obj.monitor_name), smart_str(obj.manufacturer_serial_number))
+            name = "%s_%s" % (smart_str(obj.monitor_name),
+                              smart_str(obj.manufacturer_serial_number))
         else:
             name = smart_str(obj.manufacturer_serial_number)
 
@@ -259,7 +260,7 @@ class EDIDUpdate(LoginRequiredMixin, PrefetchRelatedMixin, UpdateView):
         return super(EDIDUpdate, self).form_valid(form)
 
 
-### EDID Revisions
+# EDID Revisions
 class EDIDRevisionList(ListView):
     context_object_name = 'versions_list'
     template_name = 'frontend/edid_revision_list.html'
@@ -304,7 +305,7 @@ class EDIDRevisionDetail(DetailView):
 
         # Get version based on edid_pk and revision_pk or return 404.
         version = Version.objects.get_for_object_reference(EDID, edid_pk) \
-                           .filter(revision__pk=revision_pk)
+                         .filter(revision__pk=revision_pk)
 
         try:
             version = version.get()
@@ -370,7 +371,7 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
 
         # Get version based on edid_pk and revision_pk or return 404.
         version = Version.objects.get_for_object_reference(EDID, edid_pk) \
-                           .filter(revision__pk=revision_pk)
+                         .filter(revision__pk=revision_pk)
 
         try:
             version = version.get()
@@ -402,7 +403,7 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
         return reverse('edid-detail', kwargs={'pk': edid_pk})
 
 
-### Timing Mixin
+# Timing Mixin
 class TimingMixin(object):
     context_object_name = 'timing'
 
@@ -508,7 +509,7 @@ class TimingMixin(object):
         return HttpResponseRedirect(self.get_success_url())
 
 
-### Standard Timing
+# Standard Timing
 class StandardTimingCreate(LoginRequiredMixin, TimingMixin, CreateView):
     model = StandardTiming
     form_class = StandardTimingForm
@@ -523,7 +524,7 @@ class StandardTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
     model = StandardTiming
 
 
-### Detailed Timing
+# Detailed Timing
 class DetailedTimingCreate(LoginRequiredMixin, TimingMixin, CreateView):
     model = DetailedTiming
     form_class = DetailedTimingForm
@@ -538,7 +539,7 @@ class DetailedTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
     model = DetailedTiming
 
 
-### Timing Reorder Mixin
+# Timing Reorder Mixin
 class TimingReorderMixin(object):
     http_method_names = [u'get']
 
@@ -619,17 +620,17 @@ class TimingReorderMixin(object):
         return reverse('edid-update', kwargs={'pk': edid_pk})
 
 
-### Standard Timing
+# Standard Timing
 class StandardTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
     model = StandardTiming
 
 
-### Detailed Timing
+# Detailed Timing
 class DetailedTimingReorder(LoginRequiredMixin, TimingReorderMixin, View):
     model = DetailedTiming
 
 
-### Comment
+# Comment
 class CommentCreate(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
@@ -694,7 +695,7 @@ class CommentCreate(LoginRequiredMixin, CreateView):
         return super(CommentCreate, self).form_valid(form)
 
 
-### API Upload
+# API Upload
 # TODO: Use braces.JsonRequestResponseMixin when it's released
 class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
     http_method_names = ['post']
@@ -709,7 +710,7 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
     def post(self, request, *args, **kwargs):
         content = json.loads(request.body)
 
-        if not 'edid_list' in content:
+        if 'edid_list' not in content:
             return HttpResponseBadRequest(
                 json.dumps({'error_message': 'List of EDIDs is missing.'})
             )
@@ -778,7 +779,7 @@ class APITextUpload(CsrfExemptMixin, JSONResponseMixin, EDIDTextUpload):
         return self.render_json_response({'error': 'Submittion failed!'})
 
 
-### Grabber Release
+# Grabber Release
 class GrabberReleaseUpload(CsrfExemptMixin, CreateView):
     model = GrabberRelease
     form_class = GrabberReleaseUploadForm
@@ -800,6 +801,6 @@ class GrabberReleaseUpload(CsrfExemptMixin, CreateView):
                             content_type='text/plain')
 
 
-### User Profile
+# User Profile
 class ProfileView(TemplateView):
     template_name = 'account/profile.html'

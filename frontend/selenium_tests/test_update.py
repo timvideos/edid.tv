@@ -11,7 +11,7 @@ from base import EDIDReadySeleniumTestCase
 class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_valid(self):
         get_user_model().objects.create_superuser('tester', '', 'test')
-        self.doLogin(username='tester', password='test')
+        self.do_login(username='tester', password='test')
 
         WebDriverWait(self.browser, 30).until(
             url_to_be("%s/accounts/profile/" % self.live_server_url),

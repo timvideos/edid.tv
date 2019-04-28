@@ -1,10 +1,12 @@
+# pylint: disable-msg=C0103,C0302,E1002,R0201,R0902,R0912,R0915,W0201
+# C0302: Too many lines in module
+# C0103: Attribute name doesn't conform to u'[a-z_][a-z0-9_]{2,30}$' pattern
 # E1002: Use of super on an old style class
 # R0201: Method could be a function (no-self-use)
 # R0902: Too many instance attributes
 # R0912: Too many branches
 # R0915: Too many statements
 # W0201: Attribute 'xxxx' defined outside __init__
-# pylint: disable-msg=E1002,R0201,R0902,R0912,R0915,W0201
 from __future__ import division
 
 import re
@@ -74,16 +76,18 @@ class EDID(models.Model):
     # Binary file encoded in base64
     file_base64 = models.TextField(editable=False)
 
-    ### Header
+    # Header
     # ID Product Code
     manufacturer_product_code = models.CharField(max_length=4, blank=True)
     # ID Serial Number, 32-bit
     manufacturer_serial_number = models.PositiveIntegerField(blank=True,
                                                              null=True)
     # Week of manufacture, 1-54, 0==Unknown
-    week_of_manufacture = models.PositiveSmallIntegerField(blank=True, null=True)
+    week_of_manufacture = models.PositiveSmallIntegerField(blank=True,
+                                                           null=True)
     # Year of manufacture, 1990-2245
-    year_of_manufacture = models.PositiveSmallIntegerField(blank=True, null=True)
+    year_of_manufacture = models.PositiveSmallIntegerField(blank=True,
+                                                           null=True)
     # Model year, 1990-2245
     model_year = models.PositiveSmallIntegerField(blank=True, null=True)
 
@@ -104,7 +108,7 @@ class EDID(models.Model):
     )
     version = models.PositiveSmallIntegerField(choices=VERSION_CHOICES)
 
-    ### ASCII Text Descriptors
+    # ASCII Text Descriptors
     # Monitor Name, from Monitor Descriptor Description (type 0xFC)
     monitor_name = models.CharField(max_length=13, blank=True)
     # Monitor Serial Number, from Monitor Descriptor Description (type 0xFF)
@@ -112,7 +116,7 @@ class EDID(models.Model):
     # Monitor Data String, from Monitor Descriptor Description (type 0xFE)
     monitor_data_string = models.CharField(max_length=13, blank=True)
 
-    ### bdp=Basic display parameters
+    # bdp=Basic display parameters
     bdp_video_input_analog = 0
     bdp_video_input_digital = 1
     BDP_VIDEO_INPUT_CHOICES = ((bdp_video_input_analog, 'Analog'),
@@ -187,7 +191,9 @@ class EDID(models.Model):
         (Decimal('0.80'), '4:5'),
     )
     bdp_aspect_ratio = models.DecimalField('aspect ratio', max_digits=3,
-       decimal_places=2, blank=True, null=True, choices=BDP_ASPECT_RATIO_CHOICE)
+                                           decimal_places=2, blank=True,
+                                           null=True,
+                                           choices=BDP_ASPECT_RATIO_CHOICE)
     bdp_horizontal_screen_size = models.PositiveSmallIntegerField(
         'horizontal screen size', blank=True, null=True)
     bdp_vertical_screen_size = models.PositiveSmallIntegerField(
@@ -227,7 +233,7 @@ class EDID(models.Model):
     bdp_feature_continuous_frequency = models.NullBooleanField(
         'continuous frequency')
 
-    ### chr=Chromaticity
+    # chr=Chromaticity
     chr_red_x = models.DecimalField(
         'red x', max_digits=4, decimal_places=3)
     chr_red_y = models.DecimalField(
@@ -245,7 +251,7 @@ class EDID(models.Model):
     chr_white_y = models.DecimalField(
         'white y', max_digits=4, decimal_places=3)
 
-    ### est_timings=Established Timings
+    # est_timings=Established Timings
     est_timings_720_400_70 = models.BooleanField('720x400@70Hz', default=False)
     est_timings_720_400_88 = models.BooleanField('720x400@88Hz', default=False)
     est_timings_640_480_60 = models.BooleanField('640x480@60Hz', default=False)
@@ -268,7 +274,7 @@ class EDID(models.Model):
     est_timings_1280_1024_75 = models.BooleanField('1280x1024@75Hz',
                                                    default=False)
 
-    ### mrl=Monitor range limits, optional starting from v1.1
+    # mrl=Monitor range limits, optional starting from v1.1
     monitor_range_limits = models.BooleanField('monitor range limits',
                                                default=False)
 
@@ -286,7 +292,8 @@ class EDID(models.Model):
 
     # in MHz (0.25 MHz steps, max 256 MHz)
     mrl_max_pixel_clock = models.DecimalField(
-        'maximum supported pixel clock', max_digits=5, decimal_places=2, blank=True, null=True)
+        'maximum supported pixel clock', max_digits=5, decimal_places=2,
+        blank=True, null=True)
 
     mrl_secondary_gtf_curve_support = models.NullBooleanField(
         'secondary GTF curve')
@@ -328,12 +335,18 @@ class EDID(models.Model):
         null=True
     )
 
-    mrl_cvt_standard_blanking_supported = models.NullBooleanField('CVT standard blanking supported')
-    mrl_cvt_reduced_blanking_supported = models.NullBooleanField('CVT reduced blanking supported')
-    mrl_cvt_horizontal_shrink_supported = models.NullBooleanField('horizontal shrink supported')
-    mrl_cvt_horizontal_stretch_supported = models.NullBooleanField('horizontal stretch supported')
-    mrl_cvt_vertical_shrink_supported = models.NullBooleanField('vertical shrink supported')
-    mrl_cvt_vertical_stretch_supported = models.NullBooleanField('vertical stretch supported')
+    mrl_cvt_standard_blanking_supported \
+        = models.NullBooleanField('CVT standard blanking supported')
+    mrl_cvt_reduced_blanking_supported \
+        = models.NullBooleanField('CVT reduced blanking supported')
+    mrl_cvt_horizontal_shrink_supported \
+        = models.NullBooleanField('horizontal shrink supported')
+    mrl_cvt_horizontal_stretch_supported \
+        = models.NullBooleanField('horizontal stretch supported')
+    mrl_cvt_vertical_shrink_supported \
+        = models.NullBooleanField('vertical shrink supported')
+    mrl_cvt_vertical_stretch_supported \
+        = models.NullBooleanField('vertical stretch supported')
 
     # in Hz
     mrl_cvt_preferred_vertical_refresh_rate = models.PositiveSmallIntegerField(
@@ -349,7 +362,7 @@ class EDID(models.Model):
         return edid
 
     def _populate_from_edid_parser(self, edid):
-        ### Header
+        # Header
         try:
             self.manufacturer = Manufacturer.objects.get(
                 name_id=edid['ID_Manufacturer_Name'])
@@ -384,7 +397,7 @@ class EDID(models.Model):
         if self.version is None:
             raise ValidationError('Invalid EDID version and revision.')
 
-        ### ASCII Text Descriptors
+        # ASCII Text Descriptors
         if 'Monitor_Name' in edid:
             self.monitor_name = edid['Monitor_Name']
 
@@ -394,7 +407,7 @@ class EDID(models.Model):
         if 'Monitor_Data_String' in edid:
             self.monitor_data_string = edid['Monitor_Data_String']
 
-        ### Basic display parameters
+        # Basic display parameters
         bdp = edid['Basic_display_parameters']
         self.bdp_video_input = bdp['Video_Input']
 
@@ -449,11 +462,13 @@ class EDID(models.Model):
             self.bdp_feature_continuous_frequency = \
                 bdp['Feature_Support']['Continuous_Frequency']
         else:
-            self.bdp_max_horizontal_image_size = bdp[
-                'Max_Horizontal_Image_Size']
-            self.bdp_max_vertical_image_size = bdp['Max_Vertical_Image_Size']
+            self.bdp_max_horizontal_image_size \
+                = bdp['Max_Horizontal_Image_Size']
+            self.bdp_max_vertical_image_size \
+                = bdp['Max_Vertical_Image_Size']
 
-            self.bdp_feature_default_gtf = bdp['Feature_Support']['Default_GTF']
+            self.bdp_feature_default_gtf \
+                = bdp['Feature_Support']['Default_GTF']
 
         self.bdp_display_gamma = bdp['Display_Gamma']
 
@@ -469,7 +484,7 @@ class EDID(models.Model):
             self.bdp_feature_display_type = \
                 bdp['Feature_Support']['Display_Type']
 
-        ### Chromaticity
+        # Chromaticity
         self.chr_red_x = edid['Chromaticity']['Red_x']
         self.chr_red_y = edid['Chromaticity']['Red_y']
         self.chr_green_x = edid['Chromaticity']['Green_x']
@@ -479,7 +494,7 @@ class EDID(models.Model):
         self.chr_white_x = edid['Chromaticity']['White_x']
         self.chr_white_y = edid['Chromaticity']['White_y']
 
-        ### Established Timings
+        # Established Timings
         self.est_timings_720_400_70 = \
             edid['Established_Timings']['720x400@70Hz']
         self.est_timings_720_400_88 = \
@@ -659,7 +674,7 @@ class EDID(models.Model):
 
     def get_comments(self):
         comments = list(Comment.objects.filter(EDID=self)
-                                       .select_related('user').all())
+                        .select_related('user').all())
 
         ordered_comments = self._get_nested_comments(comments, 0)
 
@@ -780,8 +795,8 @@ class EDID(models.Model):
 
         resolution_pixels = horizontal_active * vertical_active
 
-        if resolution_pixels > maximum_resolution_pixels \
-            or (resolution_pixels == maximum_resolution_pixels
+        if resolution_pixels > maximum_resolution_pixels or (
+                resolution_pixels == maximum_resolution_pixels
                 and refresh_rate > maximum_resolution['refresh_rate']):
             maximum_resolution = {
                 'horizontal_active': horizontal_active,
@@ -815,7 +830,7 @@ class Timing(models.Model):
         abstract = True
         ordering = ['identification']
 
-    def delete(self, using=None):
+    def delete(self, using=None, keep_parents=False):
         super(Timing, self).delete(using)
 
         # Get all subsequent timings
@@ -881,16 +896,16 @@ class DetailedTiming(Timing):
     STEREO_MODE_CHOICES = (
         (Stereo_Mode.Normal_display, 'Normal display, no stereo.'),
         (Stereo_Mode.Field_sequential_right,
-            'Field sequential stereo, right image when stereo sync.'),
+         'Field sequential stereo, right image when stereo sync.'),
         (Stereo_Mode.Field_sequential_left,
-            'Field sequential stereo, left image when stereo sync.'),
+         'Field sequential stereo, left image when stereo sync.'),
         (Stereo_Mode.Interleaved_2_way_right,
-            '2-way interleaved stereo, right image on even lines.'),
+         '2-way interleaved stereo, right image on even lines.'),
         (Stereo_Mode.Interleaved_2_way_left,
-            '2-way interleaved stereo, left image on even lines.'),
+         '2-way interleaved stereo, left image on even lines.'),
         (Stereo_Mode.Interleaved_4_way, '4-way interleaved stereo.'),
         (Stereo_Mode.Interleaved_side_by_side,
-            'Side-by-Side interleaved stereo.'),
+         'Side-by-Side interleaved stereo.'),
     )
     flags_stereo_mode = models.PositiveSmallIntegerField(
         'stereo mode',
@@ -963,6 +978,7 @@ class Comment(models.Model):
         return EDID_COMMENT_MAX_THREAD_LEVEL
 
     def __unicode__(self):
+        # pylint: disable=unsubscriptable-object
         return "%s: %s" % (self.pk, self.content[:100])
 
 
