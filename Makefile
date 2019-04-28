@@ -85,9 +85,9 @@ coverage:
 	$(ACTIVATE) && coverage erase
 
 pep8:
-	-$(ACTIVATE) && pep8 --statistics *.py
-	-$(ACTIVATE) && pep8 --statistics edid_parser/
-	-$(ACTIVATE) && pep8 --statistics frontend/
+	-$(ACTIVATE) && pycodestyle --statistics *.py
+	-$(ACTIVATE) && pycodestyle --statistics edid_parser/
+	-$(ACTIVATE) && pycodestyle --statistics frontend/
 
 lint:
 	@# C0303 - Disable "Trailing whitespace"
