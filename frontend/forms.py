@@ -303,7 +303,7 @@ class EDIDUpdateForm(BaseForm):
         self.fields['year_of_manufacture'].validators.append(
             MaxValueValidator(2245))
 
-        ### bdp=Basic display parameters
+        # bdp=Basic display parameters
         self.fields['bdp_max_horizontal_image_size'].validators.append(
             MaxValueValidator(255))
         self.fields['bdp_max_vertical_image_size'].validators.append(
@@ -314,7 +314,7 @@ class EDIDUpdateForm(BaseForm):
         self.fields['bdp_display_gamma'].validators.append(
             MaxValueValidator(3.54))
 
-        ### chr=Chromaticity
+        # chr=Chromaticity
         for chr_color in ['chr_red_x', 'chr_red_y', 'chr_green_x',
                           'chr_green_y', 'chr_blue_x', 'chr_blue_y',
                           'chr_white_x', 'chr_white_y']:
@@ -323,7 +323,7 @@ class EDIDUpdateForm(BaseForm):
             self.fields[chr_color].validators.append(
                 MaxValueValidator(0.999))
 
-        ### mrl=Monitor range limits
+        # mrl=Monitor range limits
         self.fields['mrl_min_horizontal_rate'].validators.append(
             MinValueValidator(1))
         self.fields['mrl_min_horizontal_rate'].validators.append(
@@ -387,7 +387,7 @@ class EDIDUpdateForm(BaseForm):
     def clean(self):
         cleaned_data = super(EDIDUpdateForm, self).clean()
 
-        ### Basic display video input
+        # Basic display video input
         # Set unused video input fields to null
         bdp_video_input = cleaned_data.get('bdp_video_input')
         if not bdp_video_input:
@@ -406,7 +406,7 @@ class EDIDUpdateForm(BaseForm):
                                'bdp_sync_on_green_video',
                                'bdp_vsync_serration'])
 
-        ### Monitor Range Limits
+        # Monitor Range Limits
         mrl_fields = ['mrl_min_horizontal_rate', 'mrl_max_horizontal_rate',
                       'mrl_min_vertical_rate', 'mrl_max_vertical_rate',
                       'mrl_max_pixel_clock']
@@ -517,7 +517,7 @@ class StandardTimingForm(BaseForm):
         old_versions = [EDID.VERSION_1_0, EDID.VERSION_1_1, EDID.VERSION_1_2]
 
         if aspect_ratio == StandardTiming.ASPECT_RATIO_1_1:
-            if not self.edid.version in old_versions:
+            if self.edid.version not in old_versions:
                 raise forms.ValidationError('1:1 aspect ratio is not allowed'
                                             ' with EDID 1.3 or newer.')
         elif aspect_ratio == StandardTiming.ASPECT_RATIO_16_10:
@@ -755,7 +755,7 @@ class GrabberReleaseUploadForm(BaseForm):
     def clean_platform(self):
         platform = self.cleaned_data['platform']
 
-        if not platform in self.platforms.iterkeys():
+        if platform not in self.platforms.iterkeys():
             raise forms.ValidationError('Platform is incorrect.')
 
         platform = self.platforms[platform]

@@ -1,5 +1,4 @@
 import base64
-from xml.etree import ElementTree as ET
 
 from django.urls import reverse
 from django.test import TestCase
@@ -46,7 +45,7 @@ class FeedTestMixin(object):
         self.edid.save()
 
     def test_feed(self):
-        response = self.client.get(self.feed_url())
+        response = self.client.get(self._feed_url())
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'],
@@ -54,13 +53,14 @@ class FeedTestMixin(object):
 
 
 class UploadedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
-    def feed_url(self):
+    @staticmethod
+    def _feed_url():
         return reverse('uploaded-feed')
 
     def test_items(self):
         # Get feed and check its URL
         feed = UploadedEDIDsFeed()
-        self.assertEqual(feed.feed_url(), self.feed_url())
+        self.assertEqual(feed.feed_url(), self._feed_url())
 
         # Get item and check their count
         items = feed.items()
@@ -75,13 +75,14 @@ class UploadedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
 
 
 class UpdatedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
-    def feed_url(self):
+    @staticmethod
+    def _feed_url():
         return reverse('updated-feed')
 
     def test_items(self):
         # Get feed and check its URL
         feed = UpdatedEDIDsFeed()
-        self.assertEqual(feed.feed_url(), self.feed_url())
+        self.assertEqual(feed.feed_url(), self._feed_url())
 
         # Get item and check their count
         items = feed.items()

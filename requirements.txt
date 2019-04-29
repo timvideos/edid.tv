@@ -7,7 +7,7 @@ django-braces~=1.13.0
 django-crispy-forms~=1.7.0
 django-reversion~=3.0.0
 ez-setup==0.9
-pep8==1.4.6
+pycodestyle~=2.5.0
 pylint~=1.9.0
 selenium~=3.141.0
 six~=1.12.0

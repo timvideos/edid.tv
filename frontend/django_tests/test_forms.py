@@ -16,8 +16,8 @@ class FormTestMixin(object):
         if 'timing' in self.__dict__:
             return self.form(data, instance=self.timing,
                              initial={'edid': self.edid})
-        else:
-            return self.form(data, instance=self.edid)
+
+        return self.form(data, instance=self.edid)
 
     def _test_field_error(self, data, field, error_message):
         form = self._get_form(data)
@@ -35,7 +35,7 @@ class FormTestMixin(object):
             self.assertEqual(form.cleaned_data[field], None)
 
 
-### EDID Tests
+# EDID Tests
 class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
     form = EDIDUpdateForm
 
@@ -50,7 +50,7 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
             'mrl_min_vertical_rate', 'mrl_max_vertical_rate',
             'mrl_max_pixel_clock'
         ]
-        self.mrl_secondary_GTF_fields = [
+        self.mrl_secondary_gtf_fields = [
             'mrl_secondary_gtf_start_freq', 'mrl_secondary_gtf_c',
             'mrl_secondary_gtf_m', 'mrl_secondary_gtf_k', 'mrl_secondary_gtf_j'
         ]
@@ -119,14 +119,14 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         data = self.valid_data
         data['monitor_range_limits'] = True
         data['mrl_secondary_gtf_curve_support'] = False
-        self._test_nulled_fields(data, self.mrl_secondary_GTF_fields)
+        self._test_nulled_fields(data, self.mrl_secondary_gtf_fields)
 
         # Test monitor_range_limits = False
         data = self.valid_data
         data['monitor_range_limits'] = False
         self._test_nulled_fields(
             data, self.mrl_fields + ['mrl_secondary_gtf_curve_support']
-            + self.mrl_secondary_GTF_fields
+            + self.mrl_secondary_gtf_fields
         )
 
     def test_required_field(self):
@@ -143,7 +143,7 @@ class EDIDUpdateFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
         data = self.valid_data
         data['monitor_range_limits'] = True
         data['mrl_secondary_gtf_curve_support'] = True
-        for field in self.mrl_fields + self.mrl_secondary_GTF_fields:
+        for field in self.mrl_fields + self.mrl_secondary_gtf_fields:
             data[field] = None
             self._test_field_error(data, field, u'This field is required.')
 
@@ -219,7 +219,7 @@ class EDIDTextUploadFormTestCase(FormTestMixin, TestCase):
         )
 
 
-### Timing Tests
+# Timing Tests
 class StandardTimingFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
     form = StandardTimingForm
 
@@ -357,8 +357,8 @@ class CommentFormTestCase(FormTestMixin, EDIDTestMixin, TestCase):
                             content='').save()
         comment_2 = Comment(EDID=self.edid, user=user, level=1,
                             parent=comment_1, content='').save()
-        comment_3 = Comment(EDID=self.edid, user=user, level=2,
-                            parent=comment_2, content='').save()
+        Comment(EDID=self.edid, user=user, level=2,
+                parent=comment_2, content='').save()
 
         # Try to submit comment with over-limit nesting
         data = self.valid_data

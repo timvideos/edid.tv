@@ -43,7 +43,7 @@ class SeleniumTestCase(TestCase, LiveServerTestCase):
         self.browser.get(self.live_server_url)
         self.assertIn('EDID.tv', self.browser.title)
 
-    def doLogin(self, username='admin', password='admin'):
+    def do_login(self, username='admin', password='admin'):
         self.browser.find_element_by_id('account_menu').click()
         self.browser.find_element_by_id('login_link').click()
 
@@ -52,7 +52,7 @@ class SeleniumTestCase(TestCase, LiveServerTestCase):
 
         self.browser.find_element_by_id('submit_login').click()
 
-    def doLogout(self):
+    def do_logout(self):
         self.browser.find_element_by_id('account_menu').click()
         self.browser.find_element_by_id('logout_link').click()
 

@@ -10,9 +10,9 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  - pep8 --statistics *.py
-  - pep8 --statistics edid_parser/
-  - pep8 --statistics frontend/
+  - pycodestyle --statistics --exclude=wsgi.py *.py
+  - pycodestyle --statistics edid_parser/
+  - pycodestyle --statistics frontend/
   - pylint --reports=n *.py edid_parser/*.py frontend/*.py
   - coverage run --source=edid_parser edid_parser/tests.py
   - coverage run -a --source=frontend manage.py test frontend.django_tests

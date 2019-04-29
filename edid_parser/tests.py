@@ -522,7 +522,8 @@ class EDID13ValidTest(EDID13Test):
         self.assertEqual(data['Aspect_Ratio_16:10_supported'], True)
         self.assertEqual(data['Aspect_Ratio_5:4_supported'], True)
         self.assertEqual(data['Aspect_Ratio_15:9_supported'], True)
-        self.assertEqual(data['Preferred_Aspect_Ratio'], CVTSupportDefinitionPreferredAspectRatio.AR_16_10)
+        self.assertEqual(data['Preferred_Aspect_Ratio'],
+                         CVTSupportDefinitionPreferredAspectRatio.AR_16_10)
 
         self.assertEqual(data['CVT_Standard_Blanking_supported'], True)
         self.assertEqual(data['CVT_Reduced_Blanking_supported'], True)
@@ -616,19 +617,20 @@ class EDID14ValidTest(EDID14Test):
         self.assertTrue(data['Feature_Support']
                         ['Color_Encoding_YCrCb444_Supported'])
         self.assertFalse(data['Feature_Support']
-                        ['Color_Encoding_YCrCb422_Supported'])
+                         ['Color_Encoding_YCrCb422_Supported'])
+
 
 class EDID13InvalidTest(EDID13Test):
     """EDID 1.3 Parser tests with invalid input."""
 
     def test_binary(self):
-        #Invalid length of edid bytes list
+        # Invalid length of edid bytes list
         self.parser.bin_data = [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                                 0x00, 0x24]
         self.assertRaises(EDIDParsingError, self.parser.parse_binary)
 
     def test_checksum(self):
-        #Invalid header
+        # Invalid header
         test_edid = [0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0xf0,
                      0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0,
                      0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0,
@@ -646,7 +648,7 @@ class EDID13InvalidTest(EDID13Test):
                      0xf0, 0x0f]
         self.assertRaises(EDIDParsingError, self.parser.checksum, test_edid)
 
-        #Invalid checksum
+        # Invalid checksum
         test_edid = [0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0xf0,
                      0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0,
                      0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0,
@@ -665,19 +667,19 @@ class EDID13InvalidTest(EDID13Test):
         self.assertRaises(EDIDParsingError, self.parser.checksum, test_edid)
 
     def test_header(self):
-        #Invalid ID Manufacturer Name, 0: 0xD2
+        # Invalid ID Manufacturer Name, 0: 0xD2
         test_edid = [0xD2, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF,
                      0x13, 0x01, 0x03]
         self.assertRaises(EDIDParsingError, self.parser.parse_header,
                           test_edid)
 
-        #Invalid week of manufacture, 8: 0x38
+        # Invalid week of manufacture, 8: 0x38
         test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0x38,
                      0x13, 0x01, 0x03]
         self.assertRaises(EDIDParsingError, self.parser.parse_header,
                           test_edid)
 
-        #Invalid EDID version and revision, 10-11: v2.3
+        # Invalid EDID version and revision, 10-11: v2.3
         test_edid = [0x52, 0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF,
                      0x13, 0x02, 0x03]
         self.assertRaises(EDIDParsingError, self.parser.parse_header,
@@ -692,6 +694,7 @@ class EDIDParsingErrorTestCase(unittest.TestCase):
         exception = EDIDParsingError('Exception test.')
 
         self.assertEqual(str(exception), 'Exception test.')
+
 
 if __name__ == '__main__':
     unittest.main()

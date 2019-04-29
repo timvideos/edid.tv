@@ -11,7 +11,7 @@ class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_invalid_login(self):
         """Test client-side actions on login/logout."""
 
-        self.doLogin(username="notexisting", password="wrong")
+        self.do_login(username="notexisting", password="wrong")
 
         WebDriverWait(self.browser, 30).until(
             text_to_be_present_in_element((By.TAG_NAME, "html"),
@@ -24,7 +24,7 @@ class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
         """Test client-side actions on login/logout."""
 
         get_user_model().objects.create_user('tester', '', 'test')
-        self.doLogin(username='tester', password='test')
+        self.do_login(username='tester', password='test')
 
         WebDriverWait(self.browser, 30).until(
             url_to_be("%s/accounts/profile/" % self.live_server_url),
@@ -35,7 +35,7 @@ class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
         """Test client-side actions on login/logout."""
 
         get_user_model().objects.create_superuser('tester', '', 'test')
-        self.doLogin(username='tester', password='test')
+        self.do_login(username='tester', password='test')
 
         WebDriverWait(self.browser, 30).until(
             url_to_be("%s/accounts/profile/" % self.live_server_url),
@@ -45,7 +45,7 @@ class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
     def test_logout(self):
         # Non-admin user login
         get_user_model().objects.create_user('tester', '', 'test')
-        self.doLogin(username='tester', password='test')
+        self.do_login(username='tester', password='test')
 
         WebDriverWait(self.browser, 30).until(
             url_to_be("%s/accounts/profile/" % self.live_server_url),
@@ -53,7 +53,7 @@ class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
         )
 
         # Logout
-        self.doLogout()
+        self.do_logout()
 
         WebDriverWait(self.browser, 30).until(
             url_to_be("%s/" % self.live_server_url),

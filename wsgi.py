@@ -13,7 +13,7 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
-# pylint: disable-msg=C0103
+# pylint: skip-file
 
 import os
 

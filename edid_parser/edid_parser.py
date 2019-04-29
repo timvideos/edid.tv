@@ -7,8 +7,9 @@ http://read.pudn.com/downloads110/ebook/456020/E-EDID%20Standard.pdf
 """
 # C0103: Invalid name
 # R0201: Method could be a function (no-self-use)
+# R0912: Too many branches
 # R0914: Too many local variables
-# pylint: disable-msg=C0103,R0201,R0914
+# pylint: disable-msg=C0103,R0201,R0912,R0914
 
 import struct
 
@@ -92,7 +93,7 @@ class EDIDParser(object):
 
     def parse_binary(self):
         """
-        Converts string to list of bytes, supports first 128 bytes only
+        Converts string to list of bytes
 
         bin_data is a string of bytes
         """
@@ -100,7 +101,11 @@ class EDIDParser(object):
         if len(self.bin_data) < 128:
             raise EDIDParsingError("Binary file is smaller than 128 bytes.")
 
-        return struct.unpack("B" * 128, self.bin_data[:128])
+        if len(self.bin_data) % 128 != 0:
+            raise EDIDParsingError("Binary file is not a multiple of 128 "
+                                   "bytes.")
+
+        return struct.unpack("B" * len(self.bin_data), self.bin_data)
 
     def checksum(self, edid):
         """
@@ -143,8 +148,8 @@ class EDIDParser(object):
 
         # ID Product Code: edid[12:10]
         self.data['ID_Product_Code'] = "%02x%02x" % (edid[3], edid[2])
-        #TODO: v1.1 works this way?
-        #self.data['ID_Product_Code'] = edid[2] + (edid[3] << 8)
+        # TODO: v1.1 works this way?
+        # self.data['ID_Product_Code'] = edid[2] + (edid[3] << 8)
 
         # ID Serial Number: edid[12:16]
         self.data['ID_Serial_Number'] = (
@@ -207,21 +212,21 @@ class EDIDParser(object):
             new_data['Composite_sync'] = (edid[0] & 0b00000100) >> 2
             new_data['Sync_on_green_video'] = (edid[0] & 0b00000010) >> 1
             new_data['Vsync_serration'] = edid[0] & 0b00000001
-        else:
-            # Digital Input
-            if self.data['EDID_version'] == 1 \
-                    and self.data['EDID_revision'] == 4:
-                new_data['Color_Bit_Depth'] = (edid[0] & 0b01110000) >> 4
-                new_data['Digital_Video_Interface'] = edid[0] & 0b00001111
+        elif self.data['EDID_version'] == 1 \
+                and self.data['EDID_revision'] == 4:
+            # Digital Input, EDID 1.4
+            new_data['Color_Bit_Depth'] = (edid[0] & 0b01110000) >> 4
+            new_data['Digital_Video_Interface'] = edid[0] & 0b00001111
 
-                new_data['Feature_Support']['Color_Encoding_RGB444_Supported'] \
-                    = True
-                new_data['Feature_Support']['Color_Encoding_YCrCb444_Supported'] \
-                    = (edid[4] & 0b00001000) != 0
-                new_data['Feature_Support']['Color_Encoding_YCrCb422_Supported'] \
-                    = (edid[4] & 0b00010000) != 0
-            else:
-                new_data['Video_Input_DFP_1'] = edid[0] & 0b00000001
+            new_data['Feature_Support']['Color_Encoding_RGB444_Supported'] \
+                = True
+            new_data['Feature_Support']['Color_Encoding_YCrCb444_Supported'] \
+                = (edid[4] & 0b00001000) != 0
+            new_data['Feature_Support']['Color_Encoding_YCrCb422_Supported'] \
+                = (edid[4] & 0b00010000) != 0
+        else:
+            # Digital Input, EDID < 1.4
+            new_data['Video_Input_DFP_1'] = edid[0] & 0b00000001
 
         if self.data['EDID_version'] == 1 and self.data['EDID_revision'] == 4:
             if not (edid[1] == 0 and edid[2] == 0):
@@ -244,8 +249,9 @@ class EDIDParser(object):
 
             new_data['Feature_Support']['Default_GTF'] = edid[4] & 0b00000001
 
-        if (self.data['EDID_version'] == 1 and self.data['EDID_revision'] < 4) \
-                or new_data['Video_Input'] == 0:
+        if (self.data['EDID_version'] == 1 and
+                self.data['EDID_revision'] < 4) or \
+                new_data['Video_Input'] == 0:
             new_data['Feature_Support']['Display_Type'] = \
                 (edid[4] & 0b00011000) >> 3
 
@@ -569,7 +575,8 @@ class EDIDParser(object):
         elif edid[5] == 0x04:
             new_data['Coordinated_Video_Timings_supported'] = True
             new_data['Max_Supported_Pixel_Clock'] -= (edid[7] >> 2) * 0.25
-            new_data['Max_Active_Pixels_per_Line'] = (((edid[7] & 0b11) << 8) + edid[8]) * 8
+            new_data['Max_Active_Pixels_per_Line'] = \
+                (((edid[7] & 0b11) << 8) + edid[8]) * 8
             new_data['Aspect_Ratio_4:3_supported'] = \
                 (edid[9] & 0b10000000) != 0
             new_data['Aspect_Ratio_16:9_supported'] = \

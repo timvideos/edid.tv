@@ -1,13 +1,17 @@
+# pylint: disable-msg=C0103
+# C0103: Attribute name doesn't conform to u'[a-z_][a-z0-9_]{2,30}$' pattern
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from edid_parser.edid_parser import EDIDParser
 
 from frontend.django_tests.base import EDIDTestMixin
-from frontend.models import EDID, Manufacturer, StandardTiming, Comment, DetailedTiming
+from frontend.models import EDID, Manufacturer, StandardTiming, Comment, \
+    DetailedTiming
 
 
-### EDID Tests
+# EDID Tests
 class EDIDTestCase(EDIDTestMixin, TestCase):
     def test_manufacturer(self):
         manufacturer = Manufacturer.objects.get(name_id='TSB')
@@ -99,16 +103,18 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(max_res['refresh_rate'], 60)
 
     def test_get_preferred_serial_number(self):
-        sn = EDID(monitor_serial_number="ABCXYZ").get_preferred_serial_number()
-        self.assertEqual(sn, "ABCXYZ")
-
-        sn = EDID(manufacturer_serial_number=123456)\
+        serial = EDID(monitor_serial_number="ABCXYZ")\
             .get_preferred_serial_number()
-        self.assertEqual(sn, 123456)
+        self.assertEqual(serial, "ABCXYZ")
 
-        sn = EDID(manufacturer_serial_number=123456,
-                  monitor_serial_number="ABCXYZ").get_preferred_serial_number()
-        self.assertEqual(sn, "ABCXYZ")
+        serial = EDID(manufacturer_serial_number=123456)\
+            .get_preferred_serial_number()
+        self.assertEqual(serial, 123456)
+
+        serial = EDID(manufacturer_serial_number=123456,
+                      monitor_serial_number="ABCXYZ")\
+            .get_preferred_serial_number()
+        self.assertEqual(serial, "ABCXYZ")
 
 
 class EDIDParsingTestCase(TestCase):
@@ -132,7 +138,8 @@ class EDIDParsingTestCase(TestCase):
 
         self.edid_data = EDIDParser(self.EDID_BINARY).data
 
-    def _process_edid(self, edid_data):
+    @staticmethod
+    def _process_edid(edid_data):
         edid_object = EDID.create(file_base64='', edid_data=edid_data)
         # Save the entry
         edid_object.save()
@@ -194,10 +201,10 @@ class EDIDParsingTestCase(TestCase):
         edid_data['Basic_display_parameters']['Vsync_serration'] = False
 
         for standard in [
-            ((0.700, 0.300), EDID.bdp_signal_level_std_0700_0300),
-            ((0.714, 0.286), EDID.bdp_signal_level_std_0714_0286),
-            ((1.000, 0.400), EDID.bdp_signal_level_std_1000_0400),
-            ((0.700, 0.000), EDID.bdp_signal_level_std_0700_0000)
+                ((0.700, 0.300), EDID.bdp_signal_level_std_0700_0300),
+                ((0.714, 0.286), EDID.bdp_signal_level_std_0714_0286),
+                ((1.000, 0.400), EDID.bdp_signal_level_std_1000_0400),
+                ((0.700, 0.000), EDID.bdp_signal_level_std_0700_0000)
         ]:
             edid_data['Basic_display_parameters']['Signal_Level_Standard'] = \
                 standard[0]
@@ -343,7 +350,8 @@ class DetailedTimingParsingTestCase(TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
-    def _create_edid(self, flags, checksum):
+    @staticmethod
+    def _create_edid(flags, checksum):
         edid_binary = [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x52,
                        0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF, 0x13,
                        0x01, 0x03, 0x80, 0x59, 0x32, 0x78, 0x0A, 0xF0, 0x9D,
@@ -448,7 +456,7 @@ class DetailedTimingParsingTestCase(TestCase):
         self.assertEqual(timing.flags_sync_on_rgb, None)
 
 
-### Timing Tests
+# Timing Tests
 class TimingTestMixin(object):
     def setUp(self):
         super(TimingTestMixin, self).setUp()
@@ -482,14 +490,16 @@ class DetailedTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
         return self.edid.detailedtiming_set
 
     def test_get_refresh_rate(self):
-        detailed_timing = DetailedTiming(horizontal_active=1920, horizontal_blanking=280,
-                                         vertical_active=1080, vertical_blanking=45,
+        detailed_timing = DetailedTiming(horizontal_active=1920,
+                                         horizontal_blanking=280,
+                                         vertical_active=1080,
+                                         vertical_blanking=45,
                                          pixel_clock=148500)
 
         self.assertEqual(detailed_timing.get_refresh_rate(), 60.00)
 
 
-### Comment Tests
+# Comment Tests
 class CommentTestCase(EDIDTestMixin, TestCase):
     def test_max_thread_level(self):
         """
@@ -515,6 +525,7 @@ class CommentTestCase(EDIDTestMixin, TestCase):
         comment = Comment(EDID=self.edid, user=user, level=0, content='')
         comment.save()
 
+        # pylint: disable=unsubscriptable-object
         self.assertEqual(
             unicode(comment), "%s: %s" % (comment.pk, comment.content[:100])
         )
