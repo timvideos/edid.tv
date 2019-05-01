@@ -10,21 +10,21 @@ from frontend.feeds import UploadedEDIDsFeed, UpdatedEDIDsFeed
 from frontend.models import EDID
 
 
-class FeedTestMixin(object):
+class FeedTestMixin:
     def setUp(self):
         super(FeedTestMixin, self).setUp()
 
         # Add another EDID
-        edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x04\x72\xA1\xAD\xDE" \
-                      "\xF7\x50\x83\x23\x12\x01\x03\x08\x2F\x1E\x78\xEA\xDE" \
-                      "\x95\xA3\x54\x4C\x99\x26\x0F\x50\x54\xBF\xEF\x90\xA9" \
-                      "\x40\x71\x4F\x81\x40\x8B\xC0\x95\x00\x95\x0F\x90\x40" \
-                      "\x01\x01\x21\x39\x90\x30\x62\x1A\x27\x40\x68\xB0\x36" \
-                      "\x00\xDA\x28\x11\x00\x00\x19\x00\x00\x00\xFD\x00\x38" \
-                      "\x4D\x1F\x54\x11\x00\x0A\x20\x20\x20\x20\x20\x20\x00" \
-                      "\x00\x00\xFF\x00\x4C\x41\x31\x30\x43\x30\x34\x31\x34" \
-                      "\x30\x33\x30\x0A\x00\x00\x00\xFC\x00\x41\x4C\x32\x32" \
-                      "\x31\x36\x57\x0A\x20\x20\x20\x20\x20\x00\x52"
+        edid_binary = b'\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x04\x72\xA1\xAD\xDE' \
+                      b'\xF7\x50\x83\x23\x12\x01\x03\x08\x2F\x1E\x78\xEA\xDE' \
+                      b'\x95\xA3\x54\x4C\x99\x26\x0F\x50\x54\xBF\xEF\x90\xA9' \
+                      b'\x40\x71\x4F\x81\x40\x8B\xC0\x95\x00\x95\x0F\x90\x40' \
+                      b'\x01\x01\x21\x39\x90\x30\x62\x1A\x27\x40\x68\xB0\x36' \
+                      b'\x00\xDA\x28\x11\x00\x00\x19\x00\x00\x00\xFD\x00\x38' \
+                      b'\x4D\x1F\x54\x11\x00\x0A\x20\x20\x20\x20\x20\x20\x00' \
+                      b'\x00\x00\xFF\x00\x4C\x41\x31\x30\x43\x30\x34\x31\x34' \
+                      b'\x30\x33\x30\x0A\x00\x00\x00\xFC\x00\x41\x4C\x32\x32' \
+                      b'\x31\x36\x57\x0A\x20\x20\x20\x20\x20\x00\x52'
 
         # Parse EDID file
         edid_data = EDIDParser(edid_binary).data
@@ -63,7 +63,7 @@ class UploadedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
         self.assertEqual(feed.feed_url(), self._feed_url())
 
         # Get item and check their count
-        items = feed.items()
+        items = list(feed.items())
         self.assertEqual(len(items), 2)
 
         # Check EDID 1 is listed second
@@ -85,7 +85,7 @@ class UpdatedEDIDsFeedTestCase(FeedTestMixin, EDIDTestMixin, TestCase):
         self.assertEqual(feed.feed_url(), self._feed_url())
 
         # Get item and check their count
-        items = feed.items()
+        items = list(feed.items())
         self.assertEqual(len(items), 2)
 
         # Check Updated EDID 1 is listed first

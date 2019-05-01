@@ -1,5 +1,6 @@
 # Django settings for edid_db_website project.
 # pylint: disable-msg=C0103,W0401,W0614,F0401,E0611
+
 import os
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -194,7 +195,7 @@ AUTHENTICATION_BACKENDS = (
 # Import private settings (if any) to override above settings
 EXTEND_APPS = None
 try:
-    from private.settings import *
+    from .private.settings import *
     if EXTEND_APPS:
         INSTALLED_APPS += EXTEND_APPS
 except ImportError:

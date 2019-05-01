@@ -11,7 +11,7 @@ from frontend.forms import (EDIDTextUploadForm, EDIDUpdateForm, CommentForm,
 from frontend.models import EDID, StandardTiming, DetailedTiming, Comment
 
 
-class FormTestMixin(object):
+class FormTestMixin:
     def _get_form(self, data):
         if 'timing' in self.__dict__:
             return self.form(data, instance=self.timing,
@@ -389,7 +389,7 @@ class GrabberReleaseUploadFormTestCase(TestCase):
 
         self.valid_files = {
             'release_file': InMemoryUploadedFile(
-                open(filepath, 'r'), 'release_file',
+                open(filepath, 'rb'), 'release_file',
                 filename, 'application/octet-stream',
                 os.path.getsize(filepath), None
             )

@@ -5,7 +5,7 @@ from selenium.webdriver.support.expected_conditions import url_to_be, \
     url_contains
 from selenium.webdriver.support.wait import WebDriverWait
 
-from base import EDIDReadySeleniumTestCase
+from .base import EDIDReadySeleniumTestCase
 
 
 class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):

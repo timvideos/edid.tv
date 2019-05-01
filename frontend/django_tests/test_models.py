@@ -103,32 +103,32 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         self.assertEqual(max_res['refresh_rate'], 60)
 
     def test_get_preferred_serial_number(self):
-        serial = EDID(monitor_serial_number="ABCXYZ")\
+        serial = EDID(monitor_serial_number="ABCXYZ") \
             .get_preferred_serial_number()
         self.assertEqual(serial, "ABCXYZ")
 
-        serial = EDID(manufacturer_serial_number=123456)\
+        serial = EDID(manufacturer_serial_number=123456) \
             .get_preferred_serial_number()
         self.assertEqual(serial, 123456)
 
         serial = EDID(manufacturer_serial_number=123456,
-                      monitor_serial_number="ABCXYZ")\
+                      monitor_serial_number="ABCXYZ") \
             .get_preferred_serial_number()
         self.assertEqual(serial, "ABCXYZ")
 
 
 class EDIDParsingTestCase(TestCase):
-    EDID_BINARY = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
-                   "\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78" \
-                   "\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21" \
-                   "\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01" \
-                   "\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38" \
-                   "\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E" \
-                   "\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00" \
-                   "\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54" \
-                   "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
-                   "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
-                   "\x20\x20\x20\x20\x20\x20\x01\x24"
+    EDID_BINARY = b'\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02' \
+                  b'\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78' \
+                  b'\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21' \
+                  b'\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01' \
+                  b'\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38' \
+                  b'\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E' \
+                  b'\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00' \
+                  b'\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54' \
+                  b'\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20' \
+                  b'\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A' \
+                  b'\x20\x20\x20\x20\x20\x20\x01\x24'
 
     def setUp(self):
         Manufacturer.objects.bulk_create([
@@ -315,17 +315,17 @@ class EDIDParsingTestCase(TestCase):
 
 
 class EDID14ParsingTestCase(EDIDParsingTestCase):
-    EDID_BINARY = "\x00\xff\xff\xff\xff\xff\xff\x00\x22\xf0\x08\x28" \
-                   "\x01\x01\x01\x01\x19\x12\x01\x04\xa5\x2f\x1e\x78" \
-                   "\xee\xce\x50\xa3\x54\x4c\x99\x26\x0f\x50\x54\xa5" \
-                   "\x6b\x80\x81\x40\x81\x80\x95\x00\xb3\x00\xa9\x00" \
-                   "\x01\x01\x01\x01\x01\x01\x21\x39\x90\x30\x62\x1a" \
-                   "\x27\x40\x68\xb0\x36\x00\xd6\x2c\x11\x00\x00\x1c" \
-                   "\x00\x00\x00\xfd\x00\x30\x55\x1e\x5d\x11\x04\x11" \
-                   "\x50\xd2\xf8\x58\xf0\x00\x00\x00\x00\xfc\x00\x48" \
-                   "\x50\x20\x4c\x50\x32\x32\x37\x35\x77\x0a\x20\x20" \
-                   "\x00\x00\x00\xff\x00\x43\x4e\x43\x38\x32\x35\x30" \
-                   "\x47\x53\x53\x0a\x20\x20\x00\x63"
+    EDID_BINARY = b'\x00\xff\xff\xff\xff\xff\xff\x00\x22\xf0\x08\x28' \
+                  b'\x01\x01\x01\x01\x19\x12\x01\x04\xa5\x2f\x1e\x78' \
+                  b'\xee\xce\x50\xa3\x54\x4c\x99\x26\x0f\x50\x54\xa5' \
+                  b'\x6b\x80\x81\x40\x81\x80\x95\x00\xb3\x00\xa9\x00' \
+                  b'\x01\x01\x01\x01\x01\x01\x21\x39\x90\x30\x62\x1a' \
+                  b'\x27\x40\x68\xb0\x36\x00\xd6\x2c\x11\x00\x00\x1c' \
+                  b'\x00\x00\x00\xfd\x00\x30\x55\x1e\x5d\x11\x04\x11' \
+                  b'\x50\xd2\xf8\x58\xf0\x00\x00\x00\x00\xfc\x00\x48' \
+                  b'\x50\x20\x4c\x50\x32\x32\x37\x35\x77\x0a\x20\x20' \
+                  b'\x00\x00\x00\xff\x00\x43\x4e\x43\x38\x32\x35\x30' \
+                  b'\x47\x53\x53\x0a\x20\x20\x00\x63'
 
     def test_version_revision_valid(self):
         """
@@ -352,28 +352,26 @@ class DetailedTimingParsingTestCase(TestCase):
 
     @staticmethod
     def _create_edid(flags, checksum):
-        edid_binary = [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x52,
-                       0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF, 0x13,
-                       0x01, 0x03, 0x80, 0x59, 0x32, 0x78, 0x0A, 0xF0, 0x9D,
-                       0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47, 0x4A, 0x21,
-                       0x08, 0x00, 0x81, 0x80, 0x8B, 0xC0, 0x01, 0x01, 0x01,
-                       0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-                       0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
-                       0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
-                       0x66, 0x21, 0x50, 0xB0, 0x51, 0x00, 0x1B, 0x30, 0x40,
-                       0x70, 0x36, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
-                       0x00, 0x00, 0x00, 0xFC, 0x00, 0x54, 0x4F, 0x53, 0x48,
-                       0x49, 0x42, 0x41, 0x2D, 0x54, 0x56, 0x0A, 0x20, 0x20,
-                       0x00, 0x00, 0x00, 0xFD, 0x00, 0x17, 0x3D, 0x0F, 0x44,
-                       0x0F, 0x00, 0x0A, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-                       0x01, 0x24]
+        edid_binary = bytearray(
+            [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x52,
+             0x62, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0xFF, 0x13,
+             0x01, 0x03, 0x80, 0x59, 0x32, 0x78, 0x0A, 0xF0, 0x9D,
+             0xA3, 0x55, 0x49, 0x9B, 0x26, 0x0F, 0x47, 0x4A, 0x21,
+             0x08, 0x00, 0x81, 0x80, 0x8B, 0xC0, 0x01, 0x01, 0x01,
+             0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+             0x02, 0x3A, 0x80, 0x18, 0x71, 0x38, 0x2D, 0x40, 0x58,
+             0x2C, 0x45, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+             0x66, 0x21, 0x50, 0xB0, 0x51, 0x00, 0x1B, 0x30, 0x40,
+             0x70, 0x36, 0x00, 0x76, 0xF2, 0x31, 0x00, 0x00, 0x1E,
+             0x00, 0x00, 0x00, 0xFC, 0x00, 0x54, 0x4F, 0x53, 0x48,
+             0x49, 0x42, 0x41, 0x2D, 0x54, 0x56, 0x0A, 0x20, 0x20,
+             0x00, 0x00, 0x00, 0xFD, 0x00, 0x17, 0x3D, 0x0F, 0x44,
+             0x0F, 0x00, 0x0A, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+             0x01, 0x24])
 
         # Change flags and checksum
         edid_binary[71] = flags
         edid_binary[127] = checksum
-
-        # Convert to string
-        edid_binary = ''.join([chr(x) for x in edid_binary])
 
         edid_data = EDIDParser(edid_binary).data
 
@@ -457,7 +455,7 @@ class DetailedTimingParsingTestCase(TestCase):
 
 
 # Timing Tests
-class TimingTestMixin(object):
+class TimingTestMixin:
     def setUp(self):
         super(TimingTestMixin, self).setUp()
 
@@ -527,5 +525,5 @@ class CommentTestCase(EDIDTestMixin, TestCase):
 
         # pylint: disable=unsubscriptable-object
         self.assertEqual(
-            unicode(comment), "%s: %s" % (comment.pk, comment.content[:100])
+            str(comment), "{}: {}".format(comment.pk, comment.content[:100])
         )
