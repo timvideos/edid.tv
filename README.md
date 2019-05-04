@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/timvideos/edid.tv.png)](https://travis-ci.org/timvideos/edid.tv)
 [![Coverage Status](https://coveralls.io/repos/timvideos/edid.tv/badge.png)](https://coveralls.io/r/timvideos/edid.tv)
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3546d4188a3ed02851bd28932c1abdf3 "githalytics.com")](http://githalytics.com/timvideos/edid.tv)
 
 EDID.tv
 ===============
