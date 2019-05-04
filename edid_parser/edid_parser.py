@@ -14,14 +14,14 @@ http://read.pudn.com/downloads110/ebook/456020/E-EDID%20Standard.pdf
 import struct
 
 
-class DisplayType(object):
+class DisplayType:
     Monochrome = 0b00
     RGB = 0b01
     Non_RGB = 0b10
     Undefined = 0b11
 
 
-class ColorBitDepth(object):
+class ColorBitDepth:
     Undefined = 0b000
     Depth_6_bit = 0b001
     Depth_8_bit = 0b010
@@ -31,7 +31,7 @@ class ColorBitDepth(object):
     Depth_16_bit = 0b110
 
 
-class DigitalVideoInterface(object):
+class DigitalVideoInterface:
     Undefined = 0b0000
     DVI = 0b0001
     HDMI_A = 0b0010
@@ -40,7 +40,7 @@ class DigitalVideoInterface(object):
     DisplayPort = 0b0101
 
 
-class DisplayStereoMode(object):
+class DisplayStereoMode:
     Normal_display = 0b000
     Field_sequential_right = 0b010
     Field_sequential_left = 0b100
@@ -50,14 +50,14 @@ class DisplayStereoMode(object):
     Interleaved_side_by_side = 0b111
 
 
-class TimingSyncScheme(object):
+class TimingSyncScheme:
     Analog_Composite = 0b00
     Bipolar_Analog_Composite = 0b01
     Digital_Composite = 0b10
     Digital_Separate = 0b11
 
 
-class CVTSupportDefinitionPreferredAspectRatio(object):
+class CVTSupportDefinitionPreferredAspectRatio:
     AR_4_3 = 0b000
     AR_16_9 = 0b001
     AR_16_10 = 0b010
@@ -65,7 +65,7 @@ class CVTSupportDefinitionPreferredAspectRatio(object):
     AR_15_9 = 0b100
 
 
-class EDIDParser(object):
+class EDIDParser:
     def __init__(self, bin_data=None):
         """
         Preparing settings
@@ -115,12 +115,12 @@ class EDIDParser(object):
         """
 
         # Check EDID header
-        if not [x for x in edid[0:8]] == [0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
-                                          0xff, 0x00]:
+        if list(edid[0:8]) != [0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
+                               0xff, 0x00]:
             raise EDIDParsingError("Input is not an EDID file.")
 
         # Check EDID checksum
-        if not sum(bytearray([chr(x) for x in edid])) % 256 == 0:
+        if not sum(edid) % 256 == 0:
             raise EDIDParsingError("Checksum is corrupt.")
 
         self.data['Extension_Flag'] = edid[126]
@@ -354,7 +354,7 @@ class EDIDParser(object):
 
         for i in range(0, 15, 2):
             # Check if the field is not unused (both bytes are 0b01)
-            if edid[i] is not 0b01 and edid[i + 1] is not 0b01:
+            if edid[i] != 0b01 and edid[i + 1] != 0b01:
                 timing = {
                     'Horizontal_active': ((edid[i] + 31) * 8),
                     'Refresh_Rate': (edid[i + 1] & 0b00111111) + 60,
@@ -622,4 +622,4 @@ if __name__ == "__main__":
     with open(sys.argv[1], 'rb') as edid_file:
         TEMP_EDID = EDIDParser(edid_file.read())
 
-    print pprint.pprint(TEMP_EDID.data)
+    print(pprint.pprint(TEMP_EDID.data))

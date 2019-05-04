@@ -1,13 +1,11 @@
-# pylint: disable-msg=C0103,C0302,E1002,R0201,R0902,R0912,R0915,W0201
+# pylint: disable-msg=C0103,C0302,R0201,R0902,R0912,R0915,W0201
 # C0302: Too many lines in module
 # C0103: Attribute name doesn't conform to u'[a-z_][a-z0-9_]{2,30}$' pattern
-# E1002: Use of super on an old style class
 # R0201: Method could be a function (no-self-use)
 # R0902: Too many instance attributes
 # R0912: Too many branches
 # R0915: Too many statements
 # W0201: Attribute 'xxxx' defined outside __init__
-from __future__ import division
 
 import re
 from decimal import Decimal
@@ -29,7 +27,7 @@ class Manufacturer(models.Model):
     # ID, 3 characters
     name_id = models.CharField(max_length=3)
 
-    class Meta(object):
+    class Meta:
         ordering = ['name_id']
 
     def __unicode__(self):
@@ -826,7 +824,7 @@ class Timing(models.Model):
     # Identification
     identification = models.IntegerField()
 
-    class Meta(object):
+    class Meta:
         abstract = True
         ordering = ['identification']
 
@@ -868,8 +866,9 @@ class StandardTiming(Timing):
     aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
 
     def __unicode__(self):
-        return "%dx%d@%dHz" % (self.horizontal_active, self.vertical_active,
-                               self.refresh_rate)
+        return "{:x}{:n}@{:n}Hz".format(self.horizontal_active,
+                                        self.vertical_active,
+                                        self.refresh_rate)
 
 
 class DetailedTiming(Timing):
@@ -944,8 +943,9 @@ class DetailedTiming(Timing):
                       * (self.vertical_active + self.vertical_blanking)), 2)
 
     def __unicode__(self):
-        return "%dx%d@%fHz" % (self.horizontal_active, self.vertical_active,
-                               self.get_refresh_rate())
+        return "{:x}{:n}@{:f}Hz".format(self.horizontal_active,
+                                        self.vertical_active,
+                                        self.get_refresh_rate())
 
 
 # Default settings for Comment model
@@ -968,7 +968,7 @@ class Comment(models.Model):
 
     content = models.TextField()
 
-    class Meta(object):
+    class Meta:
         ordering = ('level', 'submitted',)
 
     def get_max_thread_level(self):
@@ -977,7 +977,7 @@ class Comment(models.Model):
 
         return EDID_COMMENT_MAX_THREAD_LEVEL
 
-    def __unicode__(self):
+    def __str__(self):
         # pylint: disable=unsubscriptable-object
         return "%s: %s" % (self.pk, self.content[:100])
 

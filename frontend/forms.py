@@ -1,7 +1,5 @@
-# E1002: Use of super on an old style class
-# pylint: disable-msg=E1002
-
 import base64
+import codecs
 import re
 
 from django import forms
@@ -94,7 +92,7 @@ class EDIDTextUploadForm(forms.Form):
                 )
 
             # Convert hex to binary and add it to EDIDs list
-            self.edid_list.append(text.decode('hex'))
+            self.edid_list.append(codecs.decode(text, encoding='hex'))
         elif text_type == 'xrandr':
             inside_edid = False
             edid_hex = ''
@@ -109,7 +107,8 @@ class EDIDTextUploadForm(forms.Form):
                     else:
                         inside_edid = False
                         # Convert hex to binary and add it to EDIDs list
-                        self.edid_list.append(edid_hex.decode('hex'))
+                        self.edid_list.append(
+                            codecs.decode(edid_hex, encoding='hex'))
                 # Look for edid block
                 elif line == u'\tEDID:':
                     inside_edid = True
@@ -147,7 +146,7 @@ class BaseForm(forms.ModelForm):
 
 
 class EDIDUpdateForm(BaseForm):
-    class Meta(object):
+    class Meta:
         model = EDID
         fields = [
             # Main Fields
@@ -364,7 +363,7 @@ class EDIDUpdateForm(BaseForm):
     def clean_week_of_manufacture(self):
         week_of_manufacture = self.cleaned_data['week_of_manufacture']
 
-        weeks_range = range(0, 55)
+        weeks_range = list(range(0, 55))
         weeks_range.append(255)
         weeks_range.append(None)
 
@@ -455,7 +454,7 @@ class EDIDUpdateForm(BaseForm):
 
 
 class StandardTimingForm(BaseForm):
-    class Meta(object):
+    class Meta:
         model = StandardTiming
         fields = ['horizontal_active', 'vertical_active', 'refresh_rate',
                   'aspect_ratio']
@@ -529,7 +528,7 @@ class StandardTimingForm(BaseForm):
 
 
 class DetailedTimingForm(BaseForm):
-    class Meta(object):
+    class Meta:
         model = DetailedTiming
         fields = [
             # Horizontal
@@ -678,7 +677,7 @@ class DetailedTimingForm(BaseForm):
 
 
 class CommentForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = Comment
         fields = ['EDID', 'parent', 'content']
         widgets = {'EDID': forms.HiddenInput,
@@ -722,7 +721,7 @@ class GrabberReleaseUploadForm(BaseForm):
     api_key = forms.CharField(widget=forms.PasswordInput)
     platform = forms.CharField()
 
-    class Meta(object):
+    class Meta:
         model = GrabberRelease
         fields = ['release_file', 'commit']
 
@@ -737,8 +736,7 @@ class GrabberReleaseUploadForm(BaseForm):
                 or settings.EDID_GRABBER_RELEASE_UPLOAD_API_KEY is None:
             raise forms.ValidationError('This feature is disabled.')
 
-        if not api_key == str(settings.EDID_GRABBER_RELEASE_UPLOAD_API_KEY) \
-                .encode('utf-8'):
+        if not api_key == str(settings.EDID_GRABBER_RELEASE_UPLOAD_API_KEY):
             raise forms.ValidationError('API key is incorrect.')
 
         return api_key
@@ -748,6 +746,7 @@ class GrabberReleaseUploadForm(BaseForm):
 
         # TODO: Validate file content based on file name extension
 
+        release_file.open()
         self.file_data = release_file.read()
 
         return release_file
@@ -755,7 +754,7 @@ class GrabberReleaseUploadForm(BaseForm):
     def clean_platform(self):
         platform = self.cleaned_data['platform']
 
-        if platform not in self.platforms.iterkeys():
+        if platform not in self.platforms.keys():
             raise forms.ValidationError('Platform is incorrect.')
 
         platform = self.platforms[platform]

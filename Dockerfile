@@ -1,4 +1,4 @@
-FROM python:2.7-alpine
+FROM python:3.7-alpine
 
 RUN wget -O /bin/wait-for https://raw.githubusercontent.com/eficode/wait-for/master/wait-for
 RUN chmod +x /bin/wait-for

@@ -1,5 +1,6 @@
 # pylint: disable-msg=C0302
 # C0302: Too many lines in module
+
 from copy import copy
 import json
 import os
@@ -22,17 +23,18 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
-        self.edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02" \
-                           "\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78" \
-                           "\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21" \
-                           "\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01" \
-                           "\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38" \
-                           "\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E" \
-                           "\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00" \
-                           "\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54" \
-                           "\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20" \
-                           "\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A" \
-                           "\x20\x20\x20\x20\x20\x20\x01\x24"
+        self.edid_binary = \
+            b'\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02' \
+            b'\x01\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78' \
+            b'\x0A\xF0\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21' \
+            b'\x08\x00\x81\x80\x8B\xC0\x01\x01\x01\x01\x01\x01' \
+            b'\x01\x01\x01\x01\x01\x01\x02\x3A\x80\x18\x71\x38' \
+            b'\x2D\x40\x58\x2C\x45\x00\x76\xF2\x31\x00\x00\x1E' \
+            b'\x66\x21\x50\xB0\x51\x00\x1B\x30\x40\x70\x36\x00' \
+            b'\x76\xF2\x31\x00\x00\x1E\x00\x00\x00\xFC\x00\x54' \
+            b'\x4F\x53\x48\x49\x42\x41\x2D\x54\x56\x0A\x20\x20' \
+            b'\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44\x0F\x00\x0A' \
+            b'\x20\x20\x20\x20\x20\x20\x01\x24'
 
     def test_valid(self):
         edid_file = self._create_temp_file(self.edid_binary)
@@ -70,7 +72,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
 
     def test_invalid_size(self):
         # Make truncated EDID file
-        edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x24"
+        edid_binary = b'\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x24'
 
         # Save EDID to temporary file
         edid_file = self._create_temp_file(edid_binary)
@@ -89,7 +91,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
 
     def test_invalid_header(self):
         # Sabotage EDID header
-        edid_binary = self.edid_binary[:3] + '\x00\x00' + self.edid_binary[5:]
+        edid_binary = self.edid_binary[:3] + b'\x00\x00' + self.edid_binary[5:]
 
         # Save EDID to temporary file
         edid_file = self._create_temp_file(edid_binary)
@@ -108,7 +110,7 @@ class EDIDUploadTestCase(EDIDTestMixin, TestCase):
 
     def test_invalid_checksum(self):
         # Sabotage EDID checksum
-        edid_binary = self.edid_binary[:127] + '\xFF'
+        edid_binary = self.edid_binary[:127] + b'\xFF'
 
         # Save EDID to temporary file
         edid_file = self._create_temp_file(edid_binary)
@@ -305,16 +307,16 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
             Manufacturer(name_id='UNK', name='Unknown'),
         ])
 
-        edid_binary = "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01" \
-                      "\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0" \
-                      "\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21\x08\x00\x81" \
-                      "\x80\x8B\xC0\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01" \
-                      "\x01\x01\x02\x3A\x80\x18\x71\x38\x2D\x40\x58\x2C\x45" \
-                      "\x00\x76\xF2\x31\x00\x00\x1E\x66\x21\x50\xB0\x51\x00" \
-                      "\x1B\x30\x40\x70\x36\x00\x76\xF2\x31\x00\x00\x1E\x00" \
-                      "\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54" \
-                      "\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44" \
-                      "\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24"
+        edid_binary = b'\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00\x52\x62\x06\x02\x01' \
+                      b'\x01\x01\x01\xFF\x13\x01\x03\x80\x59\x32\x78\x0A\xF0' \
+                      b'\x9D\xA3\x55\x49\x9B\x26\x0F\x47\x4A\x21\x08\x00\x81' \
+                      b'\x80\x8B\xC0\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01' \
+                      b'\x01\x01\x02\x3A\x80\x18\x71\x38\x2D\x40\x58\x2C\x45' \
+                      b'\x00\x76\xF2\x31\x00\x00\x1E\x66\x21\x50\xB0\x51\x00' \
+                      b'\x1B\x30\x40\x70\x36\x00\x76\xF2\x31\x00\x00\x1E\x00' \
+                      b'\x00\x00\xFC\x00\x54\x4F\x53\x48\x49\x42\x41\x2D\x54' \
+                      b'\x56\x0A\x20\x20\x00\x00\x00\xFD\x00\x17\x3D\x0F\x44' \
+                      b'\x0F\x00\x0A\x20\x20\x20\x20\x20\x20\x01\x24'
         edid_file = self._create_temp_file(edid_binary)
 
         # Upload the file and check for redirection to EDID detail view
@@ -564,7 +566,7 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
 
 
 # Timing Tests
-class TimingTestMixin(object):
+class TimingTestMixin:
     def setUp(self):
         super(TimingTestMixin, self).setUp()
 
@@ -680,7 +682,7 @@ class DetailedTimingTestCase(TimingTestMixin, EDIDTestMixin, TestCase):
 
 
 # Timing Reorder Tests
-class TimingReorderMixin(object):
+class TimingReorderMixin:
     def setUp(self):
         super(TimingReorderMixin, self).setUp()
 
@@ -748,7 +750,7 @@ class TimingReorderMixin(object):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.content,
-            'You can not move up a timing if it is the first one.'
+            b'You can not move up a timing if it is the first one.'
         )
 
     def test_move_down_last(self):
@@ -764,7 +766,7 @@ class TimingReorderMixin(object):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.content,
-            'You can not move down a timing if it is the last one.'
+            b'You can not move down a timing if it is the last one.'
         )
 
 

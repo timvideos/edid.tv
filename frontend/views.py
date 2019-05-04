@@ -1,4 +1,3 @@
-from __future__ import print_function
 import base64
 import hashlib
 import json
@@ -404,7 +403,7 @@ class EDIDRevisionRevert(LoginRequiredMixin, StaffuserRequiredMixin,
 
 
 # Timing Mixin
-class TimingMixin(object):
+class TimingMixin:
     context_object_name = 'timing'
 
     def get_initial(self):
@@ -540,7 +539,7 @@ class DetailedTimingDelete(LoginRequiredMixin, TimingMixin, DeleteView):
 
 
 # Timing Reorder Mixin
-class TimingReorderMixin(object):
+class TimingReorderMixin:
     http_method_names = [u'get']
 
     @reversion.create_revision()
@@ -578,7 +577,7 @@ class TimingReorderMixin(object):
             reversion.add_to_revision(current_timing.EDID)
 
             return HttpResponseRedirect(self.get_success_url())
-        elif direction == 'down':
+        if direction == 'down':
             count = self.model.objects.filter(EDID_id=edid_pk).count()
 
             if identification == count:
@@ -786,7 +785,8 @@ class GrabberReleaseUpload(CsrfExemptMixin, CreateView):
     http_method_names = [u'post']
 
     def form_invalid(self, form):
-        return HttpResponse("%d\nRelease posting failed.\n%s" % (False, form),
+        return HttpResponse("{}\nRelease posting failed.\n{}"
+                            .format(False, form),
                             content_type='text/plain', status=400)
 
     def form_valid(self, form):
@@ -797,7 +797,7 @@ class GrabberReleaseUpload(CsrfExemptMixin, CreateView):
         form.instance.checksum_sha1 = hashlib.sha1(form.file_data).hexdigest()
 
         self.object = form.save()
-        return HttpResponse("%d\nRelease posted successfully." % True,
+        return HttpResponse("{}\nRelease posted successfully.".format(True),
                             content_type='text/plain')
 
 
