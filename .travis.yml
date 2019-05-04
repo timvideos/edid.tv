@@ -15,7 +15,7 @@ script:
   - pycodestyle --statistics edid_parser/
   - pycodestyle --statistics frontend/
   - shopt -s globstar && pylint --reports=n *.py edid_parser/**/*.py frontend/**/*.py
-  - coverage run --source=edid_parser edid_parser/tests.py
+  - python -m coverage run -m edid_parser.tests
   - coverage run -a --source=frontend manage.py test frontend.django_tests
   - coverage run -a --source=frontend manage.py test frontend.selenium_tests
 after_success:
