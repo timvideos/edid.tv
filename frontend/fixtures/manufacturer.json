@@ -17878,5 +17878,1789 @@
         },
         "model": "frontend.manufacturer",
         "pk": 2235
+    },
+    {
+        "fields": {
+            "name": "3NOD Digital Technology Co. Ltd.",
+            "name_id": "NOD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2236
+    },
+    {
+        "fields": {
+            "name": "Aava Mobile Oy",
+            "name_id": "AAM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2237
+    },
+    {
+        "fields": {
+            "name": "Alenco BV",
+            "name_id": "ALE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2238
+    },
+    {
+        "fields": {
+            "name": "AlgolTek, Inc.",
+            "name_id": "AGO"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2239
+    },
+    {
+        "fields": {
+            "name": "AmTRAN Technology Co., Ltd.",
+            "name_id": "AMR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2240
+    },
+    {
+        "fields": {
+            "name": "Analog Way SAS",
+            "name_id": "ANW"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2241
+    },
+    {
+        "fields": {
+            "name": "ArchiTek Corporation",
+            "name_id": "ATJ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2242
+    },
+    {
+        "fields": {
+            "name": "AREC Inc.",
+            "name_id": "ARD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2243
+    },
+    {
+        "fields": {
+            "name": "ARRIS Group, Inc.",
+            "name_id": "ARR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2244
+    },
+    {
+        "fields": {
+            "name": "Arvanics",
+            "name_id": "NPA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2245
+    },
+    {
+        "fields": {
+            "name": "Ashton Bentley Concepts",
+            "name_id": "ASH"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2246
+    },
+    {
+        "fields": {
+            "name": "Atelier Vision Corporation",
+            "name_id": "AVJ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2247
+    },
+    {
+        "fields": {
+            "name": "August Home, Inc.",
+            "name_id": "AUG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2248
+    },
+    {
+        "fields": {
+            "name": "Auvidea GmbH",
+            "name_id": "AUV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2249
+    },
+    {
+        "fields": {
+            "name": "Barco, N.V.",
+            "name_id": "BPS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2250
+    },
+    {
+        "fields": {
+            "name": "Beijing AnHeng SecoTech Information Technology Co., Ltd.",
+            "name_id": "AHS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2251
+    },
+    {
+        "fields": {
+            "name": "Beijing ANTVR Technology Co., Ltd.",
+            "name_id": "ANV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2252
+    },
+    {
+        "fields": {
+            "name": "Biamp Systems Corporation",
+            "name_id": "BIA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2253
+    },
+    {
+        "fields": {
+            "name": "Broadata Communications Inc.",
+            "name_id": "BCI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2254
+    },
+    {
+        "fields": {
+            "name": "Canonical Ltd.",
+            "name_id": "UBU"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2255
+    },
+    {
+        "fields": {
+            "name": "Ceton Corporation",
+            "name_id": "TOM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2256
+    },
+    {
+        "fields": {
+            "name": "China Hualu Group Co., Ltd.",
+            "name_id": "HLG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2257
+    },
+    {
+        "fields": {
+            "name": "Chromatec Video Products Ltd",
+            "name_id": "CVP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2258
+    },
+    {
+        "fields": {
+            "name": "Cloudium Systems Ltd.",
+            "name_id": "CSL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2259
+    },
+    {
+        "fields": {
+            "name": "Compound Photonics",
+            "name_id": "CPP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2260
+    },
+    {
+        "fields": {
+            "name": "Contemporary Research Corp.",
+            "name_id": "CRH"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2261
+    },
+    {
+        "fields": {
+            "name": "Control4 Corporation",
+            "name_id": "CTR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2262
+    },
+    {
+        "fields": {
+            "name": "CRALTECH ELECTRONICA, S.L.",
+            "name_id": "CRA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2263
+    },
+    {
+        "fields": {
+            "name": "Curtiss-Wright Controls, Inc.",
+            "name_id": "CWC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2264
+    },
+    {
+        "fields": {
+            "name": "Data Modul AG",
+            "name_id": "DMO"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2265
+    },
+    {
+        "fields": {
+            "name": "Delphi Automotive LLP",
+            "name_id": "DPH"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2266
+    },
+    {
+        "fields": {
+            "name": "Dension Audio Systems",
+            "name_id": "DHD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2267
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - AUO",
+            "name_id": "AUO"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2268
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - LPL",
+            "name_id": "LPL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2269
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - PHI",
+            "name_id": "PHI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2270
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - PTW",
+            "name_id": "PTW"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2271
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - PVC",
+            "name_id": "PVC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2272
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - RTK",
+            "name_id": "RTK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2273
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - SEG",
+            "name_id": "SEG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2274
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - TNJ",
+            "name_id": "TNJ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2275
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - UND",
+            "name_id": "UND"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2276
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - UNE",
+            "name_id": "UNE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2277
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - UNF",
+            "name_id": "UNF"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2278
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - WAN",
+            "name_id": "WAN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2279
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - XER",
+            "name_id": "XER"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2280
+    },
+    {
+        "fields": {
+            "name": "DO NOT USE - XOC",
+            "name_id": "XOC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2281
+    },
+    {
+        "fields": {
+            "name": "Dongguan Alllike Electronics Co., Ltd.",
+            "name_id": "AIK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2282
+    },
+    {
+        "fields": {
+            "name": "EBS Euchner Büro- und Schulsysteme GmbH",
+            "name_id": "EBS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2283
+    },
+    {
+        "fields": {
+            "name": "ELAN MICROELECTRONICS CORPORATION",
+            "name_id": "TSH"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2284
+    },
+    {
+        "fields": {
+            "name": "ELTEC Elektronik AG",
+            "name_id": "EAG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2285
+    },
+    {
+        "fields": {
+            "name": "Embrionix Design Inc.",
+            "name_id": "EMD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2286
+    },
+    {
+        "fields": {
+            "name": "Eon Instrumentation, Inc.",
+            "name_id": "EON"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2287
+    },
+    {
+        "fields": {
+            "name": "Esterline Belgium BVBA",
+            "name_id": "ESB"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2288
+    },
+    {
+        "fields": {
+            "name": "eyefactive Gmbh",
+            "name_id": "EYF"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2289
+    },
+    {
+        "fields": {
+            "name": "Fantalooks Co., Ltd.",
+            "name_id": "FAN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2290
+    },
+    {
+        "fields": {
+            "name": "Fingerprint Cards AB",
+            "name_id": "FPC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2291
+    },
+    {
+        "fields": {
+            "name": "FocalTech Systems Co., Ltd.",
+            "name_id": "FTS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2292
+    },
+    {
+        "fields": {
+            "name": "Fokus Technologies GmbH",
+            "name_id": "FOK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2293
+    },
+    {
+        "fields": {
+            "name": "Forth Dimension Displays Ltd",
+            "name_id": "FDD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2294
+    },
+    {
+        "fields": {
+            "name": "Future Designs, Inc.",
+            "name_id": "FDI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2295
+    },
+    {
+        "fields": {
+            "name": "Gateworks Corporation",
+            "name_id": "GWK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2296
+    },
+    {
+        "fields": {
+            "name": "GOEPEL electronic GmbH",
+            "name_id": "GOE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2297
+    },
+    {
+        "fields": {
+            "name": "GoPro, Inc.",
+            "name_id": "GPR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2298
+    },
+    {
+        "fields": {
+            "name": "Grandstream Networks, Inc.",
+            "name_id": "GSN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2299
+    },
+    {
+        "fields": {
+            "name": "Harman International Industries, Inc",
+            "name_id": "HII"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2300
+    },
+    {
+        "fields": {
+            "name": "Hope Industrial Systems, Inc.",
+            "name_id": "HIS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2301
+    },
+    {
+        "fields": {
+            "name": "Horsent Technology Co., Ltd.",
+            "name_id": "HST"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2302
+    },
+    {
+        "fields": {
+            "name": "HTBLuVA Mödling",
+            "name_id": "HTL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2303
+    },
+    {
+        "fields": {
+            "name": "Ikegami Tsushinki Co. Ltd.",
+            "name_id": "IKE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2304
+    },
+    {
+        "fields": {
+            "name": "Informatik Information Technologies",
+            "name_id": "IIT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2305
+    },
+    {
+        "fields": {
+            "name": "Inventec Corporation",
+            "name_id": "INA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2306
+    },
+    {
+        "fields": {
+            "name": "IP3 Technology Ltd.",
+            "name_id": "IPQ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2307
+    },
+    {
+        "fields": {
+            "name": "Japan Display Inc.",
+            "name_id": "JDI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2308
+    },
+    {
+        "fields": {
+            "name": "Kionix, Inc.",
+            "name_id": "KIO"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2309
+    },
+    {
+        "fields": {
+            "name": "Kontron Europe GmbH",
+            "name_id": "KEU"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2310
+    },
+    {
+        "fields": {
+            "name": "Kramer Electronics Ltd. International",
+            "name_id": "KMR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2311
+    },
+    {
+        "fields": {
+            "name": "KUPA China Shenzhen Micro Technology Co., Ltd. Gold Institute",
+            "name_id": "KSG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2312
+    },
+    {
+        "fields": {
+            "name": "Laserdyne Technologies",
+            "name_id": "LDN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2313
+    },
+    {
+        "fields": {
+            "name": "Magic Leap",
+            "name_id": "MLP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2314
+    },
+    {
+        "fields": {
+            "name": "Marseille, Inc.",
+            "name_id": "MNI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2315
+    },
+    {
+        "fields": {
+            "name": "Mediaedge Corporation",
+            "name_id": "MEK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2316
+    },
+    {
+        "fields": {
+            "name": "Meta Watch Ltd",
+            "name_id": "MTA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2317
+    },
+    {
+        "fields": {
+            "name": "Millogic Ltd.",
+            "name_id": "MLL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2318
+    },
+    {
+        "fields": {
+            "name": "Millson Custom Solutions Inc.",
+            "name_id": "MCX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2319
+    },
+    {
+        "fields": {
+            "name": "MK Seiko Co., Ltd.",
+            "name_id": "MKS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2320
+    },
+    {
+        "fields": {
+            "name": "M-Labs Limited",
+            "name_id": "OHW"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2321
+    },
+    {
+        "fields": {
+            "name": "Najing CEC Panda FPD Technology CO. ltd",
+            "name_id": "NCP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2322
+    },
+    {
+        "fields": {
+            "name": "NDF Special Light Products B.V.",
+            "name_id": "NDF"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2323
+    },
+    {
+        "fields": {
+            "name": "NeuroSky, Inc.",
+            "name_id": "NSA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2324
+    },
+    {
+        "fields": {
+            "name": "OmniTek",
+            "name_id": "OTK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2325
+    },
+    {
+        "fields": {
+            "name": "Open Stack, Inc.",
+            "name_id": "OSI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2326
+    },
+    {
+        "fields": {
+            "name": "Optical Systems Design Pty Ltd",
+            "name_id": "OSD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2327
+    },
+    {
+        "fields": {
+            "name": "Parrot",
+            "name_id": "POT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2328
+    },
+    {
+        "fields": {
+            "name": "Pegatron Corporation",
+            "name_id": "PEG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2329
+    },
+    {
+        "fields": {
+            "name": "RAFI GmbH & Co. KG",
+            "name_id": "RFI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2330
+    },
+    {
+        "fields": {
+            "name": "Redfox Technologies Inc.",
+            "name_id": "RFX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2331
+    },
+    {
+        "fields": {
+            "name": "Revolution Display, Inc.",
+            "name_id": "REV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2332
+    },
+    {
+        "fields": {
+            "name": "Robert Bosch GmbH",
+            "name_id": "BSG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2333
+    },
+    {
+        "fields": {
+            "name": "Rozsnyó, s.r.o.",
+            "name_id": "RZS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2334
+    },
+    {
+        "fields": {
+            "name": "Santec Corporation",
+            "name_id": "SOC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2335
+    },
+    {
+        "fields": {
+            "name": "Shenzhen ChuangZhiCheng Technology Co., Ltd.",
+            "name_id": "CZC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2336
+    },
+    {
+        "fields": {
+            "name": "Shenzhen Inet Mobile Internet Technology Co., LTD",
+            "name_id": "IXN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2337
+    },
+    {
+        "fields": {
+            "name": "Shenzhen MTC Co., Ltd",
+            "name_id": "SZM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2338
+    },
+    {
+        "fields": {
+            "name": "Shenzhen Ramos Digital Technology Co., Ltd",
+            "name_id": "RMS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2339
+    },
+    {
+        "fields": {
+            "name": "Shenzhen South-Top Computer Co., Ltd.",
+            "name_id": "SSL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2340
+    },
+    {
+        "fields": {
+            "name": "Shenzhen three Connaught Information Technology Co., Ltd. (3nod Group)",
+            "name_id": "AZH"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2341
+    },
+    {
+        "fields": {
+            "name": "Shenzhen Zhuona Technology Co., Ltd.",
+            "name_id": "XYE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2342
+    },
+    {
+        "fields": {
+            "name": "Shenzhen ZhuoYi HengTong Computer Technology Limited",
+            "name_id": "HTR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2343
+    },
+    {
+        "fields": {
+            "name": "Shenzhen Zowee Technology Co., LTD",
+            "name_id": "ZWE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2344
+    },
+    {
+        "fields": {
+            "name": "Socionext Inc.",
+            "name_id": "SCX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2345
+    },
+    {
+        "fields": {
+            "name": "SUNNY ELEKTRONIK",
+            "name_id": "SNN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2346
+    },
+    {
+        "fields": {
+            "name": "Tech Source Inc.",
+            "name_id": "TEZ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2347
+    },
+    {
+        "fields": {
+            "name": "Technical Illusions Inc.",
+            "name_id": "TIL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2348
+    },
+    {
+        "fields": {
+            "name": "The Linux Foundation",
+            "name_id": "LNX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2349
+    },
+    {
+        "fields": {
+            "name": "Thinklogical",
+            "name_id": "TLL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2350
+    },
+    {
+        "fields": {
+            "name": "Times (Shanghai) Computer Co., Ltd.",
+            "name_id": "TPD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2351
+    },
+    {
+        "fields": {
+            "name": "Toshiba Corporation",
+            "name_id": "TTP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2352
+    },
+    {
+        "fields": {
+            "name": "Triumph Board a.s.",
+            "name_id": "TRB"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2353
+    },
+    {
+        "fields": {
+            "name": "U. S. Electronics Inc.",
+            "name_id": "USE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2354
+    },
+    {
+        "fields": {
+            "name": "VAIO Corporation",
+            "name_id": "VAI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2355
+    },
+    {
+        "fields": {
+            "name": "Valve Corporation",
+            "name_id": "VLV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2356
+    },
+    {
+        "fields": {
+            "name": "VanErum Group",
+            "name_id": "ITI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2357
+    },
+    {
+        "fields": {
+            "name": "Videotechnik Breithaupt",
+            "name_id": "VTB"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2358
+    },
+    {
+        "fields": {
+            "name": "VPixx Technologies Inc.",
+            "name_id": "VPX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2359
+    },
+    {
+        "fields": {
+            "name": "VRmagic Holding AG",
+            "name_id": "VRM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2360
+    },
+    {
+        "fields": {
+            "name": "Wanlida Group Co., Ltd.",
+            "name_id": "MLT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2361
+    },
+    {
+        "fields": {
+            "name": "Wipotec Wiege- und Positioniersysteme GmbH",
+            "name_id": "WWP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2362
+    },
+    {
+        "fields": {
+            "name": "ZENIC Inc.",
+            "name_id": "ZEN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2363
+    },
+    {
+        "fields": {
+            "name": "Zhejiang Tianle Digital Electric Co., Ltd.",
+            "name_id": "TLE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2364
+    },
+    {
+        "fields": {
+            "name": "Zhong Shan City Richsound Electronic Industrial Ltd.",
+            "name_id": "RSR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2365
+    },
+    {
+        "fields": {
+            "name": "Sensics, Inc.",
+            "name_id": "SVR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2366
+    },
+    {
+        "fields": {
+            "name": "IAdea Corporation",
+            "name_id": "IAD"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2367
+    },
+    {
+        "fields": {
+            "name": "Express Industrial, Ltd.",
+            "name_id": "ELU"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2368
+    },
+    {
+        "fields": {
+            "name": "Hewlett Packard Enterprise",
+            "name_id": "HPE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2369
+    },
+    {
+        "fields": {
+            "name": "Klipsch Group, Inc",
+            "name_id": "KGI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2370
+    },
+    {
+        "fields": {
+            "name": "Tek Gear",
+            "name_id": "TKG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2371
+    },
+    {
+        "fields": {
+            "name": "HangZhou ZMCHIVIN",
+            "name_id": "ZMC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2372
+    },
+    {
+        "fields": {
+            "name": "HTC Corportation",
+            "name_id": "HVR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2373
+    },
+    {
+        "fields": {
+            "name": "Zebax Technologies",
+            "name_id": "ZBX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2374
+    },
+    {
+        "fields": {
+            "name": "Guangzhou Shirui Electronics Co., Ltd.",
+            "name_id": "SWO"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2375
+    },
+    {
+        "fields": {
+            "name": "Picturall Ltd.",
+            "name_id": "PIC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2376
+    },
+    {
+        "fields": {
+            "name": "Guangzhou Teclast Information Technology Limited",
+            "name_id": "SKM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2377
+    },
+    {
+        "fields": {
+            "name": "GreenArrays, Inc.",
+            "name_id": "GAC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2378
+    },
+    {
+        "fields": {
+            "name": "Thales Avionics",
+            "name_id": "TAV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2379
+    },
+    {
+        "fields": {
+            "name": "Explorer Inc.",
+            "name_id": "EXR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2380
+    },
+    {
+        "fields": {
+            "name": "Avegant Corporation",
+            "name_id": "AVG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2381
+    },
+    {
+        "fields": {
+            "name": "MicroImage Video Systems",
+            "name_id": "MIV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2382
+    },
+    {
+        "fields": {
+            "name": "ASUSTek COMPUTER INC",
+            "name_id": "AUS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2383
+    },
+    {
+        "fields": {
+            "name": "Synthetel Corporation",
+            "name_id": "STQ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2384
+    },
+    {
+        "fields": {
+            "name": "HP Inc.",
+            "name_id": "HPN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2385
+    },
+    {
+        "fields": {
+            "name": "MicroTechnica Co.,Ltd.",
+            "name_id": "MTJ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2386
+    },
+    {
+        "fields": {
+            "name": "Gechic Corporation",
+            "name_id": "GEC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2387
+    },
+    {
+        "fields": {
+            "name": "MPL AG, Elektronik-Unternehmen",
+            "name_id": "MEU"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2388
+    },
+    {
+        "fields": {
+            "name": "Display Solution AG",
+            "name_id": "DSA"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2389
+    },
+    {
+        "fields": {
+            "name": "UEFI Forum",
+            "name_id": "PRP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2390
+    },
+    {
+        "fields": {
+            "name": "Taitex Corporation",
+            "name_id": "TTX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2391
+    },
+    {
+        "fields": {
+            "name": "EchoStar Corporation",
+            "name_id": "ECH"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2392
+    },
+    {
+        "fields": {
+            "name": "TCL Corporation",
+            "name_id": "TOL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2393
+    },
+    {
+        "fields": {
+            "name": "ADDER TECHNOLOGY LTD",
+            "name_id": "ADZ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2394
+    },
+    {
+        "fields": {
+            "name": "HKC OVERSEAS LIMITED",
+            "name_id": "HKC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2395
+    },
+    {
+        "fields": {
+            "name": "KEYENCE CORPORATION",
+            "name_id": "KYN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2396
+    },
+    {
+        "fields": {
+            "name": "TETRADYNE CO., LTD.",
+            "name_id": "TET"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2397
+    },
+    {
+        "fields": {
+            "name": "Abaco Systems, Inc.",
+            "name_id": "ABS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2398
+    },
+    {
+        "fields": {
+            "name": "Meta Company",
+            "name_id": "MVN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2399
+    },
+    {
+        "fields": {
+            "name": "Eizo Rugged Solutions",
+            "name_id": "ERS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2400
+    },
+    {
+        "fields": {
+            "name": "VersaLogic Corporation",
+            "name_id": "VLC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2401
+    },
+    {
+        "fields": {
+            "name": "CYPRESS SEMICONDUCTOR CORPORATION",
+            "name_id": "CYP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2402
+    },
+    {
+        "fields": {
+            "name": "MILDEF AB",
+            "name_id": "MDF"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2403
+    },
+    {
+        "fields": {
+            "name": "FOVE INC",
+            "name_id": "FOV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2404
+    },
+    {
+        "fields": {
+            "name": "INNES",
+            "name_id": "NES"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2405
+    },
+    {
+        "fields": {
+            "name": "Hoffmann + Krippner GmbH",
+            "name_id": "HUK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2406
+    },
+    {
+        "fields": {
+            "name": "UltiMachine",
+            "name_id": "UMT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2407
+    },
+    {
+        "fields": {
+            "name": "TPK Holding Co., Ltd",
+            "name_id": "KPT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2408
+    },
+    {
+        "fields": {
+            "name": "AAEON Technology Inc.",
+            "name_id": "AAN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2409
+    },
+    {
+        "fields": {
+            "name": "Six15 Technologies",
+            "name_id": "TDG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2410
+    },
+    {
+        "fields": {
+            "name": "Inlife-Handnet Co., Ltd.",
+            "name_id": "IVR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2411
+    },
+    {
+        "fields": {
+            "name": "VR Technology Holdings Limited",
+            "name_id": "DSJ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2412
+    },
+    {
+        "fields": {
+            "name": "Pimax Tech. CO., LTD",
+            "name_id": "PVR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2413
+    },
+    {
+        "fields": {
+            "name": "Total Vision LTD",
+            "name_id": "TVL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2414
+    },
+    {
+        "fields": {
+            "name": "Shanghai Lexiang Technology Limited",
+            "name_id": "DPN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2415
+    },
+    {
+        "fields": {
+            "name": "Black Box Corporation",
+            "name_id": "BBX"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2416
+    },
+    {
+        "fields": {
+            "name": "TRAPEZE GROUP",
+            "name_id": "TRP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2417
+    },
+    {
+        "fields": {
+            "name": "Pabian Embedded Systems",
+            "name_id": "PMS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2418
+    },
+    {
+        "fields": {
+            "name": "Televic Conference",
+            "name_id": "TCF"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2419
+    },
+    {
+        "fields": {
+            "name": "Shanghai Chai Ming Huang Info&Tech Co, Ltd",
+            "name_id": "HYL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2420
+    },
+    {
+        "fields": {
+            "name": "Techlogix Networx",
+            "name_id": "TLN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2421
+    },
+    {
+        "fields": {
+            "name": "G2TOUCH KOREA",
+            "name_id": "GGT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2422
+    },
+    {
+        "fields": {
+            "name": "MediCapture, Inc.",
+            "name_id": "MVR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2423
+    },
+    {
+        "fields": {
+            "name": "HOYA Corporation PENTAX Lifecare Division",
+            "name_id": "PNT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2424
+    },
+    {
+        "fields": {
+            "name": "christmann informationstechnik + medien GmbH & Co. KG",
+            "name_id": "CHR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2425
+    },
+    {
+        "fields": {
+            "name": "Tencent",
+            "name_id": "TEN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2426
+    },
+    {
+        "fields": {
+            "name": "VRstudios, Inc.",
+            "name_id": "VRS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2427
+    },
+    {
+        "fields": {
+            "name": "Extreme Engineering Solutions, Inc.",
+            "name_id": "XES"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2428
+    },
+    {
+        "fields": {
+            "name": "NewTek",
+            "name_id": "NTK"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2429
+    },
+    {
+        "fields": {
+            "name": "BlueBox Video Limited",
+            "name_id": "BBV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2430
+    },
+    {
+        "fields": {
+            "name": "Televés, S.A.",
+            "name_id": "TEV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2431
+    },
+    {
+        "fields": {
+            "name": "Avatron Software Inc.",
+            "name_id": "AVS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2432
+    },
+    {
+        "fields": {
+            "name": "Positivo Tecnologia S.A.",
+            "name_id": "POS"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2433
+    },
+    {
+        "fields": {
+            "name": "VRgineers, Inc.",
+            "name_id": "VRG"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2434
+    },
+    {
+        "fields": {
+            "name": "Noritake Itron Corporation",
+            "name_id": "NRI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2435
+    },
+    {
+        "fields": {
+            "name": "Matrix Orbital Corporation",
+            "name_id": "MOC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2436
+    },
+    {
+        "fields": {
+            "name": "Elegant Invention",
+            "name_id": "EIN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2437
+    },
+    {
+        "fields": {
+            "name": "Immersive Audio Technologies France",
+            "name_id": "IMF"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2438
+    },
+    {
+        "fields": {
+            "name": "Lightspace Technologies",
+            "name_id": "LSP"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2439
+    },
+    {
+        "fields": {
+            "name": "PixelNext Inc",
+            "name_id": "PXN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2440
+    },
+    {
+        "fields": {
+            "name": "VRSHOW Technology Limited",
+            "name_id": "TSW"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2441
+    },
+    {
+        "fields": {
+            "name": "SONOVE GmbH",
+            "name_id": "SNV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2442
+    },
+    {
+        "fields": {
+            "name": "Silex Inside",
+            "name_id": "SXI"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2443
+    },
+    {
+        "fields": {
+            "name": "Huawei Technologies Co., Inc.",
+            "name_id": "HWV"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2444
+    },
+    {
+        "fields": {
+            "name": "Varjo Technologies",
+            "name_id": "VRT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2445
+    },
+    {
+        "fields": {
+            "name": "Japan E.M.Solutions Co., Ltd.",
+            "name_id": "JEM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2446
+    },
+    {
+        "fields": {
+            "name": "QD Laser, Inc.",
+            "name_id": "QDL"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2447
+    },
+    {
+        "fields": {
+            "name": "VADATECH INC",
+            "name_id": "VAT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2448
+    },
+    {
+        "fields": {
+            "name": "Medicaroid Corporation",
+            "name_id": "MCJ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2449
+    },
+    {
+        "fields": {
+            "name": "Razer Taiwan Co. Ltd.",
+            "name_id": "RZR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2450
+    },
+    {
+        "fields": {
+            "name": "GIGA-BYTE TECHNOLOGY CO., LTD.",
+            "name_id": "GBT"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2451
+    },
+    {
+        "fields": {
+            "name": "Kontron GmbH",
+            "name_id": "KOM"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2452
+    },
+    {
+        "fields": {
+            "name": "Convergent Engineering, Inc.",
+            "name_id": "CIE"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2453
+    },
+    {
+        "fields": {
+            "name": "WyreStorm Technologies LLC",
+            "name_id": "WYR"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2454
+    },
+    {
+        "fields": {
+            "name": "Astro HQ LLC",
+            "name_id": "AHQ"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2455
+    },
+    {
+        "fields": {
+            "name": "QSC, LLC",
+            "name_id": "QSC"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2456
+    },
+    {
+        "fields": {
+            "name": "Dimension Engineering LLC",
+            "name_id": "DMN"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2457
+    },
+    {
+        "fields": {
+            "name": "Shenzhen Dlodlo Technologies Co., Ltd.",
+            "name_id": "DLO"
+        },
+        "model": "frontend.manufacturer",
+        "pk": 2458
     }
 ]
