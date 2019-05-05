@@ -195,7 +195,7 @@ AUTHENTICATION_BACKENDS = (
 # Import private settings (if any) to override above settings
 EXTEND_APPS = None
 try:
-    from .private.settings import *
+    from private.settings import *
     if EXTEND_APPS:
         INSTALLED_APPS += EXTEND_APPS
 except ImportError:
