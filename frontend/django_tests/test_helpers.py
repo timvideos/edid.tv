@@ -10,6 +10,21 @@ class EDIDUploadFormCleanerTest(unittest.TestCase):
         with open(os.path.join(data_dir, filename), 'r') as text_file:
             return text_file.read()
 
+    def test_hex(self):
+        for file in ['hex.log', 'hex2.log', 'hex3.log', 'hex4.log',
+                     'hex5.log']:
+            hex_text = self._read_from_file(file)
+            edid = EDIDUploadFormCleaner.clean_hex(hex_text).lower()
+            expected_edid = '00ffffffffffff004ca3415400000000' + \
+                            '00130103902213780ac8959e57549226' + \
+                            '0f505400000001010101010101010101' + \
+                            '0101010101017d1e5618510016303020' + \
+                            '250058c21000001a7d1e561651001630' + \
+                            '3020250058c21000001a000000fe0053' + \
+                            '414d53554e470a2020202020000000fe' + \
+                            '004c544e313536415430325030390055'
+            self.assertEqual(edid, expected_edid)
+
     def test_xrandr(self):
         xrandr_text = self._read_from_file('xrandr.log')
         edid_list = list(EDIDUploadFormCleaner.clean_xrandr(xrandr_text))
