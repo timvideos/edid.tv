@@ -72,7 +72,7 @@ class EDID(models.Model):
                              on_delete=models.SET_NULL)
 
     # Binary file encoded in base64
-    file_base64 = models.TextField(editable=False)
+    file_base64 = models.BinaryField(editable=False)
 
     # Header
     # ID Product Code
@@ -352,6 +352,9 @@ class EDID(models.Model):
 
     @classmethod
     def create(cls, file_base64, edid_data):
+        if isinstance(file_base64, str):
+            file_base64 = bytearray(file_base64, encoding='ascii')
+
         edid = cls(file_base64=file_base64)
 
         # Add basic data

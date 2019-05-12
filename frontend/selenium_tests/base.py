@@ -1,6 +1,6 @@
 import base64
 
-from django.test import LiveServerTestCase, TestCase
+from django.test import LiveServerTestCase
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
@@ -27,7 +27,7 @@ class BrowserQuitter:
             pass
 
 
-class SeleniumTestCase(TestCase, LiveServerTestCase):
+class SeleniumTestCase(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super(SeleniumTestCase, cls).setUpClass()

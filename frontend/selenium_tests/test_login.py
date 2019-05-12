@@ -4,10 +4,10 @@ from selenium.webdriver.support.expected_conditions import \
     text_to_be_present_in_element, url_to_be
 from selenium.webdriver.support.wait import WebDriverWait
 
-from .base import EDIDReadySeleniumTestCase
+from .base import SeleniumTestCase
 
 
-class LoginSeleniumTestCase(EDIDReadySeleniumTestCase):
+class LoginSeleniumTestCase(SeleniumTestCase):
     def test_invalid_login(self):
         """Test client-side actions on login/logout."""
 

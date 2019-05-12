@@ -276,6 +276,8 @@ class EDIDTestCase(EDIDTestMixin, TestCase):
         data['mrl_secondary_gtf_k'] = 0
         data['mrl_secondary_gtf_j'] = 0
 
+        data = {k: v for k, v in data.items() if v is not None}
+
         # Update while not logged in, get redirected to login page
         response = self.client.post(reverse('edid-update', kwargs={'pk': 1}),
                                     data)
@@ -355,6 +357,8 @@ class RevisionsTestCase(EDIDTestMixin, TestCase):
         data['mrl_secondary_gtf_m'] = 0
         data['mrl_secondary_gtf_k'] = 0
         data['mrl_secondary_gtf_j'] = 0
+
+        data = {k: v for k, v in data.items() if v is not None}
 
         response = self.client.post(reverse('edid-update', kwargs={'pk': 1}),
                                     data)
@@ -576,6 +580,8 @@ class TimingTestMixin:
         data = self.timings_set.filter(identification=1) \
                                .values(*self.form._meta.fields)[0]
 
+        data = {k: v for k, v in data.items() if v is not None}
+
         # Create while not logged in, get redirected to login page
         response = self.client.post(
             reverse('%s-create' % self.urlconf_prefix,
@@ -603,6 +609,8 @@ class TimingTestMixin:
         data = self.timings_set.filter(identification=1) \
                                .values(*self.form._meta.fields)[0]
         data['horizontal_active'] = 1400
+
+        data = {k: v for k, v in data.items() if v is not None}
 
         # Update while not logged in, get redirected to login page
         response = self.client.post(

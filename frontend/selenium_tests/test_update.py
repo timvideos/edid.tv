@@ -18,11 +18,16 @@ class UpdateSeleniumTestCase(EDIDReadySeleniumTestCase):
             'Should redirect to profile page'
         )
 
-        edid_detail_url = "%s/edid/1/" % self.live_server_url
-        edid_update_url = "%s/edid/1/update/" % self.live_server_url
-        edid_revision_url = "%s/edid/1/revision/" % self.live_server_url
-        timing_1_update_url = "%s/edid/1/standard_timing/1/update/" % (
-            self.live_server_url
+        edid_detail_url = \
+            "%s/edid/%i/" % (self.live_server_url, self.edid.id)
+        edid_update_url = \
+            "%s/edid/%i/update/" % (self.live_server_url, self.edid.id)
+        edid_revision_url = \
+            "%s/edid/%i/revision/" % (self.live_server_url, self.edid.id)
+        timing_1_update_url = "%s/edid/%i/standard_timing/%i/update/" % (
+            self.live_server_url,
+            self.edid.id,
+            self.edid.standardtiming_set.all()[0].id
         )
 
         # Go to timing update page
