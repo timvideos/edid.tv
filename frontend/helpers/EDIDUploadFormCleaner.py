@@ -7,14 +7,24 @@ class EDIDUploadFormCleanerException(Exception):
 
 class EDIDUploadFormCleaner:
 
-    _hex_addresses = re.compile(r'0x[0-9A-Fa-f]+')
+    _hex_addresses = re.compile(
+        r'^\s*(?:0x)?(?:[0-9A-Fa-f]+:|[0-9A-Fa-f]{3,})', re.MULTILINE)
+    _hex_addresses2 = re.compile(
+        r'^\s*0x[0-9A-Fa-f]+\s+(?!0x)([0-9A-Fa-f])', re.MULTILINE)
+    _prefixes = re.compile(r'0x')
     _whitespaces = re.compile(r'\s')
     _non_hex = re.compile(r'[^0-9A-Fa-f]')
 
     @staticmethod
     def clean_hex(text):
-        # Remove hex addresses, like 0x40
+        # (Try to) remove addresses (e.g., 0xabc:)
         text = EDIDUploadFormCleaner._hex_addresses.sub('', text)
+
+        # Remove lines with addresses formed like "0x00 AB CD EF"
+        text = EDIDUploadFormCleaner._hex_addresses2.sub(r'\1', text)
+
+        # Remove hex prefixes
+        text = EDIDUploadFormCleaner._prefixes.sub('', text)
 
         # Remove spaces, tabs and newlines
         text = EDIDUploadFormCleaner._whitespaces.sub('', text)
