@@ -1,7 +1,7 @@
-Django~=1.11.0
-coverage==3.6
+Django~=2.2.0
+coverage~=4.5
 setuptools~=41.0.0
-django-allauth~=0.34.0
+django-allauth~=0.39.0
 django-braces~=1.13.0
 django-crispy-forms~=1.7.0
 django-reversion~=3.0.0
@@ -9,7 +9,7 @@ ez-setup==0.9
 pycodestyle~=2.5.0
 pylint~=2.3.0
 selenium~=3.141.0
-sqlparse~=0.2.0
-webdrivermanager~=0.5.0
+sqlparse~=0.3.0
+webdrivermanager~=0.7.0
 uwsgi~=2.0.0
 mysqlclient~=1.4.0

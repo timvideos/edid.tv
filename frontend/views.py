@@ -42,6 +42,9 @@ class ManufacturerList(ListView):
         # Filter items with EDID count > 0 only
         queryset = queryset.filter(edid__count__gt=0)
 
+        # Sort by PNP ID
+        queryset = queryset.order_by('name_id')
+
         return queryset
 
 
@@ -72,14 +75,15 @@ class ManufacturerDetail(DetailView):
 class EDIDList(ListView):
     model = EDID
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
         """
         Retrieves list of EDIDs and annotates their timings count.
 
         Adds `edid_list` to template context.
         """
 
-        context = super(EDIDList, self).get_context_data(**kwargs)
+        context = super(EDIDList, self)\
+            .get_context_data(object_list=object_list, **kwargs)
 
         queryset = self.get_queryset()
 
@@ -276,12 +280,13 @@ class EDIDRevisionList(ListView):
 
         return versions_list
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
         """
         Injects edid_pk into template context.
         """
 
-        context = super(EDIDRevisionList, self).get_context_data(**kwargs)
+        context = super(EDIDRevisionList, self)\
+            .get_context_data(object_list=object_list, **kwargs)
         context['edid_pk'] = self.kwargs['edid_pk']
 
         return context
@@ -715,7 +720,7 @@ class APIUpload(CsrfExemptMixin, JSONResponseMixin, View):
             )
 
         for edid_base64 in content['edid_list']:
-            self._process_edid(edid_base64)
+            self._process_edid(bytearray(edid_base64, encoding='ascii'))
 
         return self.render_json_response({'succeeded': self.succeeded,
                                           'failed': self.failed})

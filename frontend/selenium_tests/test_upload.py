@@ -1,6 +1,6 @@
 from tempfile import NamedTemporaryFile
 
-from selenium.webdriver.support.expected_conditions import url_to_be
+from selenium.webdriver.support.expected_conditions import url_matches
 from selenium.webdriver.support.wait import WebDriverWait
 
 from frontend.models import Manufacturer
@@ -49,6 +49,6 @@ class UploadSeleniumTestCase(SeleniumTestCase):
         self.browser.find_element_by_id('upload-id-upload').submit()
 
         WebDriverWait(self.browser, 30).until(
-            url_to_be("%s/edid/1/" % self.live_server_url),
+            url_matches("%s/edid/[0-9]+/" % self.live_server_url),
             'Should redirect to EDID detail page'
         )
