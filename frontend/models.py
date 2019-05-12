@@ -30,7 +30,7 @@ class Manufacturer(models.Model):
     class Meta:
         ordering = ['name_id']
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s" % (self.name_id, self.name)
 
 
@@ -808,7 +808,7 @@ class EDID(models.Model):
         return self.monitor_serial_number if self.monitor_serial_number else \
             self.manufacturer_serial_number
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s" % (self.manufacturer.name, self.monitor_name)
 
 
@@ -865,7 +865,7 @@ class StandardTiming(Timing):
     )
     aspect_ratio = models.SmallIntegerField(choices=ASPECT_RATIO_CHOICES)
 
-    def __unicode__(self):
+    def __str__(self):
         return "{:x}{:n}@{:n}Hz".format(self.horizontal_active,
                                         self.vertical_active,
                                         self.refresh_rate)
@@ -942,7 +942,7 @@ class DetailedTiming(Timing):
                      ((self.horizontal_active + self.horizontal_blanking)
                       * (self.vertical_active + self.vertical_blanking)), 2)
 
-    def __unicode__(self):
+    def __str__(self):
         return "{:x}{:n}@{:f}Hz".format(self.horizontal_active,
                                         self.vertical_active,
                                         self.get_refresh_rate())
@@ -1007,5 +1007,5 @@ class GrabberRelease(models.Model):
     # Non-sticky releases will be listed in archive only
     sticky = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % (self.commit)
