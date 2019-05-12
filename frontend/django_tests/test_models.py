@@ -513,9 +513,9 @@ class CommentTestCase(EDIDTestMixin, TestCase):
         with self.settings(EDID_COMMENT_MAX_THREAD_LEVEL=5):
             self.assertEqual(comment.get_max_thread_level(), 5)
 
-    def test_unicode(self):
+    def test_str(self):
         """
-        Test Comment.__unicode__() method.
+        Test Comment.__str__() method.
         """
 
         # Create Comment instance
